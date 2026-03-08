@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Sandeep Kumar — AI PM Portfolio</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500&family=Nunito:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --bg:#0d1117; --bg2:#161b22; --bg3:#1c2333;
+  --border:rgba(255,255,255,0.08);
+  --text:#e6edf3; --text2:#8b949e; --text3:#484f58;
+  --gold:#e8960f; --gold2:rgba(232,150,15,0.12);
+  --green:#3fb950; --green2:rgba(63,185,80,0.1);
+  --blue:#58a6ff; --blue2:rgba(88,166,255,0.1);
+  --purple:#bc8cff; --purple2:rgba(188,140,255,0.1);
+  --red:#f85149; --red2:rgba(248,81,73,0.1);
+  --serif:'DM Serif Display',serif;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'Nunito',sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--text3);border-radius:3px;}
+
+/* subtle star field */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,.1) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 70%, rgba(255,255,255,.08) 0%, transparent 100%),
+    radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,.1) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,.12) 0%, transparent 100%);
+}
+
+/* ── HERO ── */
+.hero{
+  text-align:center;padding:72px 24px 56px;
+  position:relative;z-index:1;
+  background:linear-gradient(180deg,rgba(232,150,15,0.06) 0%,transparent 100%);
+  border-bottom:1px solid var(--border);
+}
+.hero-eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:3px;
+  color:var(--gold);text-transform:uppercase;margin-bottom:16px;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'─────';opacity:.4;}
+.hero-name{
+  font-family:var(--serif);font-size:clamp(36px,5vw,64px);
+  color:var(--text);line-height:1.1;margin-bottom:8px;
+}
+.hero-name em{color:var(--gold);font-style:italic;}
+.hero-title{
+  font-family:var(--mono);font-size:13px;color:var(--text2);
+  letter-spacing:1px;margin-bottom:20px;
+}
+.hero-desc{
+  font-size:15px;color:var(--text2);line-height:1.8;
+  max-width:600px;margin:0 auto 28px;
+}
+.hero-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:32px;}
+.hero-tag{
+  font-family:var(--mono);font-size:10px;letter-spacing:1px;
+  padding:4px 12px;border-radius:20px;border:1px solid var(--border);
+  color:var(--text2);background:var(--bg2);
+}
+.hero-stats{
+  display:inline-flex;gap:40px;padding:16px 32px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+}
+.hstat-v{font-family:var(--serif);font-size:28px;color:var(--gold);line-height:1;}
+.hstat-l{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:1px;margin-top:3px;}
+
+/* ── NAV ── */
+.nav{
+  position:sticky;top:0;z-index:400;
+  background:rgba(13,17,23,0.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 52px;display:flex;align-items:center;gap:0;
+}
+.nav-logo{
+  font-family:var(--mono);font-size:11px;color:var(--gold);
+  letter-spacing:2px;padding:14px 0;margin-right:32px;flex-shrink:0;
+}
+.nav-links{display:flex;gap:0;}
+.nav-link{
+  font-size:12px;font-weight:600;color:var(--text2);
+  padding:14px 16px;text-decoration:none;letter-spacing:.3px;
+  border-bottom:2px solid transparent;transition:.2s;
+  white-space:nowrap;
+}
+.nav-link:hover{color:var(--text);border-bottom-color:var(--gold);}
+.nav-cta{
+  margin-left:auto;font-family:var(--mono);font-size:10px;
+  color:var(--bg);background:var(--gold);
+  padding:7px 16px;border-radius:4px;text-decoration:none;
+  letter-spacing:1px;font-weight:600;transition:.2s;flex-shrink:0;
+}
+.nav-cta:hover{background:var(--gold2);color:var(--gold);}
+
+/* ── SECTION ── */
+.section{padding:52px 52px;position:relative;z-index:1;max-width:1400px;margin:0 auto;}
+.section-label{
+  font-family:var(--mono);font-size:9px;letter-spacing:3px;
+  color:var(--text3);text-transform:uppercase;
+  display:flex;align-items:center;gap:12px;margin-bottom:24px;
+}
+.section-label::before{content:'//';color:var(--gold);opacity:.6;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── ARTIFACT CARDS ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:18px;}
+.acard{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:10px;overflow:hidden;text-decoration:none;
+  transition:transform .2s,box-shadow .2s,border-color .2s;
+  display:flex;flex-direction:column;
+}
+.acard:hover{
+  transform:translateY(-3px);
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+  border-color:var(--ac);
+}
+.acard-header{
+  padding:20px 22px 16px;
+  background:linear-gradient(135deg,var(--ac1),var(--ac2));
+  position:relative;overflow:hidden;
+}
+.acard-header::after{
+  content:'';position:absolute;right:-30px;bottom:-30px;
+  width:100px;height:100px;border-radius:50%;
+  background:rgba(255,255,255,.05);
+}
+.acard-num{
+  font-family:var(--mono);font-size:9px;letter-spacing:2px;
+  color:rgba(255,255,255,.4);margin-bottom:8px;
+}
+.acard-icon{font-size:28px;margin-bottom:10px;display:block;}
+.acard-title{
+  font-family:var(--serif);font-size:20px;color:#fff;
+  line-height:1.2;margin-bottom:6px;
+}
+.acard-subtitle{font-size:11px;color:rgba(255,255,255,.55);line-height:1.5;}
+.acard-body{padding:18px 22px;flex:1;display:flex;flex-direction:column;}
+.acard-desc{font-size:12.5px;color:var(--text2);line-height:1.75;margin-bottom:14px;flex:1;}
+.acard-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px;}
+.acard-tag{
+  font-family:var(--mono);font-size:8px;letter-spacing:.5px;
+  padding:2px 8px;border-radius:2px;
+}
+.acard-metrics{
+  display:grid;grid-template-columns:1fr 1fr;gap:6px;
+  padding:10px 12px;background:var(--bg3);border-radius:6px;
+  margin-bottom:14px;
+}
+.am-val{font-family:var(--serif);font-size:20px;line-height:1;}
+.am-lbl{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:.5px;margin-top:2px;}
+.acard-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:9px 16px;border-radius:6px;
+  font-family:var(--mono);font-size:10px;font-weight:600;
+  letter-spacing:1px;text-decoration:none;
+  background:var(--ac);color:#000;
+  transition:.2s;border:none;cursor:pointer;
+}
+.acard-btn:hover{opacity:.85;}
+.acard-btn::after{content:'→';font-size:13px;}
+
+/* ── ABOUT SECTION ── */
+.about{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:32px 36px;
+  display:grid;grid-template-columns:1fr 1fr;gap:32px;
+  margin-bottom:20px;
+}
+.about-title{font-family:var(--serif);font-size:28px;color:var(--text);margin-bottom:10px;}
+.about-body{font-size:13px;color:var(--text2);line-height:1.85;}
+.skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.skill-item{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;
+  background:var(--bg3);border-radius:5px;border:1px solid var(--border);
+}
+.skill-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.skill-name{font-size:11.5px;color:var(--text2);}
+
+/* ── CONTACT ── */
+.contact-bar{
+  background:linear-gradient(135deg,rgba(232,150,15,.15),rgba(88,166,255,.08));
+  border:1px solid rgba(232,150,15,.2);border-radius:12px;
+  padding:28px 36px;display:flex;align-items:center;gap:24px;
+  flex-wrap:wrap;
+}
+.contact-title{font-family:var(--serif);font-size:22px;color:var(--text);flex:1;min-width:200px;}
+.contact-links{display:flex;gap:12px;flex-wrap:wrap;}
+.contact-link{
+  display:flex;align-items:center;gap:7px;
+  font-family:var(--mono);font-size:10px;letter-spacing:1px;
+  padding:8px 16px;border-radius:6px;text-decoration:none;
+  border:1px solid var(--border);color:var(--text2);
+  background:var(--bg2);transition:.2s;
+}
+.contact-link:hover{border-color:var(--gold);color:var(--gold);}
+
+/* ── FOOTER ── */
+.footer{
+  text-align:center;padding:28px;
+  font-family:var(--mono);font-size:10px;color:var(--text3);
+  border-top:1px solid var(--border);position:relative;z-index:1;
+  letter-spacing:1px;
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.acard{animation:fadeUp .4s ease both;}
+.acard:nth-child(2){animation-delay:.07s}
+.acard:nth-child(3){animation-delay:.14s}
+.acard:nth-child(4){animation-delay:.21s}
+.acard:nth-child(5){animation-delay:.28s}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">SK · AI PM</div>
+  <div class="nav-links">
+    <a class="nav-link" href="#artifacts">Portfolio</a>
+    <a class="nav-link" href="#about">About</a>
+    <a class="nav-link" href="#contact">Contact</a>
+  </div>
+  <a class="nav-cta" href="#contact">HIRE ME</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">AI Product Manager · Portfolio</div>
+  <h1 class="hero-name">Sandeep Kumar<br><em>AI Product Manager</em></h1>
+  <p class="hero-title">TRANSIT & MOBILITY · AGENTIC AI · RAG ARCHITECTURES · RESPONSIBLE AI</p>
+  <p class="hero-desc">10+ years in product ownership and business analysis. Currently building AI-powered transit systems at Cyient, Hyderabad. Targeting Senior AI PM roles at Google and Microsoft.</p>
+  <div class="hero-tags">
+    <span class="hero-tag">LangGraph</span>
+    <span class="hero-tag">RAG / Vector Search</span>
+    <span class="hero-tag">MCP Protocol</span>
+    <span class="hero-tag">NeMo Guardrails</span>
+    <span class="hero-tag">HITL Design</span>
+    <span class="hero-tag">SAFe / PI Planning</span>
+    <span class="hero-tag">OKRs</span>
+    <span class="hero-tag">Azure AI</span>
+    <span class="hero-tag">GPT-4o</span>
+    <span class="hero-tag">RICE · MoSCoW</span>
+  </div>
+  <div class="hero-stats">
+    <div><div class="hstat-v" style="color:var(--green)">$1.84M</div><div class="hstat-l">ANNUAL ROI</div></div>
+    <div><div class="hstat-v" style="color:var(--blue)">94.2%</div><div class="hstat-l">STRAIGHT-THROUGH</div></div>
+    <div><div class="hstat-v" style="color:var(--gold)">4.7</div><div class="hstat-l">CSAT (WAS 2.8)</div></div>
+    <div><div class="hstat-v" style="color:var(--purple)">87s</div><div class="hstat-l">RESOLUTION TIME</div></div>
+  </div>
+</section>
+
+<!-- ARTIFACTS -->
+<div class="section" id="artifacts">
+  <div class="section-label">Flagship Project · Autonomous Transit Refund Agent · 5 Portfolio Artifacts</div>
+
+  <div class="cards">
+
+    <!-- Card 1: Product Roadmap -->
+    <a class="acard" href="ProductRoadmap_TransitRefundAgent.html"
+       style="--ac:#e8960f;--ac1:#7a5c00;--ac2:#4a3800;">
+      <div class="acard-header">
+        <div class="acard-num">ARTIFACT 01 · PM STRATEGY</div>
+        <span class="acard-icon">🗺️</span>
+        <div class="acard-title">Product Roadmap</div>
+        <div class="acard-subtitle">MoSCoW · RICE Scoring · Value vs Effort · User Personas · 4-Quarter Plan</div>
+      </div>
+      <div class="acard-body">
+        <p class="acard-desc">A complete PM product roadmap — 5 user personas (Rider, Ops Supervisor, Finance, Legal, VP Ops), 28 requirements in user-story format, MoSCoW prioritisation across 4 buckets, interactive Value vs Effort matrix, RICE scoring for all 24 features, and a 5-swimlane 4-quarter roadmap.</p>
+        <div class="acard-tags">
+          <span class="acard-tag" style="background:rgba(232,150,15,.15);color:var(--gold);">5 PERSONAS</span>
+          <span class="acard-tag" style="background:rgba(232,150,15,.15);color:var(--gold);">28 REQUIREMENTS</span>
+          <span class="acard-tag" style="background:rgba(232,150,15,.15);color:var(--gold);">RICE SCORING</span>
+          <span class="acard-tag" style="background:rgba(232,150,15,.15);color:var(--gold);">MoSCoW</span>
+        </div>
+        <div class="acard-metrics">
+          <div><div class="am-val" style="color:var(--gold)">28</div><div class="am-lbl">USER STORIES</div></div>
+          <div><div class="am-val" style="color:var(--gold)">4</div><div class="am-lbl">QUARTERS PLANNED</div></div>
+        </div>
+        <div class="acard-btn" style="background:var(--gold);">VIEW ROADMAP</div>
+      </div>
+    </a>
+
+    <!-- Card 2: PDLC -->
+    <a class="acard" href="PDLC_TransitRefundAgent.html"
+       style="--ac:#58a6ff;--ac1:#1a3a5c;--ac2:#0d2240;">
+      <div class="acard-header">
+        <div class="acard-num">ARTIFACT 02 · LIFECYCLE</div>
+        <span class="acard-icon">🏗️</span>
+        <div class="acard-title">Product Development Lifecycle</div>
+        <div class="acard-subtitle">14-Month PDLC · 5 Phases · Sprint Board · Shadow System · Launch</div>
+      </div>
+      <div class="acard-body">
+        <p class="acard-desc">Full lifecycle from a 2.8 CSAT score to a production AI system. Covers ideation (CSAT deep-dive, stakeholder interviews, ROI model), design (5 ADRs, MCP contracts, RAI framework), 8-sprint development, 90-day shadow testing, and post-launch optimization experiments.</p>
+        <div class="acard-tags">
+          <span class="acard-tag" style="background:var(--blue2);color:var(--blue);">5 PHASES</span>
+          <span class="acard-tag" style="background:var(--blue2);color:var(--blue);">8 SPRINTS</span>
+          <span class="acard-tag" style="background:var(--blue2);color:var(--blue);">90-DAY SHADOW</span>
+          <span class="acard-tag" style="background:var(--blue2);color:var(--blue);">GANTT CHARTS</span>
+        </div>
+        <div class="acard-metrics">
+          <div><div class="am-val" style="color:var(--blue)">14mo</div><div class="am-lbl">DISCOVERY TO LAUNCH</div></div>
+          <div><div class="am-val" style="color:var(--blue)">68</div><div class="am-lbl">TEST CASES</div></div>
+        </div>
+        <div class="acard-btn" style="background:var(--blue);">VIEW PDLC</div>
+      </div>
+    </a>
+
+    <!-- Card 3: LangGraph -->
+    <a class="acard" href="LangGraph_Architecture_RefundAgent.html"
+       style="--ac:#3fb950;--ac1:#1a4a28;--ac2:#0d3018;">
+      <div class="acard-header">
+        <div class="acard-num">ARTIFACT 03 · ARCHITECTURE</div>
+        <span class="acard-icon">🔗</span>
+        <div class="acard-title">LangGraph Agent Architecture</div>
+        <div class="acard-subtitle">6-Agent Topology · HITL · Checkpointing · NeMo Guardrails · AgentState</div>
+      </div>
+      <div class="acard-body">
+        <p class="acard-desc">PM-authored system architecture for a 6-agent LangGraph orchestration system. Covers agent topology, conditional routing paths, HITL interrupt/resume design, crash recovery via checkpointing, AgentState schema (14 fields), and NeMo guardrail integration. Written for engineering-adjacent PM roles.</p>
+        <div class="acard-tags">
+          <span class="acard-tag" style="background:var(--green2);color:var(--green);">LANGGRAPH</span>
+          <span class="acard-tag" style="background:var(--green2);color:var(--green);">6 AGENTS</span>
+          <span class="acard-tag" style="background:var(--green2);color:var(--green);">HITL DESIGN</span>
+          <span class="acard-tag" style="background:var(--green2);color:var(--green);">RAG</span>
+        </div>
+        <div class="acard-metrics">
+          <div><div class="am-val" style="color:var(--green)">6</div><div class="am-lbl">AGENT NODES</div></div>
+          <div><div class="am-val" style="color:var(--green)">85%</div><div class="am-lbl">CONFIDENCE GATE</div></div>
+        </div>
+        <div class="acard-btn" style="background:var(--green);">VIEW ARCHITECTURE</div>
+      </div>
+    </a>
+
+    <!-- Card 4: MCP -->
+    <a class="acard" href="MCP_Architecture_RefundAgent.html"
+       style="--ac:#bc8cff;--ac1:#3d1a6b;--ac2:#280f4a;">
+      <div class="acard-header">
+        <div class="acard-num">ARTIFACT 04 · INTEGRATION</div>
+        <span class="acard-icon">⬡</span>
+        <div class="acard-title">MCP Server Architecture</div>
+        <div class="acard-subtitle">6 MCP Servers · Tool Contracts · stdio + SSE · $500 Cap · PII Boundary</div>
+      </div>
+      <div class="acard-body">
+        <p class="acard-desc">PM-authored MCP protocol architecture replacing 36 bespoke integrations with 6 standardised server contracts. Covers tool definitions, JSON Schema contracts, transport selection (stdio vs SSE), financial cap enforcement at API layer, and PII tokenization boundary design.</p>
+        <div class="acard-tags">
+          <span class="acard-tag" style="background:var(--purple2);color:var(--purple);">MCP PROTOCOL</span>
+          <span class="acard-tag" style="background:var(--purple2);color:var(--purple);">6 SERVERS</span>
+          <span class="acard-tag" style="background:var(--purple2);color:var(--purple);">24 TOOLS</span>
+          <span class="acard-tag" style="background:var(--purple2);color:var(--purple);">SECURITY</span>
+        </div>
+        <div class="acard-metrics">
+          <div><div class="am-val" style="color:var(--purple)">6</div><div class="am-lbl">MCP SERVERS</div></div>
+          <div><div class="am-val" style="color:var(--purple)">$500</div><div class="am-lbl">API CAP ENFORCED</div></div>
+        </div>
+        <div class="acard-btn" style="background:var(--purple);">VIEW MCP DESIGN</div>
+      </div>
+    </a>
+
+    <!-- Card 5: PM Discovery -->
+    <a class="acard" href="PM_Discovery_Deck_RefundAgent.html"
+       style="--ac:#f85149;--ac1:#6b1a14;--ac2:#4a0f0d;">
+      <div class="acard-header">
+        <div class="acard-num">ARTIFACT 05 · DISCOVERY</div>
+        <span class="acard-icon">🔍</span>
+        <div class="acard-title">PM Discovery Deck</div>
+        <div class="acard-subtitle">CSAT Analysis · Ops Shadow · ROI Model · Stakeholder Interviews · PRD</div>
+      </div>
+      <div class="acard-body">
+        <p class="acard-desc">The investigation that justified the build. CSAT deep-dive (200 tickets, 73% finding), 12 stakeholder interviews (JTBD framework), 2-day ops process shadow (47 refunds observed), error quantification ($380K/yr), ROI model ($1.84M), and PRD v1.0 with 10 data-traced requirements.</p>
+        <div class="acard-tags">
+          <span class="acard-tag" style="background:var(--red2);color:var(--red);">DISCOVERY</span>
+          <span class="acard-tag" style="background:var(--red2);color:var(--red);">ROI MODEL</span>
+          <span class="acard-tag" style="background:var(--red2);color:var(--red);">PRD v1.0</span>
+          <span class="acard-tag" style="background:var(--red2);color:var(--red);">JTBD</span>
+        </div>
+        <div class="acard-metrics">
+          <div><div class="am-val" style="color:var(--red)">73%</div><div class="am-lbl">KEY INSIGHT</div></div>
+          <div><div class="am-val" style="color:var(--red)">$1.84M</div><div class="am-lbl">ROI MODELLED</div></div>
+        </div>
+        <div class="acard-btn" style="background:var(--red);">VIEW DISCOVERY</div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="section" id="about">
+  <div class="section-label">About</div>
+  <div class="about">
+    <div>
+      <h2 class="about-title">AI Product Manager<br>with Technical Depth</h2>
+      <p class="about-body" style="margin-bottom:14px;">10+ years spanning business analysis, scrum mastery, and product ownership in the Transit & Mobility domain. Currently at Cyient, Hyderabad, building AI-powered products for transit authorities.</p>
+      <p class="about-body" style="margin-bottom:14px;">Focused on the intersection of agentic AI, responsible AI governance, and enterprise product delivery. Comfortable owning the full stack from discovery (CSAT analysis, stakeholder interviews, ROI modelling) to architecture decisions (LangGraph vs LangChain, RAG vs fine-tuning, MCP protocol design) to post-launch experimentation.</p>
+      <p class="about-body">Targeting Senior AI PM roles at large technology companies where deep technical fluency and enterprise product experience combine.</p>
+    </div>
+    <div>
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);margin-bottom:12px;">CORE COMPETENCIES</div>
+      <div class="skills-grid">
+        <div class="skill-item"><div class="skill-dot" style="background:var(--gold)"></div><span class="skill-name">Agentic AI / LLM Products</span></div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--blue)"></div><span class="skill-name">RAG Architecture</span></div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--green)"></div><span class="skill-name">LangGraph / LangChain</span></div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--purple)"></div><span class="skill-name">MCP Protocol</span></div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--red)"></div><span class="skill-name">Responsible AI / NeMo</span></div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--gold)"></div><span class="skill-name">HITL System Design</span></div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--blue)"></div><span class="skill-name">Product Discovery</span></div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--green)"></div><span class="skill-name">SAFe / PI Planning</span></div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--purple)"></div><span class="skill-name">OKRs / RICE / MoSCoW</span></div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--red)"></div><span class="skill-name">Transit & Mobility Domain</span></div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--gold)"></div><span class="skill-name">Azure AI / GPT-4o</span></div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--blue)"></div><span class="skill-name">GTFS / Transit Systems</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div class="section" id="contact">
+  <div class="section-label">Contact</div>
+  <div class="contact-bar">
+    <div class="contact-title">Open to Senior AI PM<br>opportunities at scale.</div>
+    <div class="contact-links">
+      <a class="contact-link" href="https://linkedin.com/in/YOUR-LINKEDIN" target="_blank">
+        <span>💼</span> LINKEDIN
+      </a>
+      <a class="contact-link" href="mailto:YOUR-EMAIL">
+        <span>✉️</span> EMAIL
+      </a>
+      <a class="contact-link" href="https://github.com/YOUR-GITHUB" target="_blank">
+        <span>⌥</span> GITHUB
+      </a>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  © 2024 SANDEEP KUMAR · AI PM PORTFOLIO · BUILT TO DEMONSTRATE SENIOR AI PM CRAFT
+</footer>
+
+</body>
+</html>
