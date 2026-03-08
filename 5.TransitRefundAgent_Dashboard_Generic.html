@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Autonomous Transit Refund Agent — AI PM Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --navy: #0D1B2A;
+    --dark: #0A1628;
+    --card: #0F2236;
+    --card2: #122840;
+    --teal: #00BFA5;
+    --teal2: #00897B;
+    --blue: #1A73E8;
+    --accent: #FBBC04;
+    --green: #34A853;
+    --red: #EA4335;
+    --orange: #FF6D00;
+    --gray1: #E8EDF2;
+    --gray2: #9AABB8;
+    --gray3: #4A6374;
+    --white: #FFFFFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--gray1);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* TOP NAV */
+  nav {
+    background: var(--card);
+    border-bottom: 1px solid rgba(0,191,165,0.15);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav-logo {
+    width: 32px; height: 32px;
+    background: var(--teal);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .nav-title { font-size: 15px; font-weight: 600; color: var(--white); }
+  .nav-sub { font-size: 11px; color: var(--teal); font-weight: 500; letter-spacing: 1px; }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--gray2);
+    transition: all 0.2s;
+    border: none;
+    background: none;
+  }
+  .nav-tab:hover, .nav-tab.active {
+    background: rgba(0,191,165,0.1);
+    color: var(--teal);
+  }
+  .status-badge {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--green);
+    background: rgba(52,168,83,0.1);
+    padding: 4px 10px; border-radius: 20px;
+  }
+  .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+  /* MAIN LAYOUT */
+  .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+  /* HERO BANNER */
+  .hero {
+    background: linear-gradient(135deg, var(--card) 0%, #0a2040 100%);
+    border: 1px solid rgba(0,191,165,0.15);
+    border-radius: 16px;
+    padding: 32px 40px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,191,165,0.08) 0%, transparent 70%);
+  }
+  .hero-left h1 { font-size: 28px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+  .hero-left h1 span { color: var(--teal); }
+  .hero-left p { font-size: 14px; color: var(--gray2); max-width: 520px; line-height: 1.6; }
+  .hero-tags { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .tag {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+    padding: 4px 10px; border-radius: 4px; border: 1px solid;
+  }
+  .tag-teal { border-color: var(--teal); color: var(--teal); background: rgba(0,191,165,0.08); }
+  .tag-blue { border-color: var(--blue); color: var(--blue); background: rgba(26,115,232,0.08); }
+  .tag-orange { border-color: var(--orange); color: var(--orange); background: rgba(255,109,0,0.08); }
+  .tag-green { border-color: var(--green); color: var(--green); background: rgba(52,168,83,0.08); }
+
+  .hero-kpis { display: flex; gap: 16px; }
+  .hero-kpi {
+    text-align: center;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 16px 22px;
+    min-width: 110px;
+  }
+  .hero-kpi .val { font-size: 30px; font-weight: 700; }
+  .hero-kpi .lbl { font-size: 10px; color: var(--gray2); margin-top: 4px; font-weight: 500; }
+
+  /* GRID LAYOUTS */
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+  .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(0,191,165,0.2); }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--white); letter-spacing: 0.3px; }
+  .card-badge { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px; }
+  .badge-teal { background: rgba(0,191,165,0.15); color: var(--teal); }
+  .badge-blue { background: rgba(26,115,232,0.15); color: var(--blue); }
+  .badge-orange { background: rgba(255,109,0,0.15); color: var(--orange); }
+  .badge-red { background: rgba(234,67,53,0.15); color: var(--red); }
+  .badge-green { background: rgba(52,168,83,0.15); color: var(--green); }
+
+  /* METRIC CARDS */
+  .metric-card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .metric-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 3px;
+  }
+  .metric-teal::before { background: var(--teal); }
+  .metric-blue::before { background: var(--blue); }
+  .metric-green::before { background: var(--green); }
+  .metric-orange::before { background: var(--orange); }
+  .metric-card .icon { font-size: 20px; margin-bottom: 10px; }
+  .metric-card .val { font-size: 34px; font-weight: 700; color: var(--white); }
+  .metric-card .lbl { font-size: 12px; color: var(--gray2); margin-top: 4px; }
+  .metric-card .delta {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px;
+    display: inline-block; margin-top: 8px;
+  }
+  .delta-up { background: rgba(52,168,83,0.15); color: var(--green); }
+  .delta-down { background: rgba(234,67,53,0.15); color: var(--red); }
+
+  /* AGENT FLOW */
+  .agent-flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .agent-node {
+    background: var(--card2);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .agent-node:hover { transform: translateY(-2px); border-color: var(--teal); }
+  .agent-node.active { border-color: var(--teal); background: rgba(0,191,165,0.08); }
+  .agent-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot-teal { background: var(--teal); }
+  .dot-blue { background: var(--blue); }
+  .dot-green { background: var(--green); }
+  .dot-orange { background: var(--orange); }
+  .dot-red { background: var(--red); }
+  .arrow { color: var(--gray3); font-size: 16px; }
+
+  /* PROGRESS BARS */
+  .progress-item { margin-bottom: 14px; }
+  .progress-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+  .progress-label { color: var(--gray1); font-weight: 500; }
+  .progress-val { color: var(--gray2); font-family: 'DM Mono', monospace; }
+  .progress-bar { height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width 1.5s ease; }
+
+  /* SAFETY GRID */
+  .safety-item {
+    display: flex; gap: 12px;
+    padding: 14px;
+    background: var(--card2);
+    border-radius: 8px;
+    border-left: 3px solid;
+    margin-bottom: 10px;
+  }
+  .safety-icon { font-size: 18px; flex-shrink: 0; }
+  .safety-title { font-size: 12px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+  .safety-desc { font-size: 11px; color: var(--gray2); line-height: 1.5; }
+
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .data-table th { padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 1px; color: var(--gray2); border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .data-table td { padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--gray1); }
+  .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; }
+
+  /* CHART BARS */
+  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 100px; }
+  .bar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .bar { border-radius: 4px 4px 0 0; width: 100%; transition: height 1s ease; min-width: 20px; }
+  .bar-label { font-size: 9px; color: var(--gray3); font-weight: 500; }
+  .bar-val { font-size: 10px; color: var(--gray2); font-family: 'DM Mono', monospace; }
+
+  /* SECTION LABELS */
+  .section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    color: var(--teal); margin-bottom: 12px; margin-top: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(0,191,165,0.15); }
+
+  /* RESPONSIBLE AI SCORE */
+  .rai-score {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    background: var(--card2);
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  .rai-icon { font-size: 16px; }
+  .rai-label { font-size: 11px; font-weight: 600; color: var(--white); flex: 1; }
+  .rai-bar { flex: 2; height: 5px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; }
+  .rai-fill { height: 100%; border-radius: 3px; }
+  .rai-pct { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--gray2); width: 36px; text-align: right; }
+
+  /* LIVE FEED */
+  .feed-item {
+    display: flex; gap: 10px; padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 11px;
+  }
+  .feed-time { color: var(--gray3); font-family: 'DM Mono', monospace; width: 55px; flex-shrink: 0; }
+  .feed-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 3px; flex-shrink: 0; }
+  .feed-text { color: var(--gray1); line-height: 1.5; }
+  .feed-agent { color: var(--teal); font-weight: 600; }
+
+  /* ROADMAP */
+  .roadmap-phase {
+    border-left: 2px solid;
+    padding-left: 20px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .roadmap-phase::before {
+    content: '';
+    position: absolute; left: -5px; top: 4px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--dark); border: 2px solid;
+    border-color: inherit;
+  }
+  .phase-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
+  .phase-title { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+  .phase-item { font-size: 11px; color: var(--gray2); margin-bottom: 4px; padding-left: 8px; }
+  .phase-item::before { content: '→ '; color: var(--gray3); }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--gray3);
+    font-size: 11px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    margin-top: 8px;
+  }
+
+  /* ANIMATED COUNTER */
+  .counter { transition: all 0.3s; }
+
+  /* TABS CONTENT */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  @media (max-width: 1100px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    .grid-2-1 { grid-template-columns: 1fr; }
+    .hero { flex-direction: column; gap: 24px; }
+    .hero-kpis { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo">🚇</div>
+    <div>
+      <div class="nav-title">Autonomous Refund Agent</div>
+      <div class="nav-sub">AI PRODUCT MANAGER PORTFOLIO · GOOGLE</div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('overview')">Overview</button>
+    <button class="nav-tab" onclick="switchTab('architecture')">Architecture</button>
+    <button class="nav-tab" onclick="switchTab('safety')">Responsible AI</button>
+    <button class="nav-tab" onclick="switchTab('metrics')">Metrics</button>
+    <button class="nav-tab" onclick="switchTab('roadmap')">Roadmap</button>
+  </div>
+  <div class="status-badge">
+    <div class="pulse"></div>
+    System Live · 847 Refunds Processed Today
+  </div>
+</nav>
+
+<!-- OVERVIEW TAB -->
+<div id="tab-overview" class="tab-content active">
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-left">
+      <h1>Transit Disruption → <span>Autonomous Refund</span></h1>
+      <p>An agentic AI system that eliminates manual bulk refund processing in public transit. Powered by an LLM backbone, LangGraph multi-agent orchestration, RAG knowledge retrieval, and enterprise guardrails.</p>
+      <div class="hero-tags">
+        <span class="tag tag-teal">Agentic AI</span>
+        <span class="tag tag-teal">LangGraph</span>
+        <span class="tag tag-blue">LLM Backbone</span>
+        <span class="tag tag-blue">Vector Store RAG</span>
+        <span class="tag tag-orange">NeMo Guardrails</span>
+        <span class="tag tag-green">LangChain</span>
+        <span class="tag tag-green">MCP Protocol</span>
+      </div>
+    </div>
+    <div class="hero-kpis">
+      <div class="hero-kpi" style="border-top: 2px solid var(--teal)">
+        <div class="val" style="color:var(--teal)">97%</div>
+        <div class="lbl">Time Reduction</div>
+      </div>
+      <div class="hero-kpi" style="border-top: 2px solid var(--blue)">
+        <div class="val" style="color:var(--blue)">4.2M</div>
+        <div class="lbl">Trips/Year</div>
+      </div>
+      <div class="hero-kpi" style="border-top: 2px solid var(--green)">
+        <div class="val" style="color:var(--green)">$2.1M</div>
+        <div class="lbl">Annual ROI</div>
+      </div>
+      <div class="hero-kpi" style="border-top: 2px solid var(--accent)">
+        <div class="val" style="color:var(--accent)">&lt;90s</div>
+        <div class="lbl">End-to-End</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">CORE KPIs</div>
+  <div class="grid-4">
+    <div class="metric-card metric-teal">
+      <div class="icon">⚡</div>
+      <div class="val">8 min</div>
+      <div class="lbl">Avg Processing Time (was 4.5 hrs)</div>
+      <div class="delta delta-up">↓ 97% improvement</div>
+    </div>
+    <div class="metric-card metric-blue">
+      <div class="icon">🎯</div>
+      <div class="val">99.7%</div>
+      <div class="lbl">Refund Accuracy Rate</div>
+      <div class="delta delta-up">↑ from 88%</div>
+    </div>
+    <div class="metric-card metric-green">
+      <div class="icon">😊</div>
+      <div class="val">4.7/5</div>
+      <div class="lbl">Patron CSAT Post-Disruption</div>
+      <div class="delta delta-up">↑ from 2.8/5</div>
+    </div>
+    <div class="metric-card metric-orange">
+      <div class="icon">👥</div>
+      <div class="val">93%</div>
+      <div class="lbl">Staff Hours Saved per Event</div>
+      <div class="delta delta-up">1 supervisor vs 12 staff</div>
+    </div>
+  </div>
+
+  <div class="section-label">LIVE AGENT ACTIVITY</div>
+  <div class="grid-2-1">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Active Agent Pipeline</div>
+        <span class="card-badge badge-teal">LIVE</span>
+      </div>
+      <div class="agent-flow" id="agentFlow">
+        <div class="agent-node active" data-agent="0">
+          <div class="agent-dot dot-teal"></div> 🔍 Disruption Analysis
+        </div>
+        <div class="arrow">→</div>
+        <div class="agent-node" data-agent="1">
+          <div class="agent-dot dot-blue"></div> ⚖️ Eligibility Check
+        </div>
+        <div class="arrow">→</div>
+        <div class="agent-node" data-agent="2">
+          <div class="agent-dot dot-red"></div> 🔒 Guardrail Validation
+        </div>
+        <div class="arrow">→</div>
+        <div class="agent-node" data-agent="3">
+          <div class="agent-dot dot-teal"></div> 💰 Refund Calc
+        </div>
+        <div class="arrow">→</div>
+        <div class="agent-node" data-agent="4">
+          <div class="agent-dot dot-green"></div> 🏦 Payment Execute
+        </div>
+        <div class="arrow">→</div>
+        <div class="agent-node" data-agent="5">
+          <div class="agent-dot dot-orange"></div> 📱 Notify Patron
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <div class="card-title" style="margin-bottom:10px;font-size:11px;color:var(--gray2);">CURRENT DISRUPTION EVENT</div>
+        <div style="background:var(--card2);border-radius:8px;padding:14px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:12px;font-weight:600;color:var(--white)">🚇 Blue Line — Signal Failure</span>
+            <span class="card-badge badge-orange">IN PROGRESS</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:11px;">
+            <div><span style="color:var(--gray3)">Affected Trips</span><br><span style="color:var(--white);font-weight:600">1,247</span></div>
+            <div><span style="color:var(--gray3)">Eligible Patrons</span><br><span style="color:var(--teal);font-weight:600">1,189</span></div>
+            <div><span style="color:var(--gray3)">Total Refund</span><br><span style="color:var(--green);font-weight:600">$18,420</span></div>
+          </div>
+          <div style="margin-top:12px;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;">
+              <span style="color:var(--gray2)">Processing Progress</span>
+              <span id="progressPct" style="color:var(--teal);font-family:monospace">0%</span>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
+              <div id="mainProgress" style="height:100%;width:0%;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:3px;transition:width 0.3s;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Agent Log</div>
+        <span class="card-badge badge-blue">REAL-TIME</span>
+      </div>
+      <div id="agentLog" style="max-height:320px;overflow-y:auto;">
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">BEFORE vs AFTER</div>
+  <div class="card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>OPERATIONAL METRIC</th>
+          <th>MANUAL PROCESS (BEFORE)</th>
+          <th>AI AGENT SYSTEM (AFTER)</th>
+          <th>DELTA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Processing Time per Event</td><td style="color:var(--red)">4.5 hours</td><td style="color:var(--teal)">&lt; 8 minutes</td><td style="color:var(--green);font-weight:600">↓ 97%</td></tr>
+        <tr><td>Staff Required</td><td style="color:var(--red)">10–15 FTEs</td><td style="color:var(--teal)">1 Supervisor (oversight)</td><td style="color:var(--green);font-weight:600">↓ 93%</td></tr>
+        <tr><td>Refund Error Rate</td><td style="color:var(--red)">~12%</td><td style="color:var(--teal)">&lt; 0.3%</td><td style="color:var(--green);font-weight:600">↓ 97.5%</td></tr>
+        <tr><td>Patron Notification Time</td><td style="color:var(--red)">2–6 hours</td><td style="color:var(--teal)">Real-time (&lt; 2 min)</td><td style="color:var(--green);font-weight:600">↓ 99%</td></tr>
+        <tr><td>Audit Compliance</td><td style="color:var(--red)">Manual logs, incomplete</td><td style="color:var(--teal)">Automated immutable trail</td><td style="color:var(--green);font-weight:600">100% coverage</td></tr>
+        <tr><td>Concurrent Event Handling</td><td style="color:var(--red)">1 event at a time</td><td style="color:var(--teal)">Unlimited parallel events</td><td style="color:var(--green);font-weight:600">∞ scale</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<!-- ARCHITECTURE TAB -->
+<div id="tab-architecture" class="tab-content">
+<div class="container">
+
+  <div class="section-label">SYSTEM ARCHITECTURE</div>
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-header">
+      <div class="card-title">Multi-Agent Orchestration Architecture</div>
+      <span class="card-badge badge-teal">LangGraph + LLM</span>
+    </div>
+    <div style="background:var(--card2);border-radius:12px;padding:24px;font-family:'DM Mono',monospace;font-size:11px;line-height:2;overflow-x:auto;">
+<pre style="color:var(--gray1);white-space:pre-wrap;">
+ ┌─────────────────────────────────────────────────────────────────────┐
+ │                     DISRUPTION EVENT TRIGGER                        │
+ │          (GTFS Real-time feed / Operator manual / Anomaly ML)       │
+ └───────────────────────────┬─────────────────────────────────────────┘
+                             ▼
+ ┌─────────────────────────────────────────────────────────────────────┐
+ │               🤖  ORCHESTRATOR AGENT (LangGraph)                    │
+ │              LLM · Function Calling · ReAct Loop             │
+ └──┬──────────┬─────────────┬──────────────┬──────────────┬───────────┘
+    ▼          ▼             ▼              ▼              ▼
+ [🔍 Disrupt] [⚖️ Eligib] [🔒 Guardrail] [💰 Refund]  [📱 Notify]
+ Analysis     Validation   Compliance     Calculation    Delivery
+ Agent        Agent        Agent          Agent          Agent
+    │          │             │              │              │
+    └──────────┴─────────────┴──────────────┴──────────────┘
+                             │
+                ┌────────────▼────────────┐
+                │  📚 RAG KNOWLEDGE LAYER  │
+                │  Vector Store (e.g. Pinecone / │
+                │  Policy Docs · GTFS      │
+                │  Disruption History Index│
+                └─────────────────────────┘
+                             │
+                ┌────────────▼────────────┐
+                │  🛡 RESPONSIBLE AI LAYER │
+                │  NeMo Guardrails · PII   │
+                │  Tokenization · Audit Log│
+                │  Human-in-Loop Escalation│
+                └─────────────────────────┘
+</pre>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header"><div class="card-title">🤖 LLM Layer</div><span class="card-badge badge-blue">LLM Backbone</span></div>
+      <div class="progress-item">
+        <div class="progress-header"><span class="progress-label">Intent Parsing</span><span class="progress-val">LLM</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:92%;background:var(--blue);"></div></div>
+      </div>
+      <div class="progress-item">
+        <div class="progress-header"><span class="progress-label">Function Calling</span><span class="progress-val">Structured JSON</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:88%;background:var(--blue);"></div></div>
+      </div>
+      <div class="progress-item">
+        <div class="progress-header"><span class="progress-label">Chain-of-Thought</span><span class="progress-val">Reasoning Trace</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:95%;background:var(--teal);"></div></div>
+      </div>
+      <div class="progress-item">
+        <div class="progress-header"><span class="progress-label">Policy Interpretation</span><span class="progress-val">RAG-grounded</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:97%;background:var(--teal);"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📚 RAG Architecture</div><span class="card-badge badge-teal">Vector Store Search</span></div>
+      <div class="safety-item" style="border-color:var(--teal)">
+        <div class="safety-icon">📄</div>
+        <div><div class="safety-title">Policy Vector Store</div><div class="safety-desc">Refund policies embedded via text-embedding-gecko. Hybrid semantic + BM25 retrieval.</div></div>
+      </div>
+      <div class="safety-item" style="border-color:var(--blue)">
+        <div class="safety-icon">🕒</div>
+        <div><div class="safety-title">Disruption Memory Index</div><div class="safety-desc">5-year historical disruption events. RAG retrieves analogous cases for decision support.</div></div>
+      </div>
+      <div class="safety-item" style="border-color:var(--green)">
+        <div class="safety-icon">🗺</div>
+        <div><div class="safety-title">GTFS Real-Time Feed</div><div class="safety-desc">Live schedule data injected as context. Grounds refund decisions in actual trip data.</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">⚙️ Agent Stack</div><span class="card-badge badge-orange">LangGraph + MCP</span></div>
+      <div class="feed-item">
+        <div class="feed-dot" style="background:var(--teal)"></div>
+        <div class="feed-text"><span class="feed-agent">LangGraph</span> — Stateful agent orchestration with cycles & conditional routing</div>
+      </div>
+      <div class="feed-item">
+        <div class="feed-dot" style="background:var(--blue)"></div>
+        <div class="feed-text"><span class="feed-agent">LangChain</span> — Tool use, memory management, prompt templating</div>
+      </div>
+      <div class="feed-item">
+        <div class="feed-dot" style="background:var(--orange)"></div>
+        <div class="feed-text"><span class="feed-agent">MCP Protocol</span> — Standardized agent-to-tool communication</div>
+      </div>
+      <div class="feed-item">
+        <div class="feed-dot" style="background:var(--green)"></div>
+        <div class="feed-text"><span class="feed-agent">NeMo Guardrails</span> — Input/output rails, topic control</div>
+      </div>
+      <div class="feed-item">
+        <div class="feed-dot" style="background:var(--red)"></div>
+        <div class="feed-text"><span class="feed-agent">Vector Store</span> — Embeddings, vector search, model hosting</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- RESPONSIBLE AI TAB -->
+<div id="tab-safety" class="tab-content">
+<div class="container">
+
+  <div class="section-label">RESPONSIBLE AI FRAMEWORK</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-title">🛡 Responsible AI Score</div><span class="card-badge badge-teal">Industry AI Principles Aligned</span></div>
+      <div class="rai-score">
+        <div class="rai-icon">🔒</div>
+        <div class="rai-label">Privacy & Data Protection</div>
+        <div class="rai-bar"><div class="rai-fill" style="width:96%;background:var(--teal);"></div></div>
+        <div class="rai-pct">96%</div>
+      </div>
+      <div class="rai-score">
+        <div class="rai-icon">⚖️</div>
+        <div class="rai-label">Fairness & Non-Discrimination</div>
+        <div class="rai-bar"><div class="rai-fill" style="width:91%;background:var(--blue);"></div></div>
+        <div class="rai-pct">91%</div>
+      </div>
+      <div class="rai-score">
+        <div class="rai-icon">🔍</div>
+        <div class="rai-label">Explainability & Transparency</div>
+        <div class="rai-bar"><div class="rai-fill" style="width:94%;background:var(--green);"></div></div>
+        <div class="rai-pct">94%</div>
+      </div>
+      <div class="rai-score">
+        <div class="rai-icon">👁</div>
+        <div class="rai-label">Human Oversight & Control</div>
+        <div class="rai-bar"><div class="rai-fill" style="width:98%;background:var(--teal);"></div></div>
+        <div class="rai-pct">98%</div>
+      </div>
+      <div class="rai-score">
+        <div class="rai-icon">🛡</div>
+        <div class="rai-label">Safety & Harm Prevention</div>
+        <div class="rai-bar"><div class="rai-fill" style="width:99%;background:var(--green);"></div></div>
+        <div class="rai-pct">99%</div>
+      </div>
+      <div class="rai-score">
+        <div class="rai-icon">🔐</div>
+        <div class="rai-label">Secure Agent Architecture</div>
+        <div class="rai-bar"><div class="rai-fill" style="width:93%;background:var(--orange);"></div></div>
+        <div class="rai-pct">93%</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🔒 Guardrail Architecture</div><span class="card-badge badge-orange">NeMo Guardrails</span></div>
+      <div class="safety-item" style="border-color:var(--orange)">
+        <div class="safety-icon">🚫</div>
+        <div><div class="safety-title">Input Rail — Prompt Injection Defense</div><div class="safety-desc">Blocks adversarial inputs attempting to override refund policies or escalate privileges. Pattern-matched + LLM classifier.</div></div>
+      </div>
+      <div class="safety-item" style="border-color:var(--blue)">
+        <div class="safety-icon">✅</div>
+        <div><div class="safety-title">Output Rail — Schema Validation</div><div class="safety-desc">All payment trigger outputs validated against strict JSON schema before execution. Malformed outputs trigger human review queue.</div></div>
+      </div>
+      <div class="safety-item" style="border-color:var(--teal)">
+        <div class="safety-icon">💰</div>
+        <div><div class="safety-title">Financial Cap Guardrail</div><div class="safety-desc">Automated refunds capped at $500 per patron. Batch limits set per event type. Exceeds → Supervisor approval required.</div></div>
+      </div>
+      <div class="safety-item" style="border-color:var(--green)">
+        <div class="safety-icon">📊</div>
+        <div><div class="safety-title">Confidence Threshold Escalation</div><div class="safety-desc">Agent confidence &lt; 85% → auto-escalate to human-in-the-loop. Prevents LLM hallucination from triggering wrong refunds.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header"><div class="card-title">🔐 PII & Data Privacy</div><span class="card-badge badge-blue">GDPR Aligned</span></div>
+      <div style="font-size:11px;line-height:1.9;color:var(--gray2);">
+        <div>→ Cardholder data tokenized <strong style="color:var(--white)">before</strong> LLM context injection</div>
+        <div>→ Differential privacy on analytics exports</div>
+        <div>→ Data minimization in RAG chunk retrieval</div>
+        <div>→ Patron PII never stored in LLM context windows</div>
+        <div>→ Consent-aware data access per trip record</div>
+        <div>→ Right-to-erasure pipeline for refund history</div>
+        <div>→ Encrypted inter-agent message passing (mTLS)</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">⚖️ Fairness & Equity</div><span class="card-badge badge-teal">Bias Monitoring</span></div>
+      <div style="font-size:11px;line-height:1.9;color:var(--gray2);">
+        <div>→ Refund rate parity audited across demographics</div>
+        <div>→ No differential treatment by payment method</div>
+        <div>→ Quarterly bias detection on eligibility decisions</div>
+        <div>→ Protected class monitoring in disruption coverage</div>
+        <div>→ Accessibility-first notification design</div>
+        <div>→ Low-income rider support via priority queue</div>
+        <div>→ Multi-lingual notification delivery</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">👁 Audit & Explainability</div><span class="card-badge badge-green">Full Trace</span></div>
+      <div style="font-size:11px;line-height:1.9;color:var(--gray2);">
+        <div>→ Chain-of-thought reasoning logged per decision</div>
+        <div>→ Immutable audit trail on all transactions</div>
+        <div>→ Human review queue for edge cases</div>
+        <div>→ Monthly model performance review</div>
+        <div>→ Appeals workflow with LLM recommendation</div>
+        <div>→ Operator override with full audit log</div>
+        <div>→ Regulator-ready compliance reporting</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- METRICS TAB -->
+<div id="tab-metrics" class="tab-content">
+<div class="container">
+
+  <div class="section-label">PRODUCT METRICS FRAMEWORK</div>
+  <div class="grid-4">
+    <div class="metric-card metric-teal">
+      <div class="icon">⏱</div>
+      <div class="val">8 min</div>
+      <div class="lbl">Time-to-Refund (North Star)</div>
+      <div class="delta delta-up">↓ 97% vs baseline</div>
+    </div>
+    <div class="metric-card metric-blue">
+      <div class="icon">🎯</div>
+      <div class="val">99.7%</div>
+      <div class="lbl">Accuracy Rate</div>
+      <div class="delta delta-up">↑ from 88% manual</div>
+    </div>
+    <div class="metric-card metric-green">
+      <div class="icon">💵</div>
+      <div class="val">$2.1M</div>
+      <div class="lbl">Annual Cost Savings</div>
+      <div class="delta delta-up">Staff + error reduction</div>
+    </div>
+    <div class="metric-card metric-orange">
+      <div class="icon">🔄</div>
+      <div class="val">847</div>
+      <div class="lbl">Refunds Processed Today</div>
+      <div class="delta delta-up">↑ 22% vs yesterday</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Monthly Refund Volume</div><span class="card-badge badge-teal">Trend</span></div>
+      <div class="bar-chart" style="height:120px;align-items:flex-end;padding-top:10px;">
+        <div class="bar-col"><div class="bar" style="height:40%;background:var(--gray3);"></div><div class="bar-label">JAN</div></div>
+        <div class="bar-col"><div class="bar" style="height:55%;background:var(--gray3);"></div><div class="bar-label">FEB</div></div>
+        <div class="bar-col"><div class="bar" style="height:48%;background:var(--gray3);"></div><div class="bar-label">MAR</div></div>
+        <div class="bar-col"><div class="bar" style="height:70%;background:var(--blue);"></div><div class="bar-label">APR</div></div>
+        <div class="bar-col"><div class="bar" style="height:82%;background:var(--blue);"></div><div class="bar-label">MAY</div></div>
+        <div class="bar-col"><div class="bar" style="height:90%;background:var(--teal);"></div><div class="bar-label">JUN</div></div>
+        <div class="bar-col"><div class="bar" style="height:95%;background:var(--teal);"></div><div class="bar-label">JUL</div></div>
+        <div class="bar-col"><div class="bar" style="height:100%;background:var(--teal);"></div><div class="bar-label">AUG</div></div>
+      </div>
+      <div style="font-size:10px;color:var(--gray3);margin-top:8px;text-align:center;">↑ AI system deployed at Apr — volume increase from scale & accuracy improvements</div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">CSAT Score Trend</div><span class="card-badge badge-green">Patron Satisfaction</span></div>
+      <div style="display:flex;align-items:flex-end;gap:10px;height:130px;padding-top:10px;">
+        <div class="bar-col"><div class="bar" style="height:56%;background:var(--red);opacity:0.7;"></div><div class="bar-label" style="font-size:9px;">Before</div><div class="bar-val">2.8</div></div>
+        <div style="font-size:20px;color:var(--gray3);align-self:center;padding-bottom:20px;">→</div>
+        <div class="bar-col"><div class="bar" style="height:94%;background:var(--green);"></div><div class="bar-label" style="font-size:9px;">After</div><div class="bar-val">4.7</div></div>
+        <div style="flex:1;padding-left:20px;font-size:11px;color:var(--gray2);line-height:1.8;align-self:center;">
+          <div>↑ Real-time refund status</div>
+          <div>↑ Sub-2-min notifications</div>
+          <div>↑ Accurate first-time refunds</div>
+          <div>↑ No manual re-work needed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">PM North Star Metrics Framework</div><span class="card-badge badge-blue">HEART + GSM</span></div>
+    <table class="data-table">
+      <thead><tr><th>GOAL</th><th>SIGNAL</th><th>METRIC</th><th>CURRENT</th><th>TARGET</th></tr></thead>
+      <tbody>
+        <tr><td>🎯 Happiness</td><td>Patron satisfaction with refund experience</td><td>Post-refund CSAT score</td><td style="color:var(--teal)">4.7/5</td><td>4.8/5</td></tr>
+        <tr><td>🔄 Engagement</td><td>Patrons checking refund status in app</td><td>Real-time status views per event</td><td style="color:var(--teal)">73%</td><td>80%</td></tr>
+        <tr><td>📈 Adoption</td><td>Disruption events processed by AI (vs manual)</td><td>% events fully automated</td><td style="color:var(--teal)">94%</td><td>99%</td></tr>
+        <tr><td>🔁 Retention</td><td>Riders continuing to use transit post-disruption</td><td>30-day retention after disruption event</td><td style="color:var(--teal)">88%</td><td>92%</td></tr>
+        <tr><td>⚡ Task Success</td><td>Refunds completing without human intervention</td><td>Straight-through processing rate</td><td style="color:var(--teal)">94.2%</td><td>97%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<!-- ROADMAP TAB -->
+<div id="tab-roadmap" class="tab-content">
+<div class="container">
+
+  <div class="section-label">PRODUCT ROADMAP</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-title">18-Month Roadmap</div><span class="card-badge badge-teal">Strategic Plan</span></div>
+      <div class="roadmap-phase" style="border-color:var(--blue)">
+        <div class="phase-label" style="color:var(--blue)">PHASE 1 · Q1–Q2 · FOUNDATION</div>
+        <div class="phase-title">MVP — Core Agentic System</div>
+        <div class="phase-item">Orchestrator + Disruption Analysis Agent</div>
+        <div class="phase-item">Basic RAG policy retrieval (Vector Store)</div>
+        <div class="phase-item">Payment gateway integration (3 providers)</div>
+        <div class="phase-item">NeMo guardrails v1 + audit logging</div>
+        <div class="phase-item">Human-in-loop escalation queue</div>
+      </div>
+      <div class="roadmap-phase" style="border-color:var(--teal)">
+        <div class="phase-label" style="color:var(--teal)">PHASE 2 · Q3–Q4 · INTELLIGENCE</div>
+        <div class="phase-title">Full Multi-Agent Deployment + Scale</div>
+        <div class="phase-item">All 6 specialized agents fully deployed</div>
+        <div class="phase-item">GTFS real-time feed enrichment</div>
+        <div class="phase-item">Predictive disruption detection ML model</div>
+        <div class="phase-item">Bias audit framework + fairness dashboard</div>
+        <div class="phase-item">Multi-modal transit support (bus, ferry, tram)</div>
+      </div>
+      <div class="roadmap-phase" style="border-color:var(--green)">
+        <div class="phase-label" style="color:var(--green)">PHASE 3 · YEAR 2 · PLATFORM</div>
+        <div class="phase-title">Transit Intelligence Platform</div>
+        <div class="phase-item">Federated learning across transit agencies</div>
+        <div class="phase-item">Open API for 3rd party transit operators</div>
+        <div class="phase-item">Carbon offset refund option for riders</div>
+        <div class="phase-item">Predictive disruption prevention recommendations</div>
+        <div class="phase-item">Cross-city disruption pattern intelligence</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header"><div class="card-title">PM Competency Alignment</div><span class="card-badge badge-blue">Why This Role</span></div>
+        <div class="safety-item" style="border-color:var(--teal)">
+          <div class="safety-icon">⚙️</div>
+          <div><div class="safety-title">Technical Depth</div><div class="safety-desc">Designed LangGraph topology, RAG pipeline, and LLM prompt strategy from first principles. Deeply familiar with agentic AI, vector stores, and MCP protocol.</div></div>
+        </div>
+        <div class="safety-item" style="border-color:var(--blue)">
+          <div class="safety-icon">❤️</div>
+          <div><div class="safety-title">User Obsession</div><div class="safety-desc">North Star = patron time-to-refund. Every architecture decision traced to reducing rider anxiety post-disruption.</div></div>
+        </div>
+        <div class="safety-item" style="border-color:var(--green)">
+          <div class="safety-icon">📊</div>
+          <div><div class="safety-title">Data-Driven PM</div><div class="safety-desc">Defined 12% → 0.3% error rate target. Instrumented full observability stack. Set up A/B test harness for refund strategy variants.</div></div>
+        </div>
+        <div class="safety-item" style="border-color:var(--orange)">
+          <div class="safety-icon">🛡</div>
+          <div><div class="safety-title">Responsible AI First</div><div class="safety-desc">Safety, fairness, and explainability as first-class requirements — not afterthoughts. Aligned with industry Responsible AI principles and frameworks.</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">The Bigger Vision</div><span class="card-badge badge-teal">Platform Thinking</span></div>
+        <div style="font-size:13px;color:var(--gray2);line-height:1.8;">
+          <p style="color:var(--white);font-weight:600;margin-bottom:10px;">"Not just a refund tool — a city-scale AI platform."</p>
+          <p>This project demonstrates that agentic AI can transform urban infrastructure operations. Every disruption event becomes a learning signal. Every patron interaction improves the model. Every refund decision builds toward a smarter, fairer transit system.</p>
+          <br>
+          <p style="color:var(--teal);font-weight:500;">At platform scale, this architecture becomes the foundation for real-time city intelligence — connecting transit, emergency services, urban planning, and climate action into a unified AI layer.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  Autonomous Transit Refund Agent · AI Product Manager Portfolio · Senior PM Interview Portfolio
+  <br style="margin-top:4px;">
+  Stack: LLM Backbone · Vector Store RAG · LangGraph · LangChain · NeMo Guardrails · MCP Protocol · RAG
+</footer>
+
+<script>
+// Tab switching
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Agent log simulation
+const logEntries = [
+  { time: '09:42:11', agent: 'Disruption Agent', text: 'Detected signal failure on Blue Line — 14 stations affected', dot: '#00BFA5' },
+  { time: '09:42:12', agent: 'RAG Layer', text: 'Retrieved 3 analogous disruption policies from vector store', dot: '#1A73E8' },
+  { time: '09:42:14', agent: 'Eligibility Agent', text: 'Scanning 1,247 trips in disruption window [06:15–09:30]', dot: '#1A73E8' },
+  { time: '09:42:18', agent: 'Eligibility Agent', text: '1,189 patrons eligible for refund (58 excluded: card-based partial trips)', dot: '#1A73E8' },
+  { time: '09:42:19', agent: 'Guardrail Agent', text: 'PII tokenization complete. No prompt injection detected.', dot: '#EA4335' },
+  { time: '09:42:20', agent: 'Guardrail Agent', text: 'Financial cap validation: all refunds < $500 threshold ✓', dot: '#EA4335' },
+  { time: '09:42:21', agent: 'Refund Agent', text: 'Calculating refund amounts: flat $15.50 + 100% fare for affected trips', dot: '#00BFA5' },
+  { time: '09:42:23', agent: 'Payment Agent', text: 'Initiating batch payment — 1,189 individual refund requests', dot: '#34A853' },
+  { time: '09:42:55', agent: 'Payment Agent', text: '847 refunds processed successfully. 342 queued.', dot: '#34A853' },
+  { time: '09:43:01', agent: 'Notify Agent', text: 'Push notifications sent to 847 patrons. Email fallback triggered for 12.', dot: '#FF6D00' },
+];
+
+let logIndex = 0;
+const logContainer = document.getElementById('agentLog');
+
+function addLogEntry(entry) {
+  const div = document.createElement('div');
+  div.className = 'feed-item';
+  div.style.opacity = '0';
+  div.style.transform = 'translateY(4px)';
+  div.style.transition = 'all 0.3s';
+  div.innerHTML = `
+    <div class="feed-time">${entry.time}</div>
+    <div class="feed-dot" style="background:${entry.dot}"></div>
+    <div class="feed-text"><span class="feed-agent">${entry.agent}</span><br>${entry.text}</div>
+  `;
+  logContainer.appendChild(div);
+  setTimeout(() => { div.style.opacity = '1'; div.style.transform = 'translateY(0)'; }, 50);
+  logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+// Agent flow animation
+const agentNodes = document.querySelectorAll('.agent-node');
+let activeAgent = 0;
+
+function animateAgents() {
+  agentNodes.forEach(n => n.classList.remove('active'));
+  agentNodes[activeAgent % agentNodes.length].classList.add('active');
+  activeAgent++;
+}
+
+// Progress bar
+let progress = 0;
+function updateProgress() {
+  progress = Math.min(progress + Math.random() * 3, 71.2);
+  document.getElementById('mainProgress').style.width = progress + '%';
+  document.getElementById('progressPct').textContent = Math.round(progress) + '%';
+}
+
+// Init simulation
+setTimeout(() => {
+  const logTimer = setInterval(() => {
+    if (logIndex < logEntries.length) {
+      addLogEntry(logEntries[logIndex]);
+      logIndex++;
+    } else {
+      clearInterval(logTimer);
+    }
+  }, 800);
+
+  const agentTimer = setInterval(animateAgents, 1400);
+  const progressTimer = setInterval(updateProgress, 400);
+  setTimeout(() => clearInterval(progressTimer), 12000);
+}, 500);
+</script>
+</body>
+</html>

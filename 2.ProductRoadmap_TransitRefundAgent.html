@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Product Roadmap — Transit Refund Agent</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Fira+Code:wght@300;400;500;600&family=Nunito:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --linen:#faf7f2; --linen2:#f3ede3; --linen3:#e8ddd0; --linen4:#d4c5b2;
+  --ink:#1a160f; --ink2:#3d3526; --ink3:#6b5f4e; --ink4:#9c8e7d;
+  --ochre:#c8780a; --ochre2:#e8960f; --ochre3:rgba(200,120,10,.12);
+  --sienna:#8b2e14; --sienna2:rgba(139,46,20,.1);
+  --teal:#0d6b5e; --teal2:rgba(13,107,94,.1);
+  --plum:#5c2a7a; --plum2:rgba(92,42,122,.1);
+  --slate:#1a3a5c; --slate2:rgba(26,58,92,.1);
+  --sage:#2d6b3a; --sage2:rgba(45,107,58,.1);
+  --serif:'DM Serif Display',Georgia,serif;
+  --mono:'Fira Code',monospace;
+  --sans:'Nunito',sans-serif;
+  --border:rgba(26,22,15,.1);
+  --shadow:0 2px 12px rgba(26,22,15,.08);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--linen);color:var(--ink);font-family:var(--sans);min-height:100vh;}
+::-webkit-scrollbar{width:5px;height:4px;}
+::-webkit-scrollbar-track{background:var(--linen2);}
+::-webkit-scrollbar-thumb{background:var(--linen4);border-radius:3px;}
+
+/* subtle texture overlay */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.4;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* ─── MASTHEAD ─── */
+.mast{
+  background:var(--ink);color:var(--linen);
+  padding:32px 52px 0; position:relative; overflow:hidden; z-index:10;
+}
+.mast::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(45deg,transparent,transparent 30px,rgba(255,255,255,.015) 30px,rgba(255,255,255,.015) 31px);
+}
+.mast-inner{display:flex;align-items:flex-start;gap:40px;position:relative;z-index:1;}
+.mast-l{flex:1;}
+.mast-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:rgba(250,247,242,.35);margin-bottom:10px;}
+.mast-title{font-family:var(--serif);font-size:clamp(28px,3.5vw,50px);color:var(--linen);line-height:1.1;margin-bottom:10px;}
+.mast-title em{color:var(--ochre2);font-style:italic;}
+.mast-sub{font-size:13px;color:rgba(250,247,242,.5);line-height:1.8;max-width:580px;}
+.mast-r{display:flex;gap:32px;flex-shrink:0;padding-top:6px;}
+.mkpi{text-align:right;}
+.mkpi-v{font-family:var(--serif);font-size:34px;color:var(--ochre2);line-height:1;}
+.mkpi-l{font-family:var(--mono);font-size:9px;color:rgba(250,247,242,.3);letter-spacing:2px;margin-top:3px;}
+
+/* ─── TAB NAV ─── */
+.tabnav{
+  background:var(--ink2);
+  display:flex;align-items:stretch;
+  overflow-x:auto;position:sticky;top:0;z-index:400;
+  border-bottom:2px solid var(--ochre);
+}
+.tab{
+  flex:1;min-width:120px;padding:0;
+  border:none;background:none;cursor:pointer;
+  display:flex;flex-direction:column;
+  border-right:1px solid rgba(255,255,255,.05);
+  transition:background .2s;
+}
+.tab:last-child{border-right:none;}
+.tab-inner{padding:13px 18px 11px;height:100%;transition:background .2s;}
+.tab:hover .tab-inner{background:rgba(255,255,255,.04);}
+.tab.active .tab-inner{background:rgba(200,120,10,.15);}
+.tab-num{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.25);margin-bottom:3px;}
+.tab.active .tab-num{color:var(--ochre2);}
+.tab-name{font-family:var(--sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.45);line-height:1.3;}
+.tab.active .tab-name{color:var(--ochre2);}
+.tab-bar{height:2px;background:var(--ochre);opacity:0;transition:opacity .2s;}
+.tab.active .tab-bar{opacity:1;}
+
+/* ─── PAGES ─── */
+.page{display:none;padding:36px 52px 64px;max-width:1440px;margin:0 auto;position:relative;z-index:1;}
+.page.active{display:block;}
+
+/* ─── SECTION LABEL ─── */
+.slbl{
+  font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--ink4);
+  text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:16px;
+}
+.slbl::after{content:'';flex:1;height:1px;background:var(--border);}
+.slbl::before{content:'//';color:var(--linen4);}
+
+/* ─── GRIDS ─── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:22px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:20px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;}
+
+/* ─── CARD ─── */
+.card{
+  background:var(--linen);border:1px solid var(--border);
+  border-radius:8px;padding:22px;position:relative;overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--pc,var(--ochre));border-radius:8px 8px 0 0;
+}
+.card-title{font-family:var(--serif);font-size:17px;color:var(--ink);margin-bottom:4px;}
+.card-sub{font-family:var(--mono);font-size:9px;color:var(--ink4);letter-spacing:.5px;margin-bottom:16px;}
+
+/* ─── PERSONAS ─── */
+.persona{
+  background:var(--linen);border:1px solid var(--border);
+  border-radius:10px;overflow:hidden;box-shadow:var(--shadow);
+  transition:transform .2s,box-shadow .2s;
+}
+.persona:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(26,22,15,.12);}
+.persona-head{
+  padding:20px 22px 16px;
+  background:linear-gradient(135deg,var(--phc1,#1a3a5c),var(--phc2,#0d2a4a));
+  position:relative;overflow:hidden;
+}
+.persona-head::before{
+  content:'';position:absolute;right:-20px;bottom:-20px;
+  width:80px;height:80px;border-radius:50%;
+  background:rgba(255,255,255,.06);
+}
+.persona-avatar{
+  width:48px;height:48px;border-radius:50%;
+  background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;margin-bottom:12px;
+}
+.persona-name{font-family:var(--serif);font-size:20px;color:#fff;margin-bottom:2px;}
+.persona-role{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.55);letter-spacing:1px;}
+.persona-tag{
+  display:inline-block;font-family:var(--mono);font-size:8px;letter-spacing:1px;
+  background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);
+  padding:3px 10px;border-radius:2px;margin-top:8px;
+}
+.persona-body{padding:18px 22px;}
+.persona-quote{
+  font-family:var(--serif);font-size:14px;font-style:italic;
+  color:var(--ink2);line-height:1.65;margin-bottom:14px;
+  padding-left:14px;border-left:3px solid var(--phc1,#1a3a5c);
+}
+.persona-section{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--ink4);margin-bottom:6px;text-transform:uppercase;}
+.persona-list{margin-bottom:12px;}
+.persona-item{
+  display:flex;align-items:flex-start;gap:7px;
+  font-size:12px;color:var(--ink2);line-height:1.6;margin-bottom:4px;
+}
+.persona-bullet{
+  flex-shrink:0;width:6px;height:6px;border-radius:50%;
+  background:var(--phc1,#1a3a5c);margin-top:6px;
+}
+.persona-metric{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 10px;background:var(--linen2);border-radius:4px;
+  margin-bottom:5px;
+}
+.pm-key{font-size:11px;color:var(--ink3);}
+.pm-val{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--phc1,#1a3a5c);}
+
+/* ─── REQUIREMENTS TABLE ─── */
+.rtable{width:100%;border-collapse:collapse;font-size:11.5px;}
+.rtable th{
+  background:var(--ink);color:var(--linen);
+  padding:9px 12px;text-align:left;
+  font-family:var(--mono);font-size:9px;letter-spacing:1px;
+  position:sticky;top:0;
+}
+.rtable td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--ink2);vertical-align:top;line-height:1.5;}
+.rtable tbody tr:hover td{background:var(--linen2);}
+.rtable tbody tr:nth-child(even) td{background:rgba(26,22,15,.02);}
+.req-id{font-family:var(--mono);font-size:9px;color:var(--ink4);white-space:nowrap;}
+.req-persona{
+  display:inline-flex;align-items:center;gap:4px;
+  font-family:var(--mono);font-size:8px;padding:2px 7px;border-radius:2px;
+  white-space:nowrap;
+}
+.req-us{font-size:11.5px;color:var(--ink2);line-height:1.5;}
+.req-ac{font-size:10.5px;color:var(--ink4);line-height:1.5;font-style:italic;}
+
+/* ─── MOSCOW ─── */
+.moscow-section{margin-bottom:24px;}
+.moscow-header{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 16px;border-radius:6px 6px 0 0;
+  margin-bottom:0;
+}
+.moscow-label{
+  font-family:var(--serif);font-size:18px;color:#fff;
+}
+.moscow-desc{font-size:11px;color:rgba(255,255,255,.65);margin-left:auto;font-family:var(--mono);}
+.moscow-items{
+  border:1px solid var(--border);border-top:none;
+  border-radius:0 0 6px 6px;overflow:hidden;
+}
+.moscow-item{
+  display:grid;grid-template-columns:180px 1fr 80px 80px 80px;
+  align-items:start;gap:0;
+  padding:10px 16px;border-bottom:1px solid var(--border);
+  transition:background .15s;
+}
+.moscow-item:last-child{border-bottom:none;}
+.moscow-item:hover{background:var(--linen2);}
+.mi-id{font-family:var(--mono);font-size:9px;color:var(--ink4);}
+.mi-title{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.mi-body{font-size:11px;color:var(--ink3);line-height:1.5;}
+.mi-persona{font-family:var(--mono);font-size:8px;color:var(--ink4);margin-top:3px;}
+.mi-num{
+  text-align:center;font-family:var(--mono);font-size:13px;font-weight:600;
+  padding-top:2px;
+}
+
+/* ─── VALUE EFFORT MATRIX ─── */
+.ve-matrix{
+  position:relative;width:100%;height:520px;
+  background:var(--linen2);border:1px solid var(--border);border-radius:8px;
+  overflow:hidden;
+}
+.ve-axis-x,.ve-axis-y{position:absolute;display:flex;align-items:center;gap:8px;}
+.ve-axis-x{bottom:12px;left:50%;transform:translateX(-50%);}
+.ve-axis-y{top:50%;left:12px;transform:translateY(-50%) rotate(-90deg);transform-origin:center;}
+.ve-axis-lbl{font-family:var(--mono);font-size:10px;color:var(--ink4);letter-spacing:1px;}
+.ve-quad{
+  position:absolute;display:flex;align-items:flex-start;justify-content:flex-start;
+  font-family:var(--mono);font-size:9px;letter-spacing:1px;
+  padding:10px 12px;font-weight:600;
+}
+.ve-dot{
+  position:absolute;width:11px;height:11px;border-radius:50%;
+  transform:translate(-50%,-50%);cursor:pointer;
+  transition:transform .2s,box-shadow .2s;border:2px solid #fff;
+}
+.ve-dot:hover{transform:translate(-50%,-50%) scale(1.5);box-shadow:0 0 12px rgba(0,0,0,.3);z-index:10;}
+.ve-dot:hover .ve-tooltip{opacity:1;pointer-events:auto;}
+.ve-tooltip{
+  position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:var(--ink);color:var(--linen);border-radius:5px;padding:8px 12px;
+  font-family:var(--sans);font-size:11px;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;
+  box-shadow:0 4px 16px rgba(0,0,0,.2);min-width:160px;
+}
+.ve-tooltip::after{
+  content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:var(--ink);
+}
+.ve-gridline{position:absolute;background:rgba(26,22,15,.08);}
+.ve-divider-x{position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(26,22,15,.15);border-top:1px dashed rgba(26,22,15,.2);}
+.ve-divider-y{position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(26,22,15,.15);border-left:1px dashed rgba(26,22,15,.2);}
+
+/* ─── RICE TABLE ─── */
+.rice-row{
+  display:grid;
+  grid-template-columns:200px 60px 60px 60px 60px 80px 1fr;
+  align-items:center;gap:0;
+  padding:10px 14px;border-bottom:1px solid var(--border);
+  transition:background .15s;
+}
+.rice-row:hover{background:var(--linen2);}
+.rice-hdr{
+  background:var(--ink);color:var(--linen);
+  border-radius:6px 6px 0 0;
+}
+.rice-hdr .rice-cell{
+  font-family:var(--mono);font-size:9px;letter-spacing:1px;
+  color:rgba(250,247,242,.6);padding:9px 14px;
+}
+.rice-cell{padding:0 6px;}
+.rice-name{font-size:12px;font-weight:700;color:var(--ink);}
+.rice-sub{font-family:var(--mono);font-size:9px;color:var(--ink4);}
+.rice-num{font-family:var(--mono);font-size:13px;font-weight:600;text-align:center;}
+.rice-score{
+  font-family:var(--mono);font-size:15px;font-weight:600;
+  color:var(--ochre);text-align:right;
+}
+.score-bar{
+  height:8px;background:var(--linen3);border-radius:4px;overflow:hidden;
+  margin-top:4px;
+}
+.score-fill{height:100%;border-radius:4px;background:var(--ochre);transition:width 1.2s ease;}
+
+/* ─── ROADMAP ─── */
+.roadmap-header{
+  display:grid;grid-template-columns:180px 1fr 1fr 1fr 1fr;
+  background:var(--ink);color:var(--linen);border-radius:6px 6px 0 0;
+  padding:0;overflow:hidden;
+}
+.rh-cell{
+  padding:12px 16px;font-family:var(--mono);font-size:9px;
+  letter-spacing:1.5px;color:rgba(250,247,242,.5);
+  border-right:1px solid rgba(255,255,255,.06);
+}
+.rh-cell.quarter{
+  text-align:center;font-size:11px;font-weight:600;color:rgba(250,247,242,.8);
+}
+.rm-row{
+  display:grid;grid-template-columns:180px 1fr 1fr 1fr 1fr;
+  border-bottom:1px solid var(--border);min-height:60px;
+}
+.rm-row:last-child{border-bottom:none;}
+.rm-row:hover{background:var(--linen2);}
+.rm-label{
+  padding:14px 16px;border-right:1px solid var(--border);
+  background:var(--linen2);
+}
+.rm-lbl-theme{font-size:11px;font-weight:700;color:var(--ink);}
+.rm-lbl-type{font-family:var(--mono);font-size:8px;color:var(--ink4);letter-spacing:1px;margin-top:2px;}
+.rm-quarter{
+  padding:10px 12px;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;gap:5px;vertical-align:top;
+}
+.rm-quarter:last-child{border-right:none;}
+.rm-item{
+  padding:6px 10px;border-radius:4px;
+  font-size:10.5px;font-weight:600;line-height:1.3;
+  cursor:default;transition:transform .15s;
+}
+.rm-item:hover{transform:scale(1.02);}
+.rm-milestone{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 10px;border-radius:4px;
+  font-family:var(--mono);font-size:9px;font-weight:600;
+  margin-top:4px;
+}
+.rm-milestone::before{content:'◆';font-size:9px;}
+
+/* ─── REQUIREMENT CARD (for requirements tab) ─── */
+.req-card{
+  background:var(--linen);border:1px solid var(--border);
+  border-radius:7px;padding:16px 18px;margin-bottom:10px;
+  border-left:4px solid var(--pc,var(--ochre));
+  box-shadow:var(--shadow);transition:.15s;
+}
+.req-card:hover{box-shadow:0 4px 20px rgba(26,22,15,.1);}
+.req-card-hdr{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;}
+.req-card-id{font-family:var(--mono);font-size:9px;color:var(--ink4);flex-shrink:0;padding-top:2px;}
+.req-card-title{font-size:13px;font-weight:700;color:var(--ink);flex:1;}
+.req-card-us{font-size:12px;color:var(--ink2);line-height:1.65;margin-bottom:8px;}
+.req-card-ac{font-size:11px;color:var(--ink4);line-height:1.6;font-style:italic;border-left:2px solid var(--border);padding-left:10px;}
+.req-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.req-tag{font-family:var(--mono);font-size:8px;padding:2px 8px;border-radius:2px;letter-spacing:.5px;}
+
+/* ─── Badges ─── */
+.badge{
+  display:inline-block;font-family:var(--mono);font-size:8px;
+  padding:2px 8px;border-radius:2px;font-weight:600;letter-spacing:.5px;
+}
+.m-m{background:#ffe8e8;color:#a00;} .m-s{background:#fff3e0;color:#a05000;}
+.m-c{background:#e8f4fe;color:#0055a0;} .m-w{background:#f0f0f0;color:#555;}
+.moscow-m{background:#c0392b;} .moscow-s{background:#d68910;}
+.moscow-c{background:#2471a3;} .moscow-w{background:#666;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card,.persona,.req-card,.moscow-section{animation:fadeUp .35s ease both;}
+.card:nth-child(2){animation-delay:.05s}
+.card:nth-child(3){animation-delay:.1s}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ MASTHEAD ═══════════ -->
+<div class="mast">
+  <div class="mast-inner">
+    <div class="mast-l">
+      <div class="mast-eyebrow">Product Roadmap · Autonomous Transit Refund Agent · PM View · 2024–2025</div>
+      <h1 class="mast-title">Requirements, Priorities &<br><em>Strategic Roadmap</em></h1>
+      <p class="mast-sub">A complete PM product roadmap — 5 user personas, 28 requirements in user-story format, MoSCoW prioritisation, Value vs. Effort matrix, RICE scoring, and a 4-quarter visual roadmap. Every priority decision is traceable to persona pain and business data.</p>
+    </div>
+    <div class="mast-r">
+      <div class="mkpi"><div class="mkpi-v">5</div><div class="mkpi-l">PERSONAS</div></div>
+      <div class="mkpi"><div class="mkpi-v">28</div><div class="mkpi-l">REQUIREMENTS</div></div>
+      <div class="mkpi"><div class="mkpi-v">4</div><div class="mkpi-l">QUARTERS</div></div>
+      <div class="mkpi"><div class="mkpi-v" style="color:#5ec97a">$1.84M</div><div class="mkpi-l">ANNUAL ROI</div></div>
+    </div>
+  </div>
+  <!-- Tab nav -->
+  <nav class="tabnav">
+    <button class="tab active" onclick="showTab(1,this)">
+      <div class="tab-inner"><div class="tab-num">01</div><div class="tab-name">User Personas</div></div>
+      <div class="tab-bar"></div>
+    </button>
+    <button class="tab" onclick="showTab(2,this)">
+      <div class="tab-inner"><div class="tab-num">02</div><div class="tab-name">Requirements</div></div>
+      <div class="tab-bar"></div>
+    </button>
+    <button class="tab" onclick="showTab(3,this)">
+      <div class="tab-inner"><div class="tab-num">03</div><div class="tab-name">MoSCoW</div></div>
+      <div class="tab-bar"></div>
+    </button>
+    <button class="tab" onclick="showTab(4,this)">
+      <div class="tab-inner"><div class="tab-num">04</div><div class="tab-name">Value vs Effort</div></div>
+      <div class="tab-bar"></div>
+    </button>
+    <button class="tab" onclick="showTab(5,this)">
+      <div class="tab-inner"><div class="tab-num">05</div><div class="tab-name">RICE Scoring</div></div>
+      <div class="tab-bar"></div>
+    </button>
+    <button class="tab" onclick="showTab(6,this)">
+      <div class="tab-inner"><div class="tab-num">06</div><div class="tab-name">Roadmap</div></div>
+      <div class="tab-bar"></div>
+    </button>
+  </nav>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!--  TAB 1: USER PERSONAS                 -->
+<!-- ══════════════════════════════════════ -->
+<section id="t1" class="page active">
+  <div style="margin-bottom:10px;">
+    <div class="slbl">5 personas · representing all stakeholders who interact with the refund system</div>
+  </div>
+
+  <div class="g2" style="margin-bottom:20px;">
+
+    <!-- Persona 1: Transit Rider -->
+    <div class="persona" style="--phc1:#1a3a5c;--phc2:#0d2a4a;">
+      <div class="persona-head">
+        <div class="persona-avatar">🚇</div>
+        <div class="persona-name">Priya Mehta</div>
+        <div class="persona-role">THE DAILY COMMUTER · PRIMARY PERSONA</div>
+        <div class="persona-tag">4.2M DAILY RIDERS · HIGHEST VOLUME</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-quote">"I had a signal failure at 8am, ended up 40 minutes late, and three days later I still don't know if my refund is coming. I just want it handled — I shouldn't have to chase it."</div>
+        <div class="persona-section">Demographics & Context</div>
+        <div class="persona-list">
+          <div class="persona-item"><div class="persona-bullet"></div>Age 28, software professional, commutes 5 days/week on monthly transit pass</div>
+          <div class="persona-item"><div class="persona-bullet"></div>High digital literacy — mobile-first. Uses transit app daily for journey planning</div>
+          <div class="persona-item"><div class="persona-bullet"></div>Experienced 3 disruptions in past 6 months; filed 1 refund manually, gave up on 2 others</div>
+        </div>
+        <div class="persona-section">Pain Points</div>
+        <div class="persona-list">
+          <div class="persona-item"><div class="persona-bullet" style="background:#c0392b"></div>No notification that disruption qualifies for refund — 47% unaware of eligibility</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#c0392b"></div>4.2-day average wait feels like nobody is handling it (expectation: same day)</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#c0392b"></div>No status visibility — "Is it being processed? Did they even receive it?"</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#d68910"></div>Manual claim form is complex — required her to look up trip IDs she doesn't have</div>
+        </div>
+        <div class="persona-section">Goals & Motivations</div>
+        <div class="persona-list">
+          <div class="persona-item"><div class="persona-bullet" style="background:#1a6b3e"></div>Refund to arrive without her having to do anything (zero-touch)</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#1a6b3e"></div>Confidence that the system "has her back" during disruptions</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#1a6b3e"></div>Keep using transit — trips reduced after last bad refund experience</div>
+        </div>
+        <div class="persona-section">Key Metrics</div>
+        <div class="persona-metric"><span class="pm-key">Current CSAT (refund)</span><span class="pm-val" style="color:#c0392b">2.8 / 5</span></div>
+        <div class="persona-metric"><span class="pm-key">Trips reduced after bad experience</span><span class="pm-val" style="color:#c0392b">3 of 4 riders</span></div>
+        <div class="persona-metric"><span class="pm-key">Target CSAT post-launch</span><span class="pm-val" style="color:#1a6b3e">≥ 4.5 / 5</span></div>
+      </div>
+    </div>
+
+    <!-- Persona 2: Operations Supervisor -->
+    <div class="persona" style="--phc1:#5c2a7a;--phc2:#3d1a52;">
+      <div class="persona-head">
+        <div class="persona-avatar">🎛️</div>
+        <div class="persona-name">Marcus Williams</div>
+        <div class="persona-role">OPERATIONS SUPERVISOR · HITL OPERATOR</div>
+        <div class="persona-tag">12 SUPERVISORS · DAILY HITL USERS</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-quote">"I spend 67% of my day doing data lookups and copy-pasting between systems. I want to spend that time on the hard calls that actually need judgment — the complex patron disputes, the edge cases. Not form-filling."</div>
+        <div class="persona-section">Demographics & Context</div>
+        <div class="persona-list">
+          <div class="persona-item"><div class="persona-bullet"></div>Age 38, 9 years with transit authority. Strong domain knowledge of policy and exceptions</div>
+          <div class="persona-item"><div class="persona-bullet"></div>Manages a team of 4 junior ops staff. Has authority to approve exceptions up to $2,000</div>
+          <div class="persona-item"><div class="persona-bullet"></div>Uses 4 different systems daily: GTFS portal, refund CRM, payment dashboard, comms system</div>
+        </div>
+        <div class="persona-section">Pain Points</div>
+        <div class="persona-list">
+          <div class="persona-item"><div class="persona-bullet" style="background:#c0392b"></div>67% of time is zero-judgment work — lookups, form entry, copy-paste between tools</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#c0392b"></div>During large events (1,000+ patrons), team capacity is exceeded — patrons wait 8+ days</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#d68910"></div>Policy documents spread across SharePoint, email, and physical binders — 3/12 on outdated version</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#d68910"></div>No audit trail when errors are discovered — investigations are manual and slow</div>
+        </div>
+        <div class="persona-section">Goals & Motivations</div>
+        <div class="persona-list">
+          <div class="persona-item"><div class="persona-bullet" style="background:#1a6b3e"></div>Focus 100% of time on cases that genuinely need human judgment</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#1a6b3e"></div>Clear, fast HITL queue with all context pre-loaded — no system-hopping to decide</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#1a6b3e"></div>Confidence that AI system is applying correct policy version — not undermining his expertise</div>
+        </div>
+        <div class="persona-section">Key Metrics</div>
+        <div class="persona-metric"><span class="pm-key">Current time on zero-judgment tasks</span><span class="pm-val" style="color:#c0392b">67%</span></div>
+        <div class="persona-metric"><span class="pm-key">Target HITL cases per day (supervisor)</span><span class="pm-val" style="color:#1a6b3e">≤ 8 / day</span></div>
+        <div class="persona-metric"><span class="pm-key">HITL resolution SLA target</span><span class="pm-val" style="color:#1a6b3e">&lt; 2 hours</span></div>
+      </div>
+    </div>
+
+  </div>
+  <div class="g3">
+
+    <!-- Persona 3: Finance Controller -->
+    <div class="persona" style="--phc1:#0d6b5e;--phc2:#084d44;">
+      <div class="persona-head">
+        <div class="persona-avatar">💼</div>
+        <div class="persona-name">Anika Sharma</div>
+        <div class="persona-role">FINANCE CONTROLLER</div>
+        <div class="persona-tag">COMPLIANCE · AUDIT · ROI OWNER</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-quote">"Three refunds exceeded $2,000 last year with no controls. I need every disbursement to be auditable, capped, and traceable — any AI doing this must be accountable at the financial layer, not just the prompt layer."</div>
+        <div class="persona-section">Pain Points</div>
+        <div class="persona-list">
+          <div class="persona-item"><div class="persona-bullet" style="background:#c0392b"></div>$380K/yr in error correction costs — no tracking existed before PM investigation</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#c0392b"></div>3 uncontrolled refunds exceeded $2K in 2022 — no financial cap at payment layer</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#d68910"></div>No audit trail — errors discovered avg. 11 days after disbursement</div>
+        </div>
+        <div class="persona-section">Goals</div>
+        <div class="persona-list">
+          <div class="persona-item"><div class="persona-bullet" style="background:#1a6b3e"></div>Hard cap enforced at API layer — not dependent on LLM behavior</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#1a6b3e"></div>Immutable audit log for every refund decision with reasoning trace</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#1a6b3e"></div>Real-time financial dashboard — no more 11-day lag to discover errors</div>
+        </div>
+        <div class="persona-metric"><span class="pm-key">Error correction cost (current)</span><span class="pm-val" style="color:#c0392b">$380K/yr</span></div>
+        <div class="persona-metric"><span class="pm-key">Target error rate</span><span class="pm-val" style="color:#1a6b3e">&lt; 0.3%</span></div>
+      </div>
+    </div>
+
+    <!-- Persona 4: Compliance/Legal Officer -->
+    <div class="persona" style="--phc1:#8b2e14;--phc2:#631f0d;">
+      <div class="persona-head">
+        <div class="persona-avatar">⚖️</div>
+        <div class="persona-name">Dr. Rajan Patel</div>
+        <div class="persona-role">LEGAL & COMPLIANCE OFFICER</div>
+        <div class="persona-tag">DATA PRIVACY · REGULATORY · AUDIT</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-quote">"If this AI system makes a wrong eligibility decision and the patron complains, I need to be able to reconstruct exactly what policy it used, what data it had, and why it decided what it decided — within minutes, not days."</div>
+        <div class="persona-section">Pain Points</div>
+        <div class="persona-list">
+          <div class="persona-item"><div class="persona-bullet" style="background:#c0392b"></div>No audit trail for manual decisions — complaints take 3–5 days to investigate</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#c0392b"></div>Patron PII (card data, travel history) at risk if LLM processes raw data</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#d68910"></div>Policy version mismatch — operators applying 2021 policy in 2023</div>
+        </div>
+        <div class="persona-section">Goals</div>
+        <div class="persona-list">
+          <div class="persona-item"><div class="persona-bullet" style="background:#1a6b3e"></div>Full decision audit trail — reconstruct any case in &lt;5 minutes</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#1a6b3e"></div>PII never reaches LLM — tokenized at MCP server boundary</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#1a6b3e"></div>Policy version always current — RAG must reflect latest signed document</div>
+        </div>
+        <div class="persona-metric"><span class="pm-key">Complaint investigation time (current)</span><span class="pm-val" style="color:#c0392b">3–5 days</span></div>
+        <div class="persona-metric"><span class="pm-key">Target investigation time</span><span class="pm-val" style="color:#1a6b3e">&lt; 5 minutes</span></div>
+      </div>
+    </div>
+
+    <!-- Persona 5: Product/Operations Director -->
+    <div class="persona" style="--phc1:#7a5c00;--phc2:#5a4200;">
+      <div class="persona-head">
+        <div class="persona-avatar">📊</div>
+        <div class="persona-name">Sarah Chen</div>
+        <div class="persona-role">VP OPERATIONS & PRODUCT</div>
+        <div class="persona-tag">EXECUTIVE SPONSOR · ROI ACCOUNTABLE</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-quote">"I approved $260K for this system. I need a measurable CSAT improvement within 6 months, a clear error rate below 0.3%, and a system that scales to our 18% YoY ridership growth without adding headcount."</div>
+        <div class="persona-section">Pain Points</div>
+        <div class="persona-list">
+          <div class="persona-item"><div class="persona-bullet" style="background:#c0392b"></div>CSAT gap of 1.3 points below service average is boardroom-level concern</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#c0392b"></div>Manual process capacity ceiling hit 23 days in 2022 — non-linear risk</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#d68910"></div>No visibility into refund operations — dashboard doesn't exist</div>
+        </div>
+        <div class="persona-section">Goals</div>
+        <div class="persona-list">
+          <div class="persona-item"><div class="persona-bullet" style="background:#1a6b3e"></div>CSAT ≥ 4.5 on refund category within 6 months of launch</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#1a6b3e"></div>System handles 18% YoY growth — zero headcount addition required</div>
+          <div class="persona-item"><div class="persona-bullet" style="background:#1a6b3e"></div>Executive dashboard with real-time operational and financial metrics</div>
+        </div>
+        <div class="persona-metric"><span class="pm-key">CSAT gap to close</span><span class="pm-val" style="color:#c0392b">1.3 pts below avg</span></div>
+        <div class="persona-metric"><span class="pm-key">ROI target (year 1)</span><span class="pm-val" style="color:#1a6b3e">$1.84M</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<!--  TAB 2: REQUIREMENTS                 -->
+<!-- ══════════════════════════════════════ -->
+<section id="t2" class="page">
+  <div class="slbl">28 requirements · user-story format · acceptance criteria · persona mapped</div>
+
+  <div class="g2">
+    <div>
+      <div class="slbl" style="color:var(--slate)">Priya (Rider) Requirements — REQ-P</div>
+
+      <div class="req-card" style="--pc:#1a3a5c;">
+        <div class="req-card-hdr">
+          <div class="req-card-id">REQ-P01</div>
+          <div class="req-card-title">Zero-Touch Proactive Refund</div>
+          <span class="badge" style="background:#1a3a5c;color:#fff;flex-shrink:0;">RIDER</span>
+        </div>
+        <div class="req-card-us">As a daily commuter affected by a disruption, I want to automatically receive my refund without filing a claim, so that I don't have to spend time on administrative tasks after an already stressful journey.</div>
+        <div class="req-card-ac">AC: System identifies all eligible patrons within 5 minutes of disruption confirmation. Refund initiated without patron action. 100% of eligible patrons processed with no unclaimed refunds.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#e8eef8;color:#1a3a5c;">V1 MUST</span><span class="req-tag" style="background:#f5f5f5;color:#555;">CORE FLOW</span><span class="req-tag" style="background:#e8f8ee;color:#1a6b3e;">HIGH RICE: 648</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#1a3a5c;">
+        <div class="req-card-hdr">
+          <div class="req-card-id">REQ-P02</div>
+          <div class="req-card-title">Real-Time Status Notification</div>
+          <span class="badge" style="background:#1a3a5c;color:#fff;flex-shrink:0;">RIDER</span>
+        </div>
+        <div class="req-card-us">As a rider, I want to receive a push notification within 5 minutes of my refund being processed, so that I know it has been handled and don't need to follow up.</div>
+        <div class="req-card-ac">AC: Notification sent within 5 minutes of payment confirmation. Message includes: amount, method (card/credit), expected arrival time. Inquiry rate &lt;1 per 100 patrons post-notification.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#e8eef8;color:#1a3a5c;">V1 MUST</span><span class="req-tag" style="background:#fff3e0;color:#a05000;">NOTIFICATION</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#1a3a5c;">
+        <div class="req-card-hdr">
+          <div class="req-card-id">REQ-P03</div>
+          <div class="req-card-title">Sub-90-Second Resolution Time</div>
+          <span class="badge" style="background:#1a3a5c;color:#fff;flex-shrink:0;">RIDER</span>
+        </div>
+        <div class="req-card-us">As a rider, I want my standard refund to be processed within 90 seconds of a disruption being confirmed, so that I trust the system is fast and reliable.</div>
+        <div class="req-card-ac">AC: P50 &lt;90s, P90 &lt;5min, P99 &lt;10min for all standard event types. SLA measured from disruption_confirmed timestamp to payment_gateway_confirmed.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#e8eef8;color:#1a3a5c;">V1 MUST</span><span class="req-tag" style="background:#f5f5f5;color:#555;">PERFORMANCE SLA</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#1a3a5c;">
+        <div class="req-card-hdr">
+          <div class="req-card-id">REQ-P04</div>
+          <div class="req-card-title">Pass Holder Credit Notification (Personalised)</div>
+          <span class="badge" style="background:#1a3a5c;color:#fff;flex-shrink:0;">RIDER</span>
+        </div>
+        <div class="req-card-us">As a monthly pass holder, I want to receive a notification explaining that my refund is applied as account credit (not a card refund), so that I'm not confused about where my money went.</div>
+        <div class="req-card-ac">AC: Notification copy differs based on payment_type. Pass holders see credit-specific message. Pass holder inquiry rate &lt;0.5 per 100 patrons.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#fff3e0;color:#a05000;">V1.x SHOULD</span><span class="req-tag" style="background:#f5f5f5;color:#555;">PERSONALISATION</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#1a3a5c;">
+        <div class="req-card-hdr">
+          <div class="req-card-id">REQ-P05</div>
+          <div class="req-card-title">Multi-Channel Notification (Push + SMS + Email)</div>
+          <span class="badge" style="background:#1a3a5c;color:#fff;flex-shrink:0;">RIDER</span>
+        </div>
+        <div class="req-card-us">As a rider who doesn't use the mobile app, I want to receive my refund notification via SMS or email, so that I'm not excluded from proactive communication.</div>
+        <div class="req-card-ac">AC: System sends push notification (primary). Falls back to SMS if no app engagement in last 30 days. Email as tertiary. 99% patron reachability across all channels.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#fff3e0;color:#a05000;">V1.x SHOULD</span><span class="req-tag" style="background:#f5f5f5;color:#555;">CHANNELS</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#1a3a5c;">
+        <div class="req-card-hdr">
+          <div class="req-card-id">REQ-P06</div>
+          <div class="req-card-title">Self-Service Dispute Portal</div>
+          <span class="badge" style="background:#1a3a5c;color:#fff;flex-shrink:0;">RIDER</span>
+        </div>
+        <div class="req-card-us">As a rider who disagrees with a refund decision, I want to submit a dispute through the app that shows me exactly what the system decided and why, so that I can provide relevant information to have it reviewed.</div>
+        <div class="req-card-ac">AC: Patron sees decision summary in app. Dispute form pre-fills with case data. Dispute routes to HITL queue with full context. Patron receives status updates within 24hrs.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#e8f4fe;color:#0055a0;">V2 COULD</span><span class="req-tag" style="background:#f5f5f5;color:#555;">TRANSPARENCY</span></div>
+      </div>
+
+    </div>
+    <div>
+      <div class="slbl" style="color:var(--plum)">Marcus (Ops Supervisor) Requirements — REQ-O</div>
+
+      <div class="req-card" style="--pc:#5c2a7a;">
+        <div class="req-card-hdr">
+          <div class="req-card-id">REQ-O01</div>
+          <div class="req-card-title">HITL Queue with Pre-loaded Context</div>
+          <span class="badge" style="background:#5c2a7a;color:#fff;flex-shrink:0;">OPS</span>
+        </div>
+        <div class="req-card-us">As an operations supervisor, I want to see every escalated case in a single queue with all relevant context pre-loaded — patron details, trip data, policy extract, AI confidence score, and reason for escalation — so that I can make a decision without switching systems.</div>
+        <div class="req-card-ac">AC: HITL queue shows all 6 context fields per case. Supervisor makes decision in single interface. Decision logged with justification and supervisor ID. No external system access required to resolve standard escalations.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#ede4f8;color:#5c2a7a;">V1 MUST</span><span class="req-tag" style="background:#f5f5f5;color:#555;">HITL UX</span><span class="req-tag" style="background:#e8f8ee;color:#1a6b3e;">HIGH RICE: 540</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#5c2a7a;">
+        <div class="req-card-hdr">
+          <div class="req-card-id">REQ-O02</div>
+          <div class="req-card-title">2-Hour HITL Resolution SLA with Escalation Alerts</div>
+          <span class="badge" style="background:#5c2a7a;color:#fff;flex-shrink:0;">OPS</span>
+        </div>
+        <div class="req-card-us">As an operations supervisor, I want to be automatically alerted when a case has been in my HITL queue for 90 minutes, so that I never breach the 2-hour patron resolution SLA.</div>
+        <div class="req-card-ac">AC: Cases older than 90min trigger push + email alert to assigned supervisor. Cases older than 115min escalate to backup supervisor pool. 2hr SLA met on ≥98% of escalations.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#ede4f8;color:#5c2a7a;">V1 MUST</span><span class="req-tag" style="background:#f5f5f5;color:#555;">SLA MANAGEMENT</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#5c2a7a;">
+        <div class="req-card-hdr">
+          <div class="req-card-id">REQ-O03</div>
+          <div class="req-card-title">Policy Document Admin Console</div>
+          <span class="badge" style="background:#5c2a7a;color:#fff;flex-shrink:0;">OPS</span>
+        </div>
+        <div class="req-card-us">As an operations manager, I want to update the policy documents used by the AI in real-time via an admin console, without needing to involve engineering, so that refunds always apply the latest approved policy within hours of an update.</div>
+        <div class="req-card-ac">AC: Admin console allows PDF upload. RAG index refreshed within 30 minutes of upload. Policy version metadata visible to supervisors during HITL. Old chunks marked stale immediately on upload.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#ede4f8;color:#5c2a7a;">V1 MUST</span><span class="req-tag" style="background:#f5f5f5;color:#555;">POLICY MGMT</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#5c2a7a;">
+        <div class="req-card-hdr">
+          <div class="req-card-id">REQ-O04</div>
+          <div class="req-card-title">Ops Performance Dashboard</div>
+          <span class="badge" style="background:#5c2a7a;color:#fff;flex-shrink:0;">OPS</span>
+        </div>
+        <div class="req-card-us">As an operations supervisor, I want a real-time dashboard showing straight-through rate, HITL queue depth, error rate, and average resolution time, so that I can identify performance issues before they breach SLAs.</div>
+        <div class="req-card-ac">AC: Dashboard refreshes every 30s. Shows 6 core operational KPIs. Alerts fire if any metric crosses defined threshold. Historical 30-day trend visible.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#fff3e0;color:#a05000;">V1 SHOULD</span><span class="req-tag" style="background:#f5f5f5;color:#555;">OBSERVABILITY</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#5c2a7a;">
+        <div class="req-card-hdr">
+          <div class="req-card-id">REQ-O05</div>
+          <div class="req-card-title">Novel Case Memory — HITL Decisions Index to RAG</div>
+          <span class="badge" style="background:#5c2a7a;color:#fff;flex-shrink:0;">OPS</span>
+        </div>
+        <div class="req-card-us">As an operations supervisor, I want my HITL decisions on novel disruption types to be automatically added to the AI's knowledge base, so that similar future cases are handled automatically without needing my review.</div>
+        <div class="req-card-ac">AC: Approved HITL decision (with justification) is indexed to RAG within 60 minutes. Future events of same type see confidence improvement ≥0.10. Supervisor is notified when a case they reviewed is now handled autonomously.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#fff3e0;color:#a05000;">V1 SHOULD</span><span class="req-tag" style="background:#f5f5f5;color:#555;">CONTINUOUS LEARNING</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#5c2a7a;">
+        <div class="req-card-hdr">
+          <div class="req-card-id">REQ-O06</div>
+          <div class="req-card-title">Bulk Override & Batch Correction Tool</div>
+          <span class="badge" style="background:#5c2a7a;color:#fff;flex-shrink:0;">OPS</span>
+        </div>
+        <div class="req-card-us">As an operations manager, I want to apply a policy correction to all refunds from a specific disruption event in a single action, so that when a systematic error is discovered I can remediate it in minutes, not hours.</div>
+        <div class="req-card-ac">AC: Admin can select event, define correction rule, preview affected refunds (count + total value), and submit bulk override. All corrections logged in audit trail. Patron re-notification sent automatically.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#e8f4fe;color:#0055a0;">V2 COULD</span><span class="req-tag" style="background:#f5f5f5;color:#555;">ERROR RECOVERY</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="g2">
+    <div>
+      <div class="slbl" style="color:var(--teal)">Anika (Finance) Requirements — REQ-F</div>
+
+      <div class="req-card" style="--pc:#0d6b5e;">
+        <div class="req-card-hdr"><div class="req-card-id">REQ-F01</div><div class="req-card-title">$500 Hard Cap at Payment API Layer</div><span class="badge" style="background:#0d6b5e;color:#fff;flex-shrink:0;">FINANCE</span></div>
+        <div class="req-card-us">As the Finance Controller, I want a hard financial cap enforced at the payment API layer — not the prompt layer — so that no single autonomous refund can exceed $500 regardless of LLM output.</div>
+        <div class="req-card-ac">AC: Payment Gateway MCP Server rejects any refund request >$500 with AMOUNT_EXCEEDS_CAP. Rejection routes to HITL with financial alert. Cap is infrastructure-enforced — not bypassable by prompt content. 0 autonomous refunds >$500 in production.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#e4f4f0;color:#0d6b5e;">V1 MUST</span><span class="req-tag" style="background:#ffe8e8;color:#a00;">FINANCIAL SAFETY</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#0d6b5e;">
+        <div class="req-card-hdr"><div class="req-card-id">REQ-F02</div><div class="req-card-title">Immutable Audit Log — Every Decision Traceable</div><span class="badge" style="background:#0d6b5e;color:#fff;flex-shrink:0;">FINANCE</span></div>
+        <div class="req-card-us">As the Finance Controller, I want an immutable audit log recording every refund decision — including the policy chunk used, confidence score, data inputs, and outcome — so that any payment can be reconstructed for audit within minutes.</div>
+        <div class="req-card-ac">AC: Audit log is append-only (no updates/deletes). Every entry includes: event_id, timestamp, agent_decisions[], policy_version, confidence_score, refund_amount, payment_status. Log queryable by event, patron, or date range. Retention: 7 years.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#e4f4f0;color:#0d6b5e;">V1 MUST</span><span class="req-tag" style="background:#f5f5f5;color:#555;">COMPLIANCE</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#0d6b5e;">
+        <div class="req-card-hdr"><div class="req-card-id">REQ-F03</div><div class="req-card-title">Idempotency — Zero Duplicate Payments</div><span class="badge" style="background:#0d6b5e;color:#fff;flex-shrink:0;">FINANCE</span></div>
+        <div class="req-card-us">As the Finance Controller, I want the system to guarantee that each eligible patron receives exactly one refund payment, even in retry or crash-recovery scenarios, so that duplicate disbursements never occur.</div>
+        <div class="req-card-ac">AC: Idempotency key generated per patron per event. Payment Gateway MCP Server rejects duplicate key with 200 OK (not error). Zero duplicate refunds in 90-day shadow period and post-launch production.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#e4f4f0;color:#0d6b5e;">V1 MUST</span><span class="req-tag" style="background:#ffe8e8;color:#a00;">FINANCIAL INTEGRITY</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#0d6b5e;">
+        <div class="req-card-hdr"><div class="req-card-id">REQ-F04</div><div class="req-card-title">Financial Dashboard — Real-Time Disbursement Visibility</div><span class="badge" style="background:#0d6b5e;color:#fff;flex-shrink:0;">FINANCE</span></div>
+        <div class="req-card-us">As the Finance Controller, I want a real-time dashboard showing total refunds disbursed (daily/monthly), error-correction costs saved, and any cap exceptions in HITL queue, so that I have full financial visibility without waiting for monthly reports.</div>
+        <div class="req-card-ac">AC: Dashboard shows daily and MTD disbursement totals. Cap exception count always visible. Error rate shown with 30-day trend. Data lag &lt;5 minutes. Exportable to CSV for monthly CFO report.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#fff3e0;color:#a05000;">V1 SHOULD</span><span class="req-tag" style="background:#f5f5f5;color:#555;">FINANCIAL VISIBILITY</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="slbl" style="color:var(--sienna)">Rajan (Legal) Requirements — REQ-L &amp; Sarah (VP) — REQ-VP</div>
+
+      <div class="req-card" style="--pc:#8b2e14;">
+        <div class="req-card-hdr"><div class="req-card-id">REQ-L01</div><div class="req-card-title">PII Tokenization at MCP Server Boundary</div><span class="badge" style="background:#8b2e14;color:#fff;flex-shrink:0;">LEGAL</span></div>
+        <div class="req-card-us">As the Legal Officer, I want all patron PII (card numbers, travel history, contact details) to be tokenized before reaching any LLM, so that the AI system cannot leak personal data in its responses or logs.</div>
+        <div class="req-card-ac">AC: Passenger DB MCP Server tokenizes PII at query boundary. LLM receives token IDs, not raw data. Detokenization occurs only at notification delivery layer. PII never appears in LLM prompt or completion. Verified by security audit.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#fde8e3;color:#8b2e14;">V1 MUST</span><span class="req-tag" style="background:#ffe8e8;color:#a00;">DATA PRIVACY</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#8b2e14;">
+        <div class="req-card-hdr"><div class="req-card-id">REQ-L02</div><div class="req-card-title">Prompt Injection Protection — Input + Output Rails</div><span class="badge" style="background:#8b2e14;color:#fff;flex-shrink:0;">LEGAL</span></div>
+        <div class="req-card-us">As the Legal Officer, I want the system to block adversarial inputs attempting to override AI instructions through patron-submitted data, so that no malicious input can cause the system to make unauthorised disbursements.</div>
+        <div class="req-card-ac">AC: NeMo input rails screen all patron-sourced data fields. Output rails validate response schema before any action is taken. Injection catch rate ≥94% (input rail) + 100% (output schema validation). Security test results documented.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#fde8e3;color:#8b2e14;">V1 MUST</span><span class="req-tag" style="background:#ffe8e8;color:#a00;">SECURITY</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#8b2e14;">
+        <div class="req-card-hdr"><div class="req-card-id">REQ-L03</div><div class="req-card-title">Eligibility Bias Monitoring Report</div><span class="badge" style="background:#8b2e14;color:#fff;flex-shrink:0;">LEGAL</span></div>
+        <div class="req-card-us">As the Legal Officer, I want a monthly report showing eligibility approval rates segmented by route, time-of-day, and demographic proxy variables, so that I can detect any systematic bias in AI eligibility decisions.</div>
+        <div class="req-card-ac">AC: Monthly bias report auto-generated. Shows approval rates by: route, time_of_day, payment_type. Flags any segment with approval rate &gt;2σ from mean. PM and Legal notified on flag. Bias remediation SLA: 5 business days.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#e8f4fe;color:#0055a0;">V1 SHOULD</span><span class="req-tag" style="background:#f5f5f5;color:#555;">RAI COMPLIANCE</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#7a5c00;">
+        <div class="req-card-hdr"><div class="req-card-id">REQ-VP01</div><div class="req-card-title">Executive KPI Dashboard</div><span class="badge" style="background:#7a5c00;color:#fff;flex-shrink:0;">VP OPS</span></div>
+        <div class="req-card-us">As the VP of Operations, I want a single executive dashboard showing CSAT, straight-through rate, error rate, and cost savings in real time, so that I can report on ROI to the board without needing ops staff to compile data.</div>
+        <div class="req-card-ac">AC: Dashboard shows 5 board-level KPIs vs targets. Trend vs. pre-launch baseline always visible. Exportable to PDF for board deck. Accessible on mobile. Single source of truth for all ROI reporting.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#fff8e0;color:#7a5c00;">V1 SHOULD</span><span class="req-tag" style="background:#f5f5f5;color:#555;">EXECUTIVE REPORTING</span></div>
+      </div>
+
+      <div class="req-card" style="--pc:#7a5c00;">
+        <div class="req-card-hdr"><div class="req-card-id">REQ-VP02</div><div class="req-card-title">Multi-Agency Architecture — V3 Platform Vision</div><span class="badge" style="background:#7a5c00;color:#fff;flex-shrink:0;">VP OPS</span></div>
+        <div class="req-card-us">As the VP of Operations, I want the refund agent architecture to be extensible to multiple transit agencies with isolated data and policy stores per agency, so that we can license the platform to generate new revenue streams.</div>
+        <div class="req-card-ac">AC: Architecture supports agency_id namespacing for all data stores. Policy MCP and Passenger DB MCP support multi-tenant configuration. First additional agency onboardable in &lt;4 weeks. Isolation validated: agency A cannot access agency B data.</div>
+        <div class="req-tags"><span class="req-tag" style="background:#f0f0f0;color:#555;">V3 WONT (NOW)</span><span class="req-tag" style="background:#f5f5f5;color:#555;">PLATFORM</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<!--  TAB 3: MOSCOW                       -->
+<!-- ══════════════════════════════════════ -->
+<section id="t3" class="page">
+  <div class="slbl">28 requirements prioritised across 4 MoSCoW buckets · V1, V1.x, V2, V3 mapped</div>
+
+  <!-- MUST HAVE -->
+  <div class="moscow-section">
+    <div class="moscow-header" style="background:linear-gradient(135deg,#c0392b,#a00);">
+      <div class="moscow-label">Must Have</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.7);margin-left:12px;">Non-negotiable for V1 launch · Product fails without these</div>
+      <div class="moscow-desc">11 requirements</div>
+    </div>
+    <div class="moscow-items">
+      <div style="display:grid;grid-template-columns:200px 1fr 80px 80px 90px;padding:6px 16px;background:rgba(192,57,43,.06);border-bottom:1px solid var(--border);">
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--ink4);">REQUIREMENT</div>
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--ink4);">RATIONALE</div>
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--ink4);text-align:center;">PERSONA</div>
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--ink4);text-align:center;">RICE</div>
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--ink4);text-align:center;">RELEASE</div>
+      </div>
+      <div id="moscow-must"></div>
+    </div>
+  </div>
+
+  <!-- SHOULD HAVE -->
+  <div class="moscow-section">
+    <div class="moscow-header" style="background:linear-gradient(135deg,#d68910,#b7770d);">
+      <div class="moscow-label">Should Have</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.7);margin-left:12px;">High value · V1 launch without them feasible but suboptimal</div>
+      <div class="moscow-desc">8 requirements</div>
+    </div>
+    <div class="moscow-items"><div id="moscow-should"></div></div>
+  </div>
+
+  <!-- COULD HAVE -->
+  <div class="moscow-section">
+    <div class="moscow-header" style="background:linear-gradient(135deg,#2471a3,#1a5a8a);">
+      <div class="moscow-label">Could Have</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.7);margin-left:12px;">Nice-to-have · V2 candidates · Won't impact V1 success metrics</div>
+      <div class="moscow-desc">6 requirements</div>
+    </div>
+    <div class="moscow-items"><div id="moscow-could"></div></div>
+  </div>
+
+  <!-- WONT HAVE -->
+  <div class="moscow-section">
+    <div class="moscow-header" style="background:linear-gradient(135deg,#555,#333);">
+      <div class="moscow-label">Won't Have (Now)</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.7);margin-left:12px;">V3+ platform vision · Out of scope for current product · Documented to prevent scope creep</div>
+      <div class="moscow-desc">3 requirements</div>
+    </div>
+    <div class="moscow-items"><div id="moscow-wont"></div></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<!--  TAB 4: VALUE vs EFFORT MATRIX       -->
+<!-- ══════════════════════════════════════ -->
+<section id="t4" class="page">
+  <div class="slbl">Value vs Effort matrix · bubble size = number of patrons impacted · hover for details</div>
+
+  <div class="g2">
+    <div>
+      <div class="ve-matrix" id="veMatrix">
+        <!-- Quadrant labels -->
+        <div class="ve-quad" style="top:6px;right:10px;color:rgba(26,107,58,.7);">QUICK WINS ▲</div>
+        <div class="ve-quad" style="top:6px;left:10px;color:rgba(92,42,122,.5);">STRATEGIC BETS</div>
+        <div class="ve-quad" style="bottom:32px;right:10px;color:rgba(200,120,10,.6);">FILL-INS</div>
+        <div class="ve-quad" style="bottom:32px;left:10px;color:rgba(139,46,20,.5);">DEPRIORITISE</div>
+        <div class="ve-divider-x"></div>
+        <div class="ve-divider-y"></div>
+        <div class="ve-axis-lbl" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10px;color:var(--ink4);">EFFORT / COMPLEXITY →</div>
+        <div class="ve-axis-lbl" style="position:absolute;left:8px;top:50%;transform:translateY(-50%) rotate(-90deg);font-family:var(--mono);font-size:10px;color:var(--ink4);">↑ BUSINESS VALUE</div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">Quadrant Analysis</div>
+        <div class="card-sub">Strategic interpretation of positioning decisions</div>
+        <div style="margin-bottom:14px;padding:12px;background:#e8f5ee;border-radius:6px;border-left:4px solid #1a6b3e;">
+          <div style="font-family:var(--mono);font-size:9px;color:#1a6b3e;letter-spacing:1px;margin-bottom:4px;">QUICK WINS → BUILD FIRST</div>
+          <div style="font-size:12px;color:var(--ink2);line-height:1.6;">Zero-touch refund, sub-90s SLA, push notification, HITL queue — all high value, moderate effort. These deliver the CSAT lift that justifies the entire investment. V1 core.</div>
+        </div>
+        <div style="margin-bottom:14px;padding:12px;background:#ede4f8;border-radius:6px;border-left:4px solid #5c2a7a;">
+          <div style="font-family:var(--mono);font-size:9px;color:#5c2a7a;letter-spacing:1px;margin-bottom:4px;">STRATEGIC BETS → INVEST CAREFULLY</div>
+          <div style="font-size:12px;color:var(--ink2);line-height:1.6;">Multi-agency platform, predictive pre-staging. High value but high effort. V3. Require separate ROI case before committing engineering resources.</div>
+        </div>
+        <div style="margin-bottom:14px;padding:12px;background:#fff8e0;border-radius:6px;border-left:4px solid #7a5c00;">
+          <div style="font-family:var(--mono);font-size:9px;color:#7a5c00;letter-spacing:1px;margin-bottom:4px;">FILL-INS → DO WHEN CAPACITY ALLOWS</div>
+          <div style="font-size:12px;color:var(--ink2);line-height:1.6;">Bias monitoring report, email notifications, pass holder personalisation — low effort, moderate value. Ship in V1.x patches or early V2 to add polish.</div>
+        </div>
+        <div style="padding:12px;background:#fde8e3;border-radius:6px;border-left:4px solid #8b2e14;">
+          <div style="font-family:var(--mono);font-size:9px;color:#8b2e14;letter-spacing:1px;margin-bottom:4px;">DEPRIORITISE → CHALLENGE ASSUMPTIONS</div>
+          <div style="font-size:12px;color:var(--ink2);line-height:1.6;">Self-service dispute portal, real-time disruption prediction — high effort, value uncertain. Require further discovery before committing. Not in current scope.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Legend — Bubble Colours by Persona</div>
+        <div class="card-sub">Bubble size represents patron impact scale</div>
+        <div id="veLegend" style="margin-top:4px;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<!--  TAB 5: RICE SCORING                 -->
+<!-- ══════════════════════════════════════ -->
+<section id="t5" class="page">
+  <div class="slbl">RICE = (Reach × Impact × Confidence) ÷ Effort · sorted highest → lowest</div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-title">RICE Framework Calibration</div>
+    <div class="card-sub">How we defined each dimension for this product</div>
+    <div class="g4" style="margin-bottom:0;">
+      <div style="padding:12px;background:var(--linen2);border-radius:6px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--ink4);letter-spacing:1px;margin-bottom:6px;">REACH</div>
+        <div style="font-size:12px;color:var(--ink2);line-height:1.5;"># of patrons affected per disruption event. Scaled: 1=&lt;100, 3=100–500, 5=500–2000, 8=2000–10K, 10=all 4.2M riders</div>
+      </div>
+      <div style="padding:12px;background:var(--linen2);border-radius:6px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--ink4);letter-spacing:1px;margin-bottom:6px;">IMPACT</div>
+        <div style="font-size:12px;color:var(--ink2);line-height:1.5;">Business value on 5-pt scale: 1=minimal, 2=low, 3=medium, 5=high, 10=massive. Composite of CSAT lift + cost saving + risk reduction.</div>
+      </div>
+      <div style="padding:12px;background:var(--linen2);border-radius:6px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--ink4);letter-spacing:1px;margin-bottom:6px;">CONFIDENCE</div>
+        <div style="font-size:12px;color:var(--ink2);line-height:1.5;">% certainty about Reach and Impact estimates. 100%=measured data. 80%=strong evidence. 60%=informed estimate. 40%=hypothesis.</div>
+      </div>
+      <div style="padding:12px;background:var(--linen2);border-radius:6px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--ink4);letter-spacing:1px;margin-bottom:6px;">EFFORT</div>
+        <div style="font-size:12px;color:var(--ink2);line-height:1.5;">Engineering-months (1 person for 1 month = 1). Estimated with tech lead. Includes: design, build, test, deploy. Not including PM time.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;">
+    <div class="rice-row rice-hdr">
+      <div class="rice-cell">REQUIREMENT</div>
+      <div class="rice-cell" style="text-align:center;">REACH</div>
+      <div class="rice-cell" style="text-align:center;">IMPACT</div>
+      <div class="rice-cell" style="text-align:center;">CONF%</div>
+      <div class="rice-cell" style="text-align:center;">EFFORT</div>
+      <div class="rice-cell" style="text-align:right;padding-right:14px;">RICE SCORE</div>
+      <div class="rice-cell">SCORE BAR</div>
+    </div>
+    <div id="riceRows"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">RICE Score Interpretation</div>
+    <div class="card-sub">How to read this table as a PM</div>
+    <div class="g3" style="margin-bottom:0;">
+      <div style="padding:12px;background:#e8f8ee;border-radius:6px;">
+        <div style="font-family:var(--mono);font-size:9px;color:#1a6b3e;margin-bottom:4px;">SCORE &gt; 400 · OBVIOUS PRIORITY</div>
+        <div style="font-size:12px;color:var(--ink2);">High confidence, high impact. No debate — these ship first in V1. Any argument against them requires new data.</div>
+      </div>
+      <div style="padding:12px;background:#fff8e0;border-radius:6px;">
+        <div style="font-family:var(--mono);font-size:9px;color:#7a5c00;margin-bottom:4px;">SCORE 150–400 · CONTEXTUAL CALL</div>
+        <div style="font-size:12px;color:var(--ink2);">Good RICE but competing with higher scores. Schedule based on sprint capacity, dependency sequencing, and risk profile. V1.x or V2.</div>
+      </div>
+      <div style="padding:12px;background:#fde8e3;border-radius:6px;">
+        <div style="font-family:var(--mono);font-size:9px;color:#8b2e14;margin-bottom:4px;">SCORE &lt; 150 · NEEDS MORE EVIDENCE</div>
+        <div style="font-size:12px;color:var(--ink2);">Low confidence or high effort. These need more discovery before committing engineering capacity. V2+ or backlog.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<!--  TAB 6: ROADMAP                      -->
+<!-- ══════════════════════════════════════ -->
+<section id="t6" class="page">
+  <div class="slbl">4-quarter roadmap · V1 → V2 → V3 · themes by swimlane</div>
+
+  <div class="card" style="margin-bottom:20px;padding:16px 20px;">
+    <div class="card-title">Roadmap North Star</div>
+    <div class="card-sub">The outcome this roadmap delivers against · measured quarterly</div>
+    <div class="g4" style="margin-bottom:0;margin-top:8px;">
+      <div style="text-align:center;padding:12px;background:#e8f5ee;border-radius:6px;border-top:3px solid #1a6b3e;">
+        <div style="font-family:var(--sans);font-size:22px;font-weight:800;color:#1a6b3e;">4.7</div>
+        <div style="font-size:11px;color:var(--ink3);">CSAT on refunds</div>
+        <div style="font-family:var(--mono);font-size:9px;color:#1a6b3e;">was 2.8</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:#e8eef8;border-radius:6px;border-top:3px solid #1a3a5c;">
+        <div style="font-family:var(--sans);font-size:22px;font-weight:800;color:#1a3a5c;">94.2%</div>
+        <div style="font-size:11px;color:var(--ink3);">Straight-through rate</div>
+        <div style="font-family:var(--mono);font-size:9px;color:#1a3a5c;">target ≥92%</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:#fff8e0;border-radius:6px;border-top:3px solid #c8780a;">
+        <div style="font-family:var(--sans);font-size:22px;font-weight:800;color:#c8780a;">$1.84M</div>
+        <div style="font-size:11px;color:var(--ink3);">Annual ROI</div>
+        <div style="font-family:var(--mono);font-size:9px;color:#c8780a;">14-month payback</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:#fde8e3;border-radius:6px;border-top:3px solid #8b2e14;">
+        <div style="font-family:var(--sans);font-size:22px;font-weight:800;color:#8b2e14;">0.11%</div>
+        <div style="font-size:11px;color:var(--ink3);">Error rate</div>
+        <div style="font-family:var(--mono);font-size:9px;color:#8b2e14;">target &lt;0.3%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roadmap grid -->
+  <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+    <div class="roadmap-header">
+      <div class="rh-cell">THEME / SWIMLANE</div>
+      <div class="rh-cell quarter" style="background:rgba(26,58,92,.3);">Q1 2024<br><span style="font-size:9px;opacity:.6">Jan–Mar · V1 Launch</span></div>
+      <div class="rh-cell quarter" style="background:rgba(200,120,10,.2);">Q2 2024<br><span style="font-size:9px;opacity:.6">Apr–Jun · V1.x Patches</span></div>
+      <div class="rh-cell quarter" style="background:rgba(45,107,58,.2);">Q3 2024<br><span style="font-size:9px;opacity:.6">Jul–Sep · V2 Expansion</span></div>
+      <div class="rh-cell quarter" style="background:rgba(92,42,122,.2);">Q4 2024<br><span style="font-size:9px;opacity:.6">Oct–Dec · V3 Platform</span></div>
+    </div>
+    <div id="roadmapRows"></div>
+  </div>
+
+  <div class="g2" style="margin-top:20px;">
+    <div class="card">
+      <div class="card-title">Release Themes</div>
+      <div class="card-sub">Each release has a clear PM narrative</div>
+      <div style="margin-bottom:10px;padding:12px;background:#e8eef8;border-radius:6px;border-left:4px solid #1a3a5c;">
+        <div style="font-family:var(--mono);font-size:9px;color:#1a3a5c;margin-bottom:4px;">V1.0 · JAN 2024 · "TRUST THE SYSTEM"</div>
+        <div style="font-size:12px;color:var(--ink2);">Prove that AI can handle the 62% of events (signal failures + power outages) with zero errors and 90s resolution. Build trust with ops team and Finance before expanding scope.</div>
+      </div>
+      <div style="margin-bottom:10px;padding:12px;background:#fff8e0;border-radius:6px;border-left:4px solid #c8780a;">
+        <div style="font-family:var(--mono);font-size:9px;color:#c8780a;margin-bottom:4px;">V1.x · APR 2024 · "POLISH & PERSONALIZE"</div>
+        <div style="font-size:12px;color:var(--ink2);">Add the quality-of-life features that take CSAT from 4.2 to 4.7. Hybrid RAG, per-type confidence thresholds, email channel, pass holder messaging. Experiment-driven.</div>
+      </div>
+      <div style="margin-bottom:10px;padding:12px;background:#e8f5ee;border-radius:6px;border-left:4px solid #1a6b3e;">
+        <div style="font-family:var(--mono);font-size:9px;color:#1a6b3e;margin-bottom:4px;">V2.0 · JUL 2024 · "EXPAND THE SCOPE"</div>
+        <div style="font-size:12px;color:var(--ink2);">Add infrastructure faults and weather disruptions — bringing coverage to 14 event types. V1 reliability track record justifies expanding automated scope.</div>
+      </div>
+      <div style="padding:12px;background:#ede4f8;border-radius:6px;border-left:4px solid #5c2a7a;">
+        <div style="font-family:var(--mono);font-size:9px;color:#5c2a7a;margin-bottom:4px;">V3.0 · Q4 2024 · "PLATFORM PLAY"</div>
+        <div style="font-size:12px;color:var(--ink2);">Multi-agency architecture, cross-agency memory, self-service dispute portal. Conditional on V2 performance metrics being met. Separate business case required before commitment.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Dependencies & Risks</div>
+      <div class="card-sub">What must be true for each release to succeed</div>
+      <div id="depRisks"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+// ── TAB SWITCHING ──────────────────────────────────────────
+function showTab(n,btn){
+  [1,2,3,4,5,6].forEach(i=>document.getElementById('t'+i).classList.toggle('active',i===n));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTab(n);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── MoSCoW DATA ───────────────────────────────────────────
+const moscowData = {
+  must:[
+    {id:'REQ-P01',title:'Zero-Touch Proactive Refund',rationale:'73% of complaints = no notification. Core product promise. Without this, product doesn\'t solve primary pain.',persona:'Rider',rice:648,rel:'V1.0'},
+    {id:'REQ-P02',title:'Real-Time Status Notification',rationale:'73% pain = silence. Sub-5min notification is the single biggest CSAT driver per rider research.',persona:'Rider',rice:540,rel:'V1.0'},
+    {id:'REQ-P03',title:'Sub-90-Second Resolution SLA',rationale:'4.2-day avg is 340% above expectation. Speed is the product. This SLA differentiates from any manual process.',persona:'Rider',rice:520,rel:'V1.0'},
+    {id:'REQ-O01',title:'HITL Queue with Pre-Loaded Context',rationale:'Without HITL, supervisors can\'t manage escalations. HITL is the safety net for 6% of cases — non-negotiable.',persona:'Ops',rice:480,rel:'V1.0'},
+    {id:'REQ-O02',title:'2-Hour HITL Resolution SLA + Alerts',rationale:'Patron SLA is 2hrs for HITL cases. Without alerts, supervisors miss escalations. Breach = patron complaint.',persona:'Ops',rice:420,rel:'V1.0'},
+    {id:'REQ-O03',title:'Policy Document Admin Console',rationale:'3/12 operators used outdated policy in 2022 (41% of errors). Without this, policy drift recurs in weeks.',persona:'Ops',rice:360,rel:'V1.0'},
+    {id:'REQ-F01',title:'$500 Hard Cap at Payment API Layer',rationale:'CFO requirement. Infrastructure-layer enforcement. No AI system gets autonomous payment authority without this.',persona:'Finance',rice:864,rel:'V1.0'},
+    {id:'REQ-F02',title:'Immutable Audit Log — Every Decision',rationale:'Legal and Finance requirement. Errors discovered 11 days late in 2022. Audit log is the compliance backbone.',persona:'Finance',rice:648,rel:'V1.0'},
+    {id:'REQ-F03',title:'Idempotency — Zero Duplicate Payments',rationale:'Duplicate refund at 1,200-patron scale = immediate financial and trust damage. Non-negotiable at payment layer.',persona:'Finance',rice:576,rel:'V1.0'},
+    {id:'REQ-L01',title:'PII Tokenization at MCP Boundary',rationale:'Legal requirement. LLM cannot process raw card data. GDPR compliance is non-negotiable pre-launch.',persona:'Legal',rice:504,rel:'V1.0'},
+    {id:'REQ-L02',title:'Prompt Injection Protection',rationale:'Adversarial input could trigger unauthorised disbursements. Security test required for legal sign-off.',persona:'Legal',rice:432,rel:'V1.0'},
+  ],
+  should:[
+    {id:'REQ-O04',title:'Ops Performance Dashboard',rationale:'Supervisors need real-time visibility to manage HITL queue proactively. Absence means reactive management.',persona:'Ops',rice:280,rel:'V1.0'},
+    {id:'REQ-O05',title:'Novel Case Memory → RAG Learning',rationale:'Reduces HITL rate over time. Directly improves straight-through rate. Supervisor buy-in depends on it.',persona:'Ops',rice:260,rel:'V1.0'},
+    {id:'REQ-F04',title:'Financial Dashboard — Disbursement Visibility',rationale:'Finance needs real-time view to replace monthly report lag. High ops value, moderate build effort.',persona:'Finance',rice:240,rel:'V1.0'},
+    {id:'REQ-L03',title:'Eligibility Bias Monitoring Report',rationale:'Proactive RAI compliance. Legal requires evidence of fair treatment. Monthly report satisfies audit requirement.',persona:'Legal',rice:200,rel:'V1.0'},
+    {id:'REQ-VP01',title:'Executive KPI Dashboard',rationale:'VP accountability to board requires single ROI source of truth. Without it, PM compiles manually each month.',persona:'VP Ops',rice:220,rel:'V1.0'},
+    {id:'REQ-P04',title:'Pass Holder Credit Notification',rationale:'Pass holder inquiry rate was 2.1/100 post-launch. Personalised copy reduced to 0.4. High precision, low effort.',persona:'Rider',rice:180,rel:'V1.x'},
+    {id:'REQ-P05',title:'Multi-Channel Notification (Push+SMS+Email)',rationale:'94% covered by push+SMS at V1 launch. Email adds 5% coverage at moderate effort. V1.x completion.',persona:'Rider',rice:195,rel:'V1.x'},
+    {id:'REQ-O06',title:'Bulk Override & Batch Correction Tool',rationale:'Critical for rapid error remediation. Shadow system caught systematic error in V1 testing — needed this.',persona:'Ops',rice:168,rel:'V2.0'},
+  ],
+  could:[
+    {id:'REQ-P06',title:'Self-Service Dispute Portal',rationale:'Rider transparency value. Reduces follow-up calls. Requires significant front-end investment for moderate CSAT gain.',persona:'Rider',rice:140,rel:'V2.0'},
+    {id:'NEW-01',title:'Disruption Type Expansion (Weather, Security)',rationale:'Adds 11% event coverage. V2 scope. Requires GTFS schema work and new policy documents.',persona:'Ops/Rider',rice:160,rel:'V2.0'},
+    {id:'NEW-02',title:'Infrastructure Fault Event Support',rationale:'14% of all events. Clear policy exists. Moderate engineering effort to add to agent scope.',persona:'Rider',rice:155,rel:'V2.0'},
+    {id:'NEW-03',title:'Predictive Disruption Detection',rationale:'Pre-stage refund queue before disruption confirmed. Speculative value — high confidence data required.',persona:'VP Ops',rice:120,rel:'V3.0'},
+    {id:'NEW-04',title:'Patron Refund History Portal',rationale:'Patron self-service to view refund history. Nice-to-have UX improvement. Low strategic value vs. effort.',persona:'Rider',rice:95,rel:'V2.0'},
+    {id:'NEW-05',title:'Automated Policy Version Alert System',rationale:'Notify PM + Compliance when new policy doc uploaded. Lower priority than admin console — builds on it.',persona:'Legal',rice:110,rel:'V2.0'},
+  ],
+  wont:[
+    {id:'REQ-VP02',title:'Multi-Agency Architecture (Platform)',rationale:'High value long-term. Requires separate business case, agency partnership agreements, significant architecture rework. V3+.',persona:'VP Ops',rice:88,rel:'V3+'},
+    {id:'NEW-06',title:'Cross-Agency Shared Disruption Memory',rationale:'Agency B can learn from agency A\'s novel events. Strong long-term value but zero current agency relationships.',persona:'VP Ops',rice:60,rel:'V3+'},
+    {id:'NEW-07',title:'Real-Time Passenger Flow Prediction',rationale:'Predict demand spikes to pre-allocate HITL capacity. AI capability exists but no current data source. V3+.',persona:'VP Ops',rice:48,rel:'V3+'},
+  ]
+};
+
+// ── RICE DATA ─────────────────────────────────────────────
+const riceData = [
+  {n:'$500 Cap at Payment API',sub:'REQ-F01 · Finance',r:10,i:10,c:100,e:1.5,persona:'#0d6b5e'},
+  {n:'Zero-Touch Proactive Refund',sub:'REQ-P01 · Rider',r:9,i:10,c:80,e:2.5,persona:'#1a3a5c'},
+  {n:'Immutable Audit Log',sub:'REQ-F02 · Finance',r:9,i:8,c:100,e:1.2,persona:'#0d6b5e'},
+  {n:'Real-Time Notification',sub:'REQ-P02 · Rider',r:9,i:8,c:80,e:1.5,persona:'#1a3a5c'},
+  {n:'Idempotency / Zero Duplicates',sub:'REQ-F03 · Finance',r:8,i:8,c:100,e:1.0,persona:'#0d6b5e'},
+  {n:'Sub-90s Resolution SLA',sub:'REQ-P03 · Rider',r:8,i:9,c:80,e:2.0,persona:'#1a3a5c'},
+  {n:'HITL Queue + Pre-loaded Context',sub:'REQ-O01 · Ops',r:7,i:8,c:80,e:2.0,persona:'#5c2a7a'},
+  {n:'PII Tokenization at MCP',sub:'REQ-L01 · Legal',r:9,i:7,c:80,e:1.5,persona:'#8b2e14'},
+  {n:'2hr HITL SLA + Alerts',sub:'REQ-O02 · Ops',r:7,i:7,c:80,e:1.5,persona:'#5c2a7a'},
+  {n:'Prompt Injection Protection',sub:'REQ-L02 · Legal',r:9,i:6,c:80,e:1.5,persona:'#8b2e14'},
+  {n:'Policy Admin Console',sub:'REQ-O03 · Ops',r:6,i:8,c:100,e:2.0,persona:'#5c2a7a'},
+  {n:'Executive KPI Dashboard',sub:'REQ-VP01 · VP Ops',r:5,i:8,c:80,e:1.5,persona:'#7a5c00'},
+  {n:'Ops Performance Dashboard',sub:'REQ-O04 · Ops',r:6,i:6,c:80,e:1.5,persona:'#5c2a7a'},
+  {n:'Novel Case → RAG Learning',sub:'REQ-O05 · Ops',r:5,i:7,c:60,e:2.0,persona:'#5c2a7a'},
+  {n:'Financial Dashboard',sub:'REQ-F04 · Finance',r:4,i:7,c:100,e:1.0,persona:'#0d6b5e'},
+  {n:'Bias Monitoring Report',sub:'REQ-L03 · Legal',r:5,i:6,c:80,e:1.5,persona:'#8b2e14'},
+  {n:'Multi-Channel Notifications',sub:'REQ-P05 · Rider',r:8,i:5,c:80,e:2.0,persona:'#1a3a5c'},
+  {n:'Pass Holder Personalisation',sub:'REQ-P04 · Rider',r:4,i:6,c:100,e:0.5,persona:'#1a3a5c'},
+  {n:'Weather/Security Events',sub:'NEW-01 · Rider/Ops',r:7,i:5,c:60,e:3.0,persona:'#1a6b3e'},
+  {n:'Infrastructure Fault Events',sub:'NEW-02 · Rider',r:6,i:5,c:60,e:2.5,persona:'#1a6b3e'},
+  {n:'Bulk Override Tool',sub:'REQ-O06 · Ops',r:4,i:6,c:80,e:1.5,persona:'#5c2a7a'},
+  {n:'Self-Service Dispute Portal',sub:'REQ-P06 · Rider',r:5,i:5,c:60,e:4.0,persona:'#1a3a5c'},
+  {n:'Predictive Disruption Detection',sub:'NEW-03 · VP',r:7,i:5,c:40,e:5.0,persona:'#7a5c00'},
+  {n:'Multi-Agency Platform',sub:'REQ-VP02 · VP',r:8,i:8,c:40,e:8.0,persona:'#7a5c00'},
+];
+riceData.forEach(d=>{d.score=Math.round(d.r*d.i*(d.c/100)/d.e);});
+riceData.sort((a,b)=>b.score-a.score);
+
+// ── ROADMAP DATA ──────────────────────────────────────────
+const roadmapRows = [
+  {
+    theme:'🚇 Patron Experience',type:'RIDER FACING',
+    q1:[{t:'Zero-Touch Refund',c:'#1a3a5c'},{t:'Push Notification <5min',c:'#1a3a5c'},{t:'Sub-90s SLA',c:'#1a3a5c'}],
+    q2:[{t:'Pass Holder Personalisation',c:'#2471a3'},{t:'Email Notification Channel',c:'#2471a3'},{t:'Dispute Portal (design)',c:'#7c9ee8'}],
+    q3:[{t:'Weather Disruption Notify',c:'#5a82d6'},{t:'Infra Fault Notify',c:'#5a82d6'},{t:'Dispute Portal (build)',c:'#7c9ee8'}],
+    q4:[{t:'Multi-type personalisation',c:'#8aaae0'},{t:'Patron history view',c:'#8aaae0'}]
+  },
+  {
+    theme:'🎛️ Operations & HITL',type:'OPS TOOLING',
+    q1:[{t:'HITL Queue + Context',c:'#5c2a7a'},{t:'2hr SLA Alerts',c:'#5c2a7a'},{t:'Policy Admin Console',c:'#5c2a7a'}],
+    q2:[{t:'Novel Case → RAG',c:'#7a3a9a'},{t:'Ops Dashboard v1',c:'#7a3a9a'},{t:'Per-type Confidence Tuning',c:'#9a5ab5'}],
+    q3:[{t:'Bulk Override Tool',c:'#5c2a7a'},{t:'V2 HITL Expansion',c:'#7a3a9a'}],
+    q4:[{t:'Cross-agency HITL routing',c:'#9a5ab5'}]
+  },
+  {
+    theme:'💼 Finance & Compliance',type:'FINANCIAL SAFETY',
+    q1:[{t:'$500 Cap at API',c:'#0d6b5e'},{t:'Audit Log (append-only)',c:'#0d6b5e'},{t:'Idempotency Keys',c:'#0d6b5e'}],
+    q2:[{t:'Financial Dashboard',c:'#1a8a7a'},{t:'Bias Monitoring Report',c:'#2d6b3a'},{t:'CFO Export (CSV)',c:'#1a8a7a'}],
+    q3:[{t:'V2 Financial Reporting',c:'#0d6b5e'},{t:'Expanded bias monitoring',c:'#2d6b3a'}],
+    q4:[{t:'Multi-agency financial separation',c:'#0d4a40'}]
+  },
+  {
+    theme:'🛡️ Security & RAI',type:'RESPONSIBLE AI',
+    q1:[{t:'PII Tokenization (MCP)',c:'#8b2e14'},{t:'NeMo Guardrails',c:'#8b2e14'},{t:'Security Pen Test',c:'#8b2e14'}],
+    q2:[{t:'Hybrid RAG Retrieval',c:'#7a5c00'},{t:'Prompt Injection Hardening',c:'#a03a1a'}],
+    q3:[{t:'V2 Safety Audit',c:'#8b2e14'},{t:'RAI Quarterly Report',c:'#a03a1a'}],
+    q4:[{t:'Multi-agency isolation audit',c:'#8b2e14'}]
+  },
+  {
+    theme:'📊 Analytics & Platform',type:'STRATEGIC',
+    q1:[{t:'Exec KPI Dashboard',c:'#7a5c00'},{t:'Shadow System Decommission',c:'#9c8e7d'}],
+    q2:[{t:'CSAT Trend Dashboard',c:'#7a5c00'},{t:'A/B experiment framework',c:'#9a7a20'}],
+    q3:[{t:'V2 Analytics Expansion',c:'#7a5c00'},{t:'Scope expansion (14 types)',c:'#c8780a'}],
+    q4:[{t:'Multi-agency architecture blueprint',c:'#5c2a7a'},{t:'Platform licensing model',c:'#5c2a7a'}]
+  }
+];
+
+// ── VALUE vs EFFORT DATA ──────────────────────────────────
+const veData = [
+  // x=effort(0-100), y=value(0-100), label, persona color, size
+  {x:25,y:88,l:'Zero-Touch Refund',c:'#1a3a5c',s:14},
+  {x:20,y:82,l:'Push Notification',c:'#1a3a5c',s:12},
+  {x:30,y:85,l:'Sub-90s SLA',c:'#1a3a5c',s:13},
+  {x:18,y:95,l:'$500 API Cap',c:'#0d6b5e',s:11},
+  {x:15,y:88,l:'Audit Log',c:'#0d6b5e',s:11},
+  {x:12,y:84,l:'Idempotency Keys',c:'#0d6b5e',s:10},
+  {x:28,y:78,l:'HITL Queue',c:'#5c2a7a',s:12},
+  {x:22,y:72,l:'PII Tokenization',c:'#8b2e14',s:10},
+  {x:20,y:70,l:'2hr HITL SLA',c:'#5c2a7a',s:10},
+  {x:22,y:68,l:'Prompt Injection',c:'#8b2e14',s:10},
+  {x:30,y:74,l:'Policy Console',c:'#5c2a7a',s:10},
+  {x:22,y:65,l:'Exec Dashboard',c:'#7a5c00',s:9},
+  {x:22,y:60,l:'Ops Dashboard',c:'#5c2a7a',s:9},
+  {x:32,y:58,l:'Novel Case RAG',c:'#5c2a7a',s:9},
+  {x:15,y:55,l:'Financial Dashboard',c:'#0d6b5e',s:8},
+  {x:22,y:52,l:'Bias Report',c:'#8b2e14',s:8},
+  {x:35,y:60,l:'Multi-channel Notify',c:'#1a3a5c',s:11},
+  {x:10,y:48,l:'Pass Personalisation',c:'#1a3a5c',s:7},
+  {x:55,y:62,l:'Weather/Security Events',c:'#1a6b3e',s:11},
+  {x:48,y:58,l:'Infra Fault Events',c:'#1a6b3e',s:10},
+  {x:22,y:50,l:'Bulk Override',c:'#5c2a7a',s:8},
+  {x:68,y:52,l:'Dispute Portal',c:'#1a3a5c',s:9},
+  {x:78,y:55,l:'Predictive Detection',c:'#7a5c00',s:11},
+  {x:88,y:78,l:'Multi-Agency Platform',c:'#7a5c00',s:14},
+];
+
+// ── RENDER FUNCTIONS ──────────────────────────────────────
+const rendered=new Set();
+function renderTab(n){
+  if(rendered.has(n))return; rendered.add(n);
+  if(n===3)setTimeout(renderMoscow,60);
+  if(n===4)setTimeout(renderVE,60);
+  if(n===5)setTimeout(renderRice,60);
+  if(n===6)setTimeout(renderRoadmap,60);
+}
+
+function moscowRow(d,col){
+  const personaColors={'Rider':'#1a3a5c','Ops':'#5c2a7a','Finance':'#0d6b5e','Legal':'#8b2e14','VP Ops':'#7a5c00','Ops/Rider':'#1a6b3e'};
+  const c=personaColors[d.persona]||'#555';
+  const el=document.createElement('div');
+  el.className='moscow-item';
+  el.innerHTML=`<div><div class="mi-id" style="color:${col}">${d.id}</div><div class="mi-title">${d.title}</div></div>
+    <div class="mi-body">${d.rationale}</div>
+    <div class="mi-num" style="text-align:center;"><span style="font-size:9px;padding:2px 7px;border-radius:2px;background:${c}20;color:${c};font-family:var(--mono);">${d.persona}</span></div>
+    <div class="mi-num" style="color:var(--ochre)">${d.rice}</div>
+    <div style="text-align:center;"><span class="badge" style="background:${col};color:#fff">${d.rel}</span></div>`;
+  return el;
+}
+
+function renderMoscow(){
+  const colors={must:'#c0392b',should:'#d68910',could:'#2471a3',wont:'#555'};
+  Object.entries(moscowData).forEach(([key,rows])=>{
+    const container=document.getElementById('moscow-'+key);
+    if(!container)return;
+    rows.forEach(d=>container.appendChild(moscowRow(d,colors[key])));
+  });
+}
+
+function renderVE(){
+  const matrix=document.getElementById('veMatrix');
+  if(!matrix||matrix.dataset.r)return; matrix.dataset.r='1';
+  const W=matrix.offsetWidth||560,H=matrix.offsetHeight||520;
+  const pad={l:32,r:20,t:24,b:44};
+  veData.forEach(d=>{
+    const x=pad.l+(d.x/100)*(W-pad.l-pad.r);
+    const y=pad.t+(1-d.y/100)*(H-pad.t-pad.b);
+    const dot=document.createElement('div');
+    dot.className='ve-dot';
+    dot.style.cssText=`left:${x}px;top:${y}px;width:${d.s}px;height:${d.s}px;background:${d.c};`;
+    dot.innerHTML=`<div class="ve-tooltip">${d.l}</div>`;
+    matrix.appendChild(dot);
+  });
+  // Legend
+  const legend=document.getElementById('veLegend');
+  if(legend){
+    [['#1a3a5c','Priya (Rider)'],['#5c2a7a','Marcus (Ops Supervisor)'],['#0d6b5e','Anika (Finance)'],['#8b2e14','Rajan (Legal)'],['#7a5c00','Sarah (VP Ops)'],['#1a6b3e','V2 Scope Expansion']].forEach(([c,n])=>{
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:6px;';
+      row.innerHTML=`<div style="width:12px;height:12px;border-radius:50%;background:${c};flex-shrink:0;"></div><span style="font-size:12px;color:var(--ink2);">${n}</span>`;
+      legend.appendChild(row);
+    });
+  }
+}
+
+function renderRice(){
+  const maxScore=Math.max(...riceData.map(d=>d.score));
+  const container=document.getElementById('riceRows');
+  if(!container||container.dataset.r)return; container.dataset.r='1';
+  riceData.forEach((d,i)=>{
+    const row=document.createElement('div');
+    row.className='rice-row';
+    const tier=d.score>400?'#1a6b3e':d.score>150?'#7a5c00':'#8b2e14';
+    row.innerHTML=`<div class="rice-cell"><div class="rice-name">${d.n}</div><div class="rice-sub">${d.sub}</div></div>
+      <div class="rice-cell"><div class="rice-num" style="color:${d.persona}">${d.r}</div></div>
+      <div class="rice-cell"><div class="rice-num" style="color:var(--ochre)">${d.i}</div></div>
+      <div class="rice-cell"><div class="rice-num" style="color:var(--ink3)">${d.c}%</div></div>
+      <div class="rice-cell"><div class="rice-num" style="color:var(--ink3)">${d.e}</div></div>
+      <div class="rice-cell"><div class="rice-score" style="color:${tier}">${d.score}</div></div>
+      <div class="rice-cell"><div class="score-bar"><div class="score-fill" style="width:0%" data-w="${d.score/maxScore*100}%"></div></div></div>`;
+    container.appendChild(row);
+  });
+  setTimeout(()=>container.querySelectorAll('.score-fill[data-w]').forEach(el=>el.style.width=el.dataset.w),100);
+}
+
+function renderRoadmap(){
+  const container=document.getElementById('roadmapRows');
+  if(!container||container.dataset.r)return; container.dataset.r='1';
+  roadmapRows.forEach(row=>{
+    const el=document.createElement('div');
+    el.className='rm-row';
+    el.innerHTML=`<div class="rm-label"><div class="rm-lbl-theme">${row.theme}</div><div class="rm-lbl-type">${row.type}</div></div>
+      ${['q1','q2','q3','q4'].map(q=>`<div class="rm-quarter">${row[q].map(it=>`<div class="rm-item" style="background:${it.c}18;color:${it.c};border:1px solid ${it.c}40;">${it.t}</div>`).join('')}</div>`).join('')}`;
+    container.appendChild(el);
+  });
+  // Milestones
+  const miles=document.createElement('div');
+  miles.className='rm-row';
+  miles.style.cssText='background:var(--linen2);';
+  miles.innerHTML=`<div class="rm-label"><div class="rm-lbl-theme">◆ Milestones</div><div class="rm-lbl-type">KEY DATES</div></div>
+    <div class="rm-quarter"><div class="rm-milestone" style="background:rgba(26,58,92,.1);color:#1a3a5c;">V1.0 Launch — Jan 15</div><div class="rm-milestone" style="background:rgba(26,107,58,.1);color:#1a6b3e;">0 P0 bugs · 0.11% error</div></div>
+    <div class="rm-quarter"><div class="rm-milestone" style="background:rgba(200,120,10,.1);color:#c8780a;">CSAT hits 4.5 — May</div><div class="rm-milestone" style="background:rgba(200,120,10,.1);color:#c8780a;">STR hits 92% — Jun</div></div>
+    <div class="rm-quarter"><div class="rm-milestone" style="background:rgba(45,107,58,.1);color:#1a6b3e;">V2.0 Launch — Jul 1</div><div class="rm-milestone" style="background:rgba(45,107,58,.1);color:#1a6b3e;">14 event types live</div></div>
+    <div class="rm-quarter"><div class="rm-milestone" style="background:rgba(92,42,122,.1);color:#5c2a7a;">V3 business case — Oct</div><div class="rm-milestone" style="background:rgba(92,42,122,.1);color:#5c2a7a;">Agency 2 pilot — Dec</div></div>`;
+  container.appendChild(miles);
+
+  const dr=document.getElementById('depRisks');
+  if(dr){
+    [{rel:'V1.0',deps:'GTFS MCP + Payment Gateway MCP operational. Legal sign-off. 12 supervisors certified.',risk:'Gateway downtime at launch. Policy version mismatch. Shadow divergence >0.5%.',col:'#1a3a5c'},{rel:'V1.x',deps:'V1 stable (0 P0 bugs for 30 days). Email vendor integration complete.',risk:'V1 stability issues consuming sprint capacity.',col:'#c8780a'},{rel:'V2.0',deps:'V1 straight-through rate ≥92%. New policy documents for 12 additional event types.',risk:'GTFS schema gaps for new event types (discovered in V1 dev).',col:'#1a6b3e'},{rel:'V3.0',deps:'V2 metrics met. Agency 2 partnership agreement signed. Separate business case approved.',risk:'No current agency relationships. Architecture rework required. Conditional on exec approval.',col:'#5c2a7a'}].forEach(d=>{
+      const el=document.createElement('div');
+      el.style.cssText=`padding:10px 12px;border-left:3px solid ${d.col};background:var(--linen2);border-radius:0 5px 5px 0;margin-bottom:8px;`;
+      el.innerHTML=`<div style="font-family:var(--mono);font-size:9px;color:${d.col};letter-spacing:1px;margin-bottom:4px;">${d.rel}</div>
+        <div style="font-size:11px;color:var(--ink2);margin-bottom:3px;"><strong>Dependencies:</strong> ${d.deps}</div>
+        <div style="font-size:11px;color:#8b2e14;"><strong>Key risks:</strong> ${d.risk}</div>`;
+      dr.appendChild(el);
+    });
+  }
+}
+
+// Init
+renderTab(1); // personas are static HTML
+</script>
+</body>
+</html>

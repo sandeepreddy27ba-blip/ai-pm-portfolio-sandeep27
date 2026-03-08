@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LangGraph Architecture — Autonomous Transit Refund Agent</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg: #060d18;
+  --surface: #0b1929;
+  --card: #0f2236;
+  --card2: #132840;
+  --border: rgba(255,255,255,0.07);
+  --teal: #00e5c8;
+  --teal2: #00bfa5;
+  --blue: #3d8ef8;
+  --blue2: #1a73e8;
+  --purple: #a78bfa;
+  --green: #34d399;
+  --red: #f87171;
+  --orange: #fb923c;
+  --yellow: #fbbf24;
+  --gray1: #e2e8f0;
+  --gray2: #94a3b8;
+  --gray3: #475569;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--gray1); font-family:var(--sans); min-height:100vh; overflow-x:hidden; }
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(135deg, #071220 0%, #0a1e35 100%);
+  border-bottom: 1px solid rgba(0,229,200,0.12);
+  padding: 20px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.h-brand { display:flex; align-items:center; gap:14px; }
+.h-logo {
+  width:44px; height:44px; border-radius:10px;
+  background: linear-gradient(135deg, var(--teal), var(--blue));
+  display:flex; align-items:center; justify-content:center; font-size:22px;
+}
+.h-title { font-size:18px; font-weight:700; color:#fff; }
+.h-sub { font-size:11px; color:var(--teal); letter-spacing:1.5px; font-weight:600; margin-top:2px; }
+.h-badge {
+  font-size:11px; font-weight:600; padding:6px 14px;
+  border-radius:20px; border:1px solid rgba(0,229,200,0.3);
+  color:var(--teal); background:rgba(0,229,200,0.06);
+}
+
+/* ── TABS ── */
+.tab-bar {
+  display:flex; gap:0; background:var(--surface);
+  border-bottom:1px solid var(--border); padding: 0 40px;
+  overflow-x:auto;
+}
+.tab-btn {
+  padding:14px 22px; font-size:13px; font-weight:500;
+  color:var(--gray3); border:none; background:none;
+  cursor:pointer; border-bottom:2px solid transparent;
+  transition:all 0.2s; white-space:nowrap;
+}
+.tab-btn:hover { color:var(--gray1); }
+.tab-btn.active { color:var(--teal); border-bottom-color:var(--teal); }
+
+/* ── LAYOUT ── */
+.page { display:none; padding:32px 40px; max-width:1400px; margin:0 auto; }
+.page.active { display:block; }
+
+/* ── SECTION LABELS ── */
+.sec-label {
+  font-size:10px; font-weight:700; letter-spacing:2.5px;
+  color:var(--teal); margin-bottom:16px;
+  display:flex; align-items:center; gap:10px;
+}
+.sec-label::after { content:''; flex:1; height:1px; background:rgba(0,229,200,0.12); }
+
+/* ── GRAPH CANVAS (Tab 1) ── */
+.graph-wrap {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:32px;
+  position:relative;
+  overflow:hidden;
+}
+.graph-wrap::before {
+  content:'';
+  position:absolute; top:-60px; right:-60px;
+  width:300px; height:300px; border-radius:50%;
+  background:radial-gradient(circle, rgba(0,229,200,0.04) 0%, transparent 70%);
+  pointer-events:none;
+}
+
+/* Node base */
+.node {
+  position:absolute;
+  border-radius:10px;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.25s;
+  z-index:10;
+}
+.node:hover { transform:scale(1.04); z-index:20; }
+.node.highlight { box-shadow:0 0 0 2px var(--teal), 0 0 20px rgba(0,229,200,0.3); }
+
+.node-label { font-size:11px; font-weight:600; line-height:1.3; }
+.node-sub { font-size:9px; opacity:0.7; margin-top:3px; font-family:var(--mono); }
+.node-icon { font-size:20px; margin-bottom:5px; }
+
+/* Node types */
+.n-trigger {
+  background: linear-gradient(135deg, #1a3a5c, #0f2845);
+  border:1px solid rgba(61,142,248,0.5);
+  width:120px; height:75px;
+  color: var(--blue);
+}
+.n-orchestrator {
+  background: linear-gradient(135deg, #0d3030, #092828);
+  border:2px solid var(--teal);
+  width:150px; height:85px;
+  color:var(--teal);
+  box-shadow:0 0 20px rgba(0,229,200,0.15);
+}
+.n-agent {
+  background:var(--card2);
+  border:1px solid rgba(255,255,255,0.1);
+  width:130px; height:80px;
+  color:var(--gray1);
+}
+.n-agent:hover { border-color:var(--teal); }
+.n-rag {
+  background:linear-gradient(135deg, #1a2a4a, #0f1e38);
+  border:1px solid rgba(167,139,250,0.4);
+  width:500px; height:60px;
+  color:var(--purple);
+  flex-direction:row; gap:16px;
+}
+.n-guardrail {
+  background:linear-gradient(135deg, #2a1515, #1e0f0f);
+  border:1px solid rgba(248,113,113,0.4);
+  width:500px; height:55px;
+  color:var(--red);
+  flex-direction:row; gap:16px;
+}
+.n-decision {
+  background:linear-gradient(135deg, #1a2a1a, #0f1e0f);
+  border:1px solid rgba(52,211,153,0.4);
+  width:110px; height:60px;
+  color:var(--green);
+  border-radius:30px;
+}
+.n-hitl {
+  background:linear-gradient(135deg, #2a2010, #1e160a);
+  border:1px solid rgba(251,191,36,0.4);
+  width:120px; height:70px;
+  color:var(--yellow);
+}
+.n-end {
+  background:linear-gradient(135deg, #0d2a1a, #081e10);
+  border:2px solid var(--green);
+  width:110px; height:65px;
+  color:var(--green);
+  border-radius:50%;
+}
+
+/* SVG arrows */
+.arrows-svg {
+  position:absolute; top:0; left:0;
+  width:100%; height:100%;
+  pointer-events:none; z-index:5;
+}
+
+/* Graph container sizing */
+.graph-inner { position:relative; width:100%; height:780px; }
+
+/* Legend */
+.legend {
+  display:flex; flex-wrap:wrap; gap:12px;
+  margin-top:20px; padding-top:16px;
+  border-top:1px solid var(--border);
+}
+.leg-item { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--gray2); }
+.leg-dot { width:10px; height:10px; border-radius:3px; }
+
+/* ── STATE MACHINE (Tab 2) ── */
+.state-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.state-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:20px;
+  position:relative;
+  overflow:hidden;
+}
+.state-card::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0;
+  height:3px;
+}
+.state-card.s-teal::before { background:var(--teal); }
+.state-card.s-blue::before { background:var(--blue); }
+.state-card.s-purple::before { background:var(--purple); }
+.state-card.s-green::before { background:var(--green); }
+.state-card.s-red::before { background:var(--red); }
+.state-card.s-yellow::before { background:var(--yellow); }
+.state-card.s-orange::before { background:var(--orange); }
+.state-card.s-gray::before { background:var(--gray3); }
+
+.state-num {
+  font-size:28px; font-weight:700;
+  font-family:var(--mono);
+  opacity:0.15; position:absolute; top:12px; right:16px;
+}
+.state-name { font-size:14px; font-weight:700; color:#fff; margin-bottom:4px; }
+.state-type { font-size:10px; font-weight:600; letter-spacing:1px; margin-bottom:12px; }
+.state-inputs, .state-outputs {
+  font-size:11px; line-height:1.8; color:var(--gray2);
+}
+.state-inputs strong, .state-outputs strong {
+  font-size:9px; letter-spacing:1px; display:block;
+  margin-bottom:4px; margin-top:8px;
+}
+.state-cond {
+  font-size:11px; color:var(--yellow);
+  background:rgba(251,191,36,0.08);
+  border:1px solid rgba(251,191,36,0.15);
+  border-radius:6px;
+  padding:8px 10px; margin-top:10px;
+  font-family:var(--mono);
+}
+
+/* ── SEQUENCE DIAGRAM (Tab 3) ── */
+.seq-wrap {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:32px;
+  overflow-x:auto;
+}
+.seq-inner { min-width:900px; position:relative; }
+
+/* Actor headers */
+.actors { display:flex; gap:0; margin-bottom:0; }
+.actor {
+  flex:1; text-align:center;
+  padding:10px 6px;
+  border-radius:8px;
+  font-size:11px; font-weight:600;
+  line-height:1.4;
+}
+
+/* Lifelines drawn via SVG */
+.seq-svg { width:100%; display:block; }
+
+/* ── CODE / STATE OBJECT (Tab 4) ── */
+.code-block {
+  background:#060f1a;
+  border:1px solid rgba(0,229,200,0.12);
+  border-radius:10px;
+  padding:24px;
+  font-family:var(--mono);
+  font-size:12px;
+  line-height:1.8;
+  overflow-x:auto;
+  white-space:pre;
+}
+.kw { color:#c792ea; }
+.str { color:#c3e88d; }
+.cmt { color:#546e7a; font-style:italic; }
+.fn { color:#82aaff; }
+.var { color:#f07178; }
+.num { color:#f78c6c; }
+.op { color:#89ddff; }
+.prop { color:#ffcb6b; }
+.cls { color:var(--teal); }
+
+.code-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.code-section { margin-bottom:20px; }
+.code-title { font-size:12px; font-weight:700; color:var(--teal); margin-bottom:10px; letter-spacing:0.5px; }
+
+/* ── WORKING (Tab 5) ── */
+.working-timeline { position:relative; padding-left:30px; }
+.working-timeline::before {
+  content:''; position:absolute; left:11px; top:0; bottom:0;
+  width:2px; background:linear-gradient(to bottom, var(--teal), var(--blue), var(--purple), var(--green));
+}
+.wt-step {
+  position:relative; margin-bottom:24px;
+  background:var(--card); border:1px solid var(--border);
+  border-radius:12px; padding:18px 20px;
+  transition:border-color 0.2s;
+}
+.wt-step:hover { border-color:rgba(0,229,200,0.2); }
+.wt-step::before {
+  content:''; position:absolute;
+  left:-23px; top:22px;
+  width:12px; height:12px; border-radius:50%;
+  border:2px solid var(--bg);
+}
+.wt-num { font-size:10px; font-weight:700; letter-spacing:1px; margin-bottom:6px; }
+.wt-title { font-size:14px; font-weight:700; color:#fff; margin-bottom:8px; }
+.wt-desc { font-size:12px; color:var(--gray2); line-height:1.7; }
+.wt-code {
+  font-family:var(--mono); font-size:10px;
+  background:rgba(0,0,0,0.3); border-radius:6px;
+  padding:10px 12px; margin-top:10px;
+  color:var(--teal); line-height:1.6;
+  border-left:2px solid var(--teal);
+}
+.wt-tags { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+.wt-tag {
+  font-size:10px; font-weight:600; padding:2px 8px;
+  border-radius:4px; border:1px solid;
+}
+
+/* Conditional routing table */
+.routing-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:16px; }
+.routing-table th {
+  padding:10px 14px; text-align:left;
+  font-size:10px; font-weight:700; letter-spacing:1px;
+  color:var(--gray3); border-bottom:1px solid var(--border);
+}
+.routing-table td { padding:11px 14px; border-bottom:1px solid rgba(255,255,255,0.03); }
+.routing-table tr:hover td { background:rgba(255,255,255,0.02); }
+
+/* Scrollable panels */
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--gray3); border-radius:3px; }
+
+/* Tooltip */
+.tooltip {
+  position:fixed; z-index:1000;
+  background:var(--card2);
+  border:1px solid rgba(0,229,200,0.3);
+  border-radius:10px;
+  padding:14px 18px;
+  font-size:12px; line-height:1.7;
+  max-width:280px;
+  pointer-events:none;
+  opacity:0; transition:opacity 0.15s;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);
+}
+.tooltip.show { opacity:1; }
+.tooltip-title { font-weight:700; color:var(--teal); margin-bottom:6px; font-size:13px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-brand">
+    <div class="h-logo">🔗</div>
+    <div>
+      <div class="h-title">LangGraph Architecture</div>
+      <div class="h-sub">AUTONOMOUS TRANSIT REFUND AGENT · AI PM PORTFOLIO</div>
+    </div>
+  </div>
+  <div class="h-badge">Hover nodes for details · Click tabs to explore</div>
+</header>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('graph')">① Graph Topology</button>
+  <button class="tab-btn" onclick="switchTab('states')">② State Machine</button>
+  <button class="tab-btn" onclick="switchTab('sequence')">③ Sequence Flow</button>
+  <button class="tab-btn" onclick="switchTab('code')">④ State Object & Code</button>
+  <button class="tab-btn" onclick="switchTab('working')">⑤ How It Works</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- TAB 1: GRAPH TOPOLOGY -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="page-graph" class="page active">
+  <div class="sec-label">LANGGRAPH NODE TOPOLOGY — FULL AGENT GRAPH</div>
+  <div class="graph-wrap">
+    <div class="graph-inner" id="graphInner">
+
+      <!-- SVG Arrows -->
+      <svg class="arrows-svg" id="arrowSvg"></svg>
+
+      <!-- TRIGGER NODE -->
+      <div class="node n-trigger" id="n-trigger" style="left:430px;top:20px;"
+        data-title="Disruption Trigger" data-desc="Entry point. GTFS real-time feed anomaly, operator manual flag, or ML anomaly detector publishes event to Cloud Pub/Sub. Payload: line_id, disruption_type, start_time, end_time, severity_score.">
+        <div class="node-icon">⚡</div>
+        <div class="node-label">TRIGGER</div>
+        <div class="node-sub">START NODE</div>
+      </div>
+
+      <!-- ORCHESTRATOR -->
+      <div class="node n-orchestrator" id="n-orch" style="left:400px;top:145px;"
+        data-title="Orchestrator Agent" data-desc="The central brain. Built on LangGraph + LLM. Manages the global AgentState object, routes to sub-agents via conditional edges, handles cycles (retries), and maintains execution graph. Uses ReAct reasoning loop.">
+        <div class="node-icon">🤖</div>
+        <div class="node-label">ORCHESTRATOR</div>
+        <div class="node-sub">LangGraph · LLM</div>
+      </div>
+
+      <!-- AGENT 1: Disruption Analysis -->
+      <div class="node n-agent" id="n-a1" style="left:60px;top:290px;"
+        data-title="Disruption Analysis Agent" data-desc="INPUT: disruption event payload. ACTION: queries GTFS tool, cross-refs passenger DB, builds trip manifest. OUTPUT: structured TripManifest{trip_ids[], patron_tokens[], fare_amounts[], payment_methods[]}. Tool calls: get_gtfs_trips(), query_passenger_db().">
+        <div class="node-icon">🔍</div>
+        <div class="node-label">Disruption<br>Analysis</div>
+        <div class="node-sub">GTFS · PassengerDB</div>
+      </div>
+
+      <!-- AGENT 2: Eligibility -->
+      <div class="node n-agent" id="n-a2" style="left:220px;top:290px;"
+        data-title="Eligibility Validation Agent" data-desc="INPUT: TripManifest. ACTION: RAG retrieval from policy vector store (hybrid semantic+BM25). LLM reasons over retrieved chunks per patron. OUTPUT: EligibilityResult{eligible_patrons[], exclusion_reasons{}, policy_clauses_applied[]}. Chain-of-thought logged per decision.">
+        <div class="node-icon">⚖️</div>
+        <div class="node-label">Eligibility<br>Validation</div>
+        <div class="node-sub">RAG · Policy Store</div>
+      </div>
+
+      <!-- AGENT 3: Guardrail -->
+      <div class="node n-agent" id="n-a3" style="left:390px;top:290px;"
+        data-title="Compliance Guardrail Agent" data-desc="INPUT: EligibilityResult + accumulated state. CHECKS: (1) NeMo input rail — prompt injection scan, (2) PII tokenization audit — no plain text sensitive data, (3) Output schema pre-validation. VETO POWER: any failure → hard stop → HITL queue. Does not proceed unless all three pass.">
+        <div class="node-icon">🔒</div>
+        <div class="node-label">Compliance<br>Guardrail</div>
+        <div class="node-sub">NeMo · PII · Schema</div>
+      </div>
+
+      <!-- AGENT 4: Refund Calc -->
+      <div class="node n-agent" id="n-a4" style="left:560px;top:290px;"
+        data-title="Refund Calculation Agent" data-desc="INPUT: validated EligibilityResult + policy context. ACTION: applies refund formula per disruption type (flat/percentage/full fare). Validates each amount against $500 cap. OUTPUT: RefundManifest{patron_token, amount, currency, calculation_trace}. Signed manifest with agent attestation.">
+        <div class="node-icon">💰</div>
+        <div class="node-label">Refund<br>Calculation</div>
+        <div class="node-sub">Business Logic LLM</div>
+      </div>
+
+      <!-- AGENT 5: Payment -->
+      <div class="node n-agent" id="n-a5" style="left:730px;top:290px;"
+        data-title="Payment Orchestration Agent" data-desc="INPUT: signed RefundManifest. ACTION: routes each refund to correct gateway (stored value / credit card / mobile wallet). Fires individual requests asynchronously. Implements exponential backoff retry (max 3). Idempotency keys prevent double-refund. OUTPUT: PaymentStatus{completed[], pending[], failed[]} per patron.">
+        <div class="node-icon">🏦</div>
+        <div class="node-label">Payment<br>Orchestration</div>
+        <div class="node-sub">Gateway · Retry Logic</div>
+      </div>
+
+      <!-- AGENT 6: Notification -->
+      <div class="node n-agent" id="n-a6" style="left:900px;top:290px;"
+        data-title="Notification Delivery Agent" data-desc="INPUT: PaymentStatus per patron. ACTION: fires notification per patron immediately on individual payment confirmation (not batch completion). Multi-channel: push → SMS → email fallback. Personalised, multi-lingual, accessibility-compliant. OUTPUT: NotificationStatus{delivered[], failed[]}.">
+        <div class="node-icon">📱</div>
+        <div class="node-label">Notification<br>Delivery</div>
+        <div class="node-sub">Push · SMS · Email</div>
+      </div>
+
+      <!-- DECISION: Confidence Check -->
+      <div class="node n-decision" id="n-conf" style="left:390px;top:430px;"
+        data-title="Confidence Gate" data-desc="CONDITIONAL EDGE: evaluates agent confidence scores after Eligibility and Guardrail steps. If ANY agent confidence < 85% → route to HITL queue. If all ≥ 85% → proceed to Refund Calculation. This is LangGraph's conditional_edge() function in action.">
+        <div class="node-icon">🎯</div>
+        <div class="node-label" style="font-size:10px;">CONFIDENCE<br>GATE</div>
+      </div>
+
+      <!-- HITL NODE -->
+      <div class="node n-hitl" id="n-hitl" style="left:600px;top:430px;"
+        data-title="Human-in-the-Loop Queue" data-desc="ESCALATION NODE: receives events when confidence < 85%, guardrail fails, amount > $500, or novel disruption type. Supervisor reviews full agent reasoning trace. Three options: APPROVE (resume graph), MODIFY + APPROVE (update state and resume), REJECT + ESCALATE (full manual mode). Graph resumes from correct node after decision.">
+        <div class="node-icon">👤</div>
+        <div class="node-label">HITL Queue</div>
+        <div class="node-sub">Supervisor Review</div>
+      </div>
+
+      <!-- RAG LAYER -->
+      <div class="node n-rag" id="n-rag" style="left:180px;top:545px;"
+        data-title="RAG Knowledge Layer" data-desc="SHARED INFRASTRUCTURE beneath all agents. Three knowledge sources: (1) Policy Vector Store — Vertex AI Vector Search, text-embedding-gecko embeddings, hybrid semantic+BM25 retrieval. (2) Disruption Memory Index — 5yr historical events. (3) GTFS Real-Time Feed — live schedule context injected at query time. Retrieval scoped per agent query with relevance threshold 0.7.">
+        <div class="node-icon">📚</div>
+        <div class="node-label" style="color:var(--purple)">RAG KNOWLEDGE LAYER &nbsp;·&nbsp; Vertex AI Vector Search &nbsp;·&nbsp; Policy Store &nbsp;·&nbsp; Disruption Index &nbsp;·&nbsp; GTFS Feed</div>
+      </div>
+
+      <!-- GUARDRAIL LAYER -->
+      <div class="node n-guardrail" id="n-guard" style="left:180px;top:630px;"
+        data-title="Responsible AI Layer" data-desc="CROSS-CUTTING LAYER wrapping entire graph. NeMo Guardrails on every agent I/O. PII tokenization enforced before any LLM call. Financial caps at infrastructure level (not prompt level). Immutable audit logging of every state transition. Confidence monitoring. Human escalation triggers.">
+        <div class="node-icon">🛡</div>
+        <div class="node-label" style="color:var(--red)">RESPONSIBLE AI LAYER &nbsp;·&nbsp; NeMo Guardrails &nbsp;·&nbsp; PII Tokenization &nbsp;·&nbsp; Audit Log &nbsp;·&nbsp; Financial Caps</div>
+      </div>
+
+      <!-- END NODE -->
+      <div class="node n-end" id="n-end" style="left:430px;top:710px;"
+        data-title="END — Refund Complete" data-desc="Terminal node. Reached when all patrons processed (PaymentStatus complete) and all notifications delivered. Final state snapshot written to persistent store. Audit log closed with event summary. Supervisor dashboard updated.">
+        <div class="node-icon">✅</div>
+        <div class="node-label" style="font-size:10px;">COMPLETE</div>
+      </div>
+
+    </div><!-- graph-inner -->
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--blue);"></div>Trigger / Entry</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--teal);"></div>Orchestrator</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--gray2);"></div>Specialized Agent</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--green);"></div>Conditional Gate</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--yellow);"></div>HITL Escalation</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--purple);"></div>RAG Layer</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--red);"></div>Responsible AI Layer</div>
+      <div class="leg-item"><div class="leg-dot" style="background:rgba(255,255,255,0.2); border:1px dashed var(--gray3);"></div>Dashed = Conditional Edge</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- TAB 2: STATE MACHINE -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="page-states" class="page">
+  <div class="sec-label">LANGGRAPH STATE MACHINE — NODE STATES & TRANSITIONS</div>
+  <div class="state-grid">
+
+    <div class="state-card s-blue">
+      <div class="state-num">01</div>
+      <div class="state-name">⚡ IDLE → TRIGGERED</div>
+      <div class="state-type" style="color:var(--blue)">ENTRY STATE</div>
+      <div class="state-inputs">
+        <strong>TRIGGER CONDITIONS</strong>
+        → GTFS anomaly detected on monitored feed<br>
+        → Operator manually submits disruption report<br>
+        → ML anomaly model confidence > 90%
+        <strong>STATE OBJECT INITIALISED</strong>
+        → disruption_id (UUID), line_id, disruption_type<br>
+        → start_time, end_time, severity_score<br>
+        → status: "TRIGGERED", agents_completed: []
+      </div>
+      <div class="state-cond">NEXT → DISRUPTION_ANALYSIS<br>(always, no condition)</div>
+    </div>
+
+    <div class="state-card s-teal">
+      <div class="state-num">02</div>
+      <div class="state-name">🔍 DISRUPTION_ANALYSIS</div>
+      <div class="state-type" style="color:var(--teal)">AGENT NODE</div>
+      <div class="state-inputs">
+        <strong>TOOLS INVOKED</strong>
+        → get_gtfs_trips(line_id, start_time, end_time)<br>
+        → query_passenger_db(trip_ids[])<br>
+        → tokenize_pii(patron_data[])
+        <strong>STATE UPDATED</strong>
+        → trip_manifest: TripManifest object<br>
+        → affected_count: integer<br>
+        → agents_completed: ["disruption_analysis"]
+      </div>
+      <div class="state-cond">NEXT → ELIGIBILITY_VALIDATION<br>(always, trip_manifest populated)</div>
+    </div>
+
+    <div class="state-card s-purple">
+      <div class="state-num">03</div>
+      <div class="state-name">⚖️ ELIGIBILITY_VALIDATION</div>
+      <div class="state-type" style="color:var(--purple)">AGENT NODE + RAG</div>
+      <div class="state-inputs">
+        <strong>RAG RETRIEVAL</strong>
+        → semantic_search(disruption_type, fare_category)<br>
+        → bm25_search(policy_exact_terms)<br>
+        → merge_results(threshold=0.7)
+        <strong>LLM REASONING</strong>
+        → evaluate_eligibility(patron, retrieved_policy)<br>
+        → log_reasoning_trace(per_patron)
+        <strong>STATE UPDATED</strong>
+        → eligibility_result: EligibilityResult<br>
+        → confidence_scores: {per_agent_avg}<br>
+        → reasoning_traces: {patron_id: trace}
+      </div>
+      <div class="state-cond">NEXT → COMPLIANCE_CHECK (confidence ≥ 85%)<br>OR → HITL_QUEUE (confidence &lt; 85%)</div>
+    </div>
+
+    <div class="state-card s-red">
+      <div class="state-num">04</div>
+      <div class="state-name">🔒 COMPLIANCE_CHECK</div>
+      <div class="state-type" style="color:var(--red)">GUARDRAIL NODE</div>
+      <div class="state-inputs">
+        <strong>THREE SEQUENTIAL CHECKS</strong>
+        → nemo_input_rail(state_object) → PASS/FAIL<br>
+        → pii_audit(state_object) → PASS/FAIL<br>
+        → schema_validate(eligibility_result) → PASS/FAIL
+        <strong>STATE UPDATED</strong>
+        → guardrail_status: {rail1, rail2, rail3}<br>
+        → compliance_passed: boolean<br>
+        → violation_details: string | null
+      </div>
+      <div class="state-cond">NEXT → REFUND_CALCULATION (all 3 PASS)<br>OR → HITL_QUEUE (any FAIL)</div>
+    </div>
+
+    <div class="state-card s-green">
+      <div class="state-num">05</div>
+      <div class="state-name">💰 REFUND_CALCULATION</div>
+      <div class="state-type" style="color:var(--green)">AGENT NODE</div>
+      <div class="state-inputs">
+        <strong>FORMULA APPLIED</strong>
+        → get_refund_formula(disruption_type, fare_cat)<br>
+        → calculate_amount(fare, formula)<br>
+        → validate_cap(amount, max=500)
+        <strong>STATE UPDATED</strong>
+        → refund_manifest: RefundManifest<br>
+        → total_refund_value: float<br>
+        → cap_exceptions: [patron_ids above $500]
+      </div>
+      <div class="state-cond">NEXT → PAYMENT_EXECUTION (no cap exceptions)<br>OR → HITL_QUEUE (cap exceptions exist)</div>
+    </div>
+
+    <div class="state-card s-orange">
+      <div class="state-num">06</div>
+      <div class="state-name">🏦 PAYMENT_EXECUTION</div>
+      <div class="state-type" style="color:var(--orange)">AGENT NODE + RETRY</div>
+      <div class="state-inputs">
+        <strong>EXECUTION PATTERN</strong>
+        → for each patron in refund_manifest:<br>
+        &nbsp;&nbsp;→ route_to_gateway(payment_method)<br>
+        &nbsp;&nbsp;→ fire_refund_request(idempotency_key)<br>
+        &nbsp;&nbsp;→ on_timeout: retry(max=3, backoff=exp)<br>
+        &nbsp;&nbsp;→ update_payment_status(patron_id, status)
+        <strong>STATE UPDATED</strong>
+        → payment_status: {completed[], pending[], failed[]}<br>
+        → processed_count: integer<br>
+        → retry_queue: [patron_ids pending retry]
+      </div>
+      <div class="state-cond">NEXT → NOTIFICATION (completed[] not empty)<br>LOOP BACK if retry_queue not empty</div>
+    </div>
+
+    <div class="state-card s-yellow">
+      <div class="state-num">07</div>
+      <div class="state-name">👤 HITL_QUEUE</div>
+      <div class="state-type" style="color:var(--yellow)">INTERRUPT NODE</div>
+      <div class="state-inputs">
+        <strong>TRIGGERED BY</strong>
+        → confidence &lt; 85% on any agent decision<br>
+        → guardrail FAIL on any check<br>
+        → refund amount > $500 (cap exception)<br>
+        → novel disruption type (no RAG match)
+        <strong>SUPERVISOR OPTIONS</strong>
+        → APPROVE: graph.resume() from paused node<br>
+        → MODIFY: update state object, then resume<br>
+        → REJECT: switch to manual_processing mode
+        <strong>STATE UPDATED</strong>
+        → hitl_status: "pending" | "approved" | "rejected"<br>
+        → supervisor_id: string<br>
+        → supervisor_notes: string
+      </div>
+      <div class="state-cond">NEXT → (node that triggered escalation)<br>OR → MANUAL_MODE (rejected)</div>
+    </div>
+
+    <div class="state-card s-gray">
+      <div class="state-num">08</div>
+      <div class="state-name">✅ COMPLETE</div>
+      <div class="state-type" style="color:var(--gray2)">TERMINAL NODE</div>
+      <div class="state-inputs">
+        <strong>TERMINAL CONDITIONS</strong>
+        → payment_status.pending is empty<br>
+        → notification_status.failed is empty<br>
+        → OR max_retry_attempts reached
+        <strong>FINAL ACTIONS</strong>
+        → write_final_state(persistent_store)<br>
+        → close_audit_log(event_id)<br>
+        → update_dashboard(event_summary)<br>
+        → trigger_post_event_audit(schedule: +24hrs)
+      </div>
+      <div class="state-cond">END — Graph execution complete</div>
+    </div>
+
+  </div>
+
+  <!-- Conditional routing table -->
+  <div style="margin-top:24px;">
+    <div class="sec-label">CONDITIONAL EDGE ROUTING TABLE</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;">
+      <table class="routing-table">
+        <thead>
+          <tr>
+            <th>FROM NODE</th>
+            <th>CONDITION</th>
+            <th>→ ROUTE TO</th>
+            <th>LANGGRAPH METHOD</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="color:var(--teal)">TRIGGER</td><td>Always</td><td>DISRUPTION_ANALYSIS</td><td style="font-family:var(--mono);font-size:11px;color:var(--blue)">add_edge()</td></tr>
+          <tr><td style="color:var(--teal)">DISRUPTION_ANALYSIS</td><td>trip_manifest populated</td><td>ELIGIBILITY_VALIDATION</td><td style="font-family:var(--mono);font-size:11px;color:var(--blue)">add_edge()</td></tr>
+          <tr><td style="color:var(--purple)">ELIGIBILITY_VALIDATION</td><td>avg_confidence ≥ 0.85</td><td>COMPLIANCE_CHECK</td><td style="font-family:var(--mono);font-size:11px;color:var(--blue)">add_conditional_edges()</td></tr>
+          <tr><td style="color:var(--purple)">ELIGIBILITY_VALIDATION</td><td>avg_confidence &lt; 0.85</td><td>HITL_QUEUE</td><td style="font-family:var(--mono);font-size:11px;color:var(--blue)">add_conditional_edges()</td></tr>
+          <tr><td style="color:var(--red)">COMPLIANCE_CHECK</td><td>all_rails_passed == True</td><td>REFUND_CALCULATION</td><td style="font-family:var(--mono);font-size:11px;color:var(--blue)">add_conditional_edges()</td></tr>
+          <tr><td style="color:var(--red)">COMPLIANCE_CHECK</td><td>any_rail_failed == True</td><td>HITL_QUEUE</td><td style="font-family:var(--mono);font-size:11px;color:var(--blue)">add_conditional_edges()</td></tr>
+          <tr><td style="color:var(--green)">REFUND_CALCULATION</td><td>cap_exceptions is empty</td><td>PAYMENT_EXECUTION</td><td style="font-family:var(--mono);font-size:11px;color:var(--blue)">add_conditional_edges()</td></tr>
+          <tr><td style="color:var(--green)">REFUND_CALCULATION</td><td>cap_exceptions not empty</td><td>HITL_QUEUE</td><td style="font-family:var(--mono);font-size:11px;color:var(--blue)">add_conditional_edges()</td></tr>
+          <tr><td style="color:var(--orange)">PAYMENT_EXECUTION</td><td>retry_queue not empty</td><td>PAYMENT_EXECUTION (self-loop)</td><td style="font-family:var(--mono);font-size:11px;color:var(--blue)">add_conditional_edges() + cycle</td></tr>
+          <tr><td style="color:var(--orange)">PAYMENT_EXECUTION</td><td>completed[] not empty</td><td>NOTIFICATION</td><td style="font-family:var(--mono);font-size:11px;color:var(--blue)">add_conditional_edges()</td></tr>
+          <tr><td style="color:var(--yellow)">HITL_QUEUE</td><td>supervisor APPROVE</td><td>(originating node)</td><td style="font-family:var(--mono);font-size:11px;color:var(--blue)">interrupt() + resume()</td></tr>
+          <tr><td style="color:var(--yellow)">HITL_QUEUE</td><td>supervisor REJECT</td><td>MANUAL_MODE</td><td style="font-family:var(--mono);font-size:11px;color:var(--blue)">interrupt() + end()</td></tr>
+          <tr><td style="color:var(--gray2)">NOTIFICATION</td><td>all notifications done</td><td>END (COMPLETE)</td><td style="font-family:var(--mono);font-size:11px;color:var(--blue)">add_edge(END)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- TAB 3: SEQUENCE DIAGRAM -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="page-sequence" class="page">
+  <div class="sec-label">SEQUENCE FLOW — MESSAGE PASSING BETWEEN AGENTS</div>
+  <div class="seq-wrap">
+    <div class="seq-inner">
+      <svg class="seq-svg" id="seqSvg" height="820"></svg>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- TAB 4: CODE & STATE OBJECT -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="page-code" class="page">
+  <div class="sec-label">LANGGRAPH STATE OBJECT & GRAPH DEFINITION</div>
+  <div class="code-grid">
+    <div>
+      <div class="code-title">① AgentState TypedDict — Shared State Object</div>
+      <div class="code-block"><span class="kw">from</span> <span class="cls">typing</span> <span class="kw">import</span> TypedDict, List, Dict, Optional
+<span class="kw">from</span> <span class="cls">langgraph.graph</span> <span class="kw">import</span> StateGraph, END
+
+<span class="kw">class</span> <span class="cls">AgentState</span>(TypedDict):
+    <span class="cmt"># ── Disruption Context ──────────────────────</span>
+    <span class="prop">disruption_id</span><span class="op">:</span>      <span class="cls">str</span>
+    <span class="prop">line_id</span><span class="op">:</span>             <span class="cls">str</span>
+    <span class="prop">disruption_type</span><span class="op">:</span>    <span class="cls">str</span>
+    <span class="prop">start_time</span><span class="op">:</span>          <span class="cls">datetime</span>
+    <span class="prop">end_time</span><span class="op">:</span>            <span class="cls">datetime</span>
+    <span class="prop">severity_score</span><span class="op">:</span>     <span class="cls">float</span>
+
+    <span class="cmt"># ── Trip Manifest (from Analysis Agent) ────</span>
+    <span class="prop">trip_manifest</span><span class="op">:</span>      Optional[<span class="cls">TripManifest</span>]
+    <span class="prop">affected_count</span><span class="op">:</span>     <span class="cls">int</span>
+
+    <span class="cmt"># ── Eligibility (from Eligibility Agent) ───</span>
+    <span class="prop">eligibility_result</span><span class="op">:</span> Optional[<span class="cls">EligibilityResult</span>]
+    <span class="prop">confidence_scores</span><span class="op">:</span>  Dict[<span class="cls">str</span>, <span class="cls">float</span>]
+    <span class="prop">reasoning_traces</span><span class="op">:</span>   Dict[<span class="cls">str</span>, <span class="cls">str</span>]
+
+    <span class="cmt"># ── Compliance (from Guardrail Agent) ──────</span>
+    <span class="prop">guardrail_status</span><span class="op">:</span>   Dict[<span class="cls">str</span>, <span class="cls">bool</span>]
+    <span class="prop">compliance_passed</span><span class="op">:</span>  <span class="cls">bool</span>
+    <span class="prop">violation_details</span><span class="op">:</span>  Optional[<span class="cls">str</span>]
+
+    <span class="cmt"># ── Refund Manifest (from Calc Agent) ──────</span>
+    <span class="prop">refund_manifest</span><span class="op">:</span>    Optional[<span class="cls">RefundManifest</span>]
+    <span class="prop">total_refund_value</span><span class="op">:</span> <span class="cls">float</span>
+    <span class="prop">cap_exceptions</span><span class="op">:</span>     List[<span class="cls">str</span>]
+
+    <span class="cmt"># ── Payment Status (from Payment Agent) ────</span>
+    <span class="prop">payment_status</span><span class="op">:</span>     Dict[<span class="cls">str</span>, <span class="cls">str</span>]
+    <span class="prop">retry_queue</span><span class="op">:</span>        List[<span class="cls">str</span>]
+    <span class="prop">retry_count</span><span class="op">:</span>        Dict[<span class="cls">str</span>, <span class="cls">int</span>]
+
+    <span class="cmt"># ── HITL (from Supervisor) ──────────────────</span>
+    <span class="prop">hitl_required</span><span class="op">:</span>      <span class="cls">bool</span>
+    <span class="prop">hitl_reason</span><span class="op">:</span>        Optional[<span class="cls">str</span>]
+    <span class="prop">supervisor_decision</span><span class="op">:</span> Optional[<span class="cls">str</span>]
+
+    <span class="cmt"># ── Audit ───────────────────────────────────</span>
+    <span class="prop">agents_completed</span><span class="op">:</span>   List[<span class="cls">str</span>]
+    <span class="prop">audit_log</span><span class="op">:</span>          List[<span class="cls">AuditEntry</span>]
+    <span class="prop">event_status</span><span class="op">:</span>       <span class="cls">str</span>  <span class="cmt"># TRIGGERED|PROCESSING|COMPLETE</span></div>
+    </div>
+
+    <div>
+      <div class="code-title">② Graph Definition — Nodes + Edges</div>
+      <div class="code-block"><span class="cmt"># ── Build the LangGraph ─────────────────────────</span>
+<span class="var">graph</span> <span class="op">=</span> <span class="cls">StateGraph</span>(<span class="cls">AgentState</span>)
+
+<span class="cmt"># Add all nodes</span>
+<span class="var">graph</span>.<span class="fn">add_node</span>(<span class="str">"disruption_analysis"</span>, <span class="fn">disruption_analysis_agent</span>)
+<span class="var">graph</span>.<span class="fn">add_node</span>(<span class="str">"eligibility_validation"</span>, <span class="fn">eligibility_agent</span>)
+<span class="var">graph</span>.<span class="fn">add_node</span>(<span class="str">"compliance_check"</span>, <span class="fn">guardrail_agent</span>)
+<span class="var">graph</span>.<span class="fn">add_node</span>(<span class="str">"refund_calculation"</span>, <span class="fn">refund_calc_agent</span>)
+<span class="var">graph</span>.<span class="fn">add_node</span>(<span class="str">"payment_execution"</span>, <span class="fn">payment_agent</span>)
+<span class="var">graph</span>.<span class="fn">add_node</span>(<span class="str">"notification_delivery"</span>, <span class="fn">notification_agent</span>)
+<span class="var">graph</span>.<span class="fn">add_node</span>(<span class="str">"hitl_queue"</span>, <span class="fn">hitl_interrupt_handler</span>)
+
+<span class="cmt"># Entry point</span>
+<span class="var">graph</span>.<span class="fn">set_entry_point</span>(<span class="str">"disruption_analysis"</span>)
+
+<span class="cmt"># Unconditional edges</span>
+<span class="var">graph</span>.<span class="fn">add_edge</span>(<span class="str">"disruption_analysis"</span>, <span class="str">"eligibility_validation"</span>)
+
+<span class="cmt"># Conditional: confidence gate after eligibility</span>
+<span class="var">graph</span>.<span class="fn">add_conditional_edges</span>(
+    <span class="str">"eligibility_validation"</span>,
+    <span class="fn">route_on_confidence</span>,  <span class="cmt"># routing function</span>
+    {
+        <span class="str">"proceed"</span><span class="op">:</span> <span class="str">"compliance_check"</span>,
+        <span class="str">"escalate"</span><span class="op">:</span> <span class="str">"hitl_queue"</span>,
+    }
+)
+
+<span class="cmt"># Conditional: guardrail gate</span>
+<span class="var">graph</span>.<span class="fn">add_conditional_edges</span>(
+    <span class="str">"compliance_check"</span>,
+    <span class="fn">route_on_compliance</span>,
+    {
+        <span class="str">"passed"</span><span class="op">:</span> <span class="str">"refund_calculation"</span>,
+        <span class="str">"failed"</span><span class="op">:</span> <span class="str">"hitl_queue"</span>,
+    }
+)
+
+<span class="cmt"># Conditional: cap exception gate</span>
+<span class="var">graph</span>.<span class="fn">add_conditional_edges</span>(
+    <span class="str">"refund_calculation"</span>,
+    <span class="fn">route_on_cap_exceptions</span>,
+    {
+        <span class="str">"no_exceptions"</span><span class="op">:</span> <span class="str">"payment_execution"</span>,
+        <span class="str">"exceptions_exist"</span><span class="op">:</span> <span class="str">"hitl_queue"</span>,
+    }
+)
+
+<span class="cmt"># Conditional: payment retry loop (cycle)</span>
+<span class="var">graph</span>.<span class="fn">add_conditional_edges</span>(
+    <span class="str">"payment_execution"</span>,
+    <span class="fn">route_on_payment_status</span>,
+    {
+        <span class="str">"retry"</span><span class="op">:</span> <span class="str">"payment_execution"</span>,  <span class="cmt"># CYCLE!</span>
+        <span class="str">"proceed"</span><span class="op">:</span> <span class="str">"notification_delivery"</span>,
+    }
+)
+
+<span class="cmt"># HITL routes back to originating node</span>
+<span class="var">graph</span>.<span class="fn">add_conditional_edges</span>(
+    <span class="str">"hitl_queue"</span>,
+    <span class="fn">route_on_supervisor_decision</span>,
+    {
+        <span class="str">"resume_eligibility"</span><span class="op">:</span> <span class="str">"eligibility_validation"</span>,
+        <span class="str">"resume_compliance"</span><span class="op">:</span> <span class="str">"compliance_check"</span>,
+        <span class="str">"resume_calculation"</span><span class="op">:</span> <span class="str">"refund_calculation"</span>,
+        <span class="str">"manual_mode"</span><span class="op">:</span> END,
+    }
+)
+
+<span class="cmt"># Terminal edge</span>
+<span class="var">graph</span>.<span class="fn">add_edge</span>(<span class="str">"notification_delivery"</span>, END)
+
+<span class="cmt"># Compile with checkpointing (enables HITL interrupt)</span>
+<span class="var">app</span> <span class="op">=</span> <span class="var">graph</span>.<span class="fn">compile</span>(
+    <span class="prop">checkpointer</span><span class="op">=</span><span class="cls">SqliteSaver</span>.<span class="fn">from_conn_string</span>(<span class="str">":memory:"</span>),
+    <span class="prop">interrupt_before</span><span class="op">=</span>[<span class="str">"hitl_queue"</span>]
+)</div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px;">
+    <div class="code-title">③ Routing Function Example — Confidence Gate</div>
+    <div class="code-block"><span class="kw">def</span> <span class="fn">route_on_confidence</span>(<span class="var">state</span><span class="op">:</span> <span class="cls">AgentState</span>) <span class="op">-></span> <span class="cls">str</span><span class="op">:</span>
+    <span class="str">"""
+    Conditional edge routing function.
+    Evaluates agent confidence scores and returns routing key.
+    LangGraph calls this after eligibility_validation node completes.
+    """</span>
+    <span class="var">scores</span> <span class="op">=</span> <span class="var">state</span>[<span class="str">"confidence_scores"</span>]
+    <span class="var">avg_confidence</span> <span class="op">=</span> <span class="fn">sum</span>(<span class="var">scores</span>.<span class="fn">values</span>()) <span class="op">/</span> <span class="fn">len</span>(<span class="var">scores</span>)
+
+    <span class="kw">if</span> <span class="var">avg_confidence</span> <span class="op">&lt;</span> <span class="num">0.85</span><span class="op">:</span>
+        <span class="cmt"># Update state with HITL reason before routing</span>
+        <span class="var">state</span>[<span class="str">"hitl_required"</span>] <span class="op">=</span> <span class="cls">True</span>
+        <span class="var">state</span>[<span class="str">"hitl_reason"</span>] <span class="op">=</span> <span class="fn">f</span><span class="str">"Low confidence: {avg_confidence:.2%} < 85% threshold"</span>
+        <span class="kw">return</span> <span class="str">"escalate"</span>  <span class="cmt"># → hitl_queue node</span>
+
+    <span class="kw">return</span> <span class="str">"proceed"</span>  <span class="cmt"># → compliance_check node</span>
+
+
+<span class="kw">def</span> <span class="fn">route_on_payment_status</span>(<span class="var">state</span><span class="op">:</span> <span class="cls">AgentState</span>) <span class="op">-></span> <span class="cls">str</span><span class="op">:</span>
+    <span class="str">"""Handles the payment retry CYCLE in LangGraph."""</span>
+    <span class="var">retry_queue</span> <span class="op">=</span> <span class="var">state</span>[<span class="str">"retry_queue"</span>]
+    <span class="var">retry_counts</span> <span class="op">=</span> <span class="var">state</span>[<span class="str">"retry_count"</span>]
+    <span class="var">max_retries</span> <span class="op">=</span> <span class="num">3</span>
+
+    <span class="cmt"># Filter out patrons who've exceeded max retries</span>
+    <span class="var">still_retrying</span> <span class="op">=</span> [
+        <span class="var">p</span> <span class="kw">for</span> <span class="var">p</span> <span class="kw">in</span> <span class="var">retry_queue</span>
+        <span class="kw">if</span> <span class="var">retry_counts</span>.<span class="fn">get</span>(<span class="var">p</span>, <span class="num">0</span>) <span class="op">&lt;</span> <span class="var">max_retries</span>
+    ]
+
+    <span class="kw">if</span> <span class="var">still_retrying</span><span class="op">:</span>
+        <span class="var">state</span>[<span class="str">"retry_queue"</span>] <span class="op">=</span> <span class="var">still_retrying</span>
+        <span class="kw">return</span> <span class="str">"retry"</span>   <span class="cmt"># ← CYCLE BACK to payment_execution</span>
+
+    <span class="kw">return</span> <span class="str">"proceed"</span>  <span class="cmt"># → notification_delivery</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- TAB 5: HOW IT WORKS -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="page-working" class="page">
+  <div class="sec-label">END-TO-END WORKING — STEP BY STEP EXECUTION</div>
+  <div style="display:grid;grid-template-columns:1fr 380px;gap:24px;">
+    <div class="working-timeline">
+
+      <div class="wt-step" style="border-left:3px solid var(--blue);">
+        <div style="position:absolute;left:-23px;top:22px;width:12px;height:12px;border-radius:50%;background:var(--blue);border:2px solid var(--bg);"></div>
+        <div class="wt-num" style="color:var(--blue)">STEP 01 · T+0s</div>
+        <div class="wt-title">Disruption Event Triggers the Graph</div>
+        <div class="wt-desc">GTFS real-time feed detects signal failure on Blue Line. Anomaly score exceeds threshold. Cloud Pub/Sub publishes a structured event message. LangGraph runtime receives the message and calls <code style="background:rgba(255,255,255,0.05);padding:1px 5px;border-radius:3px;font-size:11px;">app.invoke(initial_state)</code> — initialising the AgentState object and setting the entry point to <strong>disruption_analysis</strong>.</div>
+        <div class="wt-code">event = {disruption_id: "DIS-2024-0847", line_id: "BLUE",
+  disruption_type: "SIGNAL_FAILURE", severity: 0.82,
+  start_time: "06:15:00", end_time: "09:30:00"}
+app.invoke(event, config={"thread_id": "DIS-2024-0847"})</div>
+        <div class="wt-tags">
+          <span class="wt-tag" style="border-color:var(--blue);color:var(--blue)">Cloud Pub/Sub</span>
+          <span class="wt-tag" style="border-color:var(--blue);color:var(--blue)">LangGraph.invoke()</span>
+        </div>
+      </div>
+
+      <div class="wt-step" style="border-left:3px solid var(--teal);">
+        <div style="position:absolute;left:-23px;top:22px;width:12px;height:12px;border-radius:50%;background:var(--teal);border:2px solid var(--bg);"></div>
+        <div class="wt-num" style="color:var(--teal)">STEP 02 · T+2s</div>
+        <div class="wt-title">Disruption Analysis Agent Builds Trip Manifest</div>
+        <div class="wt-desc">The first node executes. LLM invokes two tools via function calling: <strong>get_gtfs_trips()</strong> retrieves all trips on the Blue Line between 06:15 and 09:30 — returns 1,247 trip records. <strong>query_passenger_db()</strong> cross-references each trip with fare transaction data. PII tokenization runs immediately — all patron identifiers replaced with secure tokens before anything proceeds.</div>
+        <div class="wt-code">trip_manifest = TripManifest(
+  trips=1247, eligible_for_check=1247,
+  patron_tokens=["TKN_001...TKN_1247"],
+  fare_amounts={...}, payment_methods={...}
+)
+state["trip_manifest"] = trip_manifest  # written to shared state</div>
+        <div class="wt-tags">
+          <span class="wt-tag" style="border-color:var(--teal);color:var(--teal)">Function Calling</span>
+          <span class="wt-tag" style="border-color:var(--teal);color:var(--teal)">PII Tokenization</span>
+          <span class="wt-tag" style="border-color:var(--teal);color:var(--teal)">GTFS Tool</span>
+        </div>
+      </div>
+
+      <div class="wt-step" style="border-left:3px solid var(--purple);">
+        <div style="position:absolute;left:-23px;top:22px;width:12px;height:12px;border-radius:50%;background:var(--purple);border:2px solid var(--bg);"></div>
+        <div class="wt-num" style="color:var(--purple)">STEP 03 · T+8s</div>
+        <div class="wt-title">Eligibility Agent — RAG Retrieval + LLM Reasoning</div>
+        <div class="wt-desc">The most complex step. For each patron, the agent runs a hybrid retrieval query against the Vertex AI Vector Search index — semantic similarity search for conceptual policy matches combined with BM25 keyword search for exact fare rule terms. Retrieved chunks are filtered at 0.7 cosine similarity threshold. LLM then reasons over the retrieved context to make an eligibility determination per patron. Chain-of-thought reasoning trace is logged for every decision.</div>
+        <div class="wt-code">retrieved_chunks = rag.hybrid_search(
+  query=f"signal_failure refund policy {fare_category}",
+  semantic_weight=0.6, bm25_weight=0.4, threshold=0.7
+)
+decision = llm.reason(patron_context, retrieved_chunks)
+# decision.confidence = 0.91  ← above 0.85 threshold ✓
+# eligibility_result: 1189 eligible, 58 excluded</div>
+        <div class="wt-tags">
+          <span class="wt-tag" style="border-color:var(--purple);color:var(--purple)">RAG Hybrid Search</span>
+          <span class="wt-tag" style="border-color:var(--purple);color:var(--purple)">LLM Reasoning</span>
+          <span class="wt-tag" style="border-color:var(--purple);color:var(--purple)">Chain-of-Thought Log</span>
+        </div>
+      </div>
+
+      <div class="wt-step" style="border-left:3px solid var(--green);">
+        <div style="position:absolute;left:-23px;top:22px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--bg);"></div>
+        <div class="wt-num" style="color:var(--green)">STEP 04 · T+12s</div>
+        <div class="wt-title">Confidence Gate — Conditional Edge Evaluation</div>
+        <div class="wt-desc">LangGraph calls the <strong>route_on_confidence()</strong> routing function with the current state. Average confidence across the eligibility batch is 0.91 — above the 0.85 threshold. The conditional edge routes to <strong>compliance_check</strong>. If confidence had been below 0.85, the graph would have paused at the HITL interrupt node, notified the supervisor dashboard, and waited for human approval before proceeding.</div>
+        <div class="wt-code">avg_confidence = mean([0.91, 0.88, 0.94, ...]) = 0.91
+# route_on_confidence returns "proceed"
+# LangGraph transitions: eligibility_validation → compliance_check</div>
+        <div class="wt-tags">
+          <span class="wt-tag" style="border-color:var(--green);color:var(--green)">Conditional Edge</span>
+          <span class="wt-tag" style="border-color:var(--green);color:var(--green)">Confidence Threshold</span>
+        </div>
+      </div>
+
+      <div class="wt-step" style="border-left:3px solid var(--red);">
+        <div style="position:absolute;left:-23px;top:22px;width:12px;height:12px;border-radius:50%;background:var(--red);border:2px solid var(--bg);"></div>
+        <div class="wt-num" style="color:var(--red)">STEP 05 · T+14s</div>
+        <div class="wt-title">Compliance Guardrail Agent — Three Sequential Checks</div>
+        <div class="wt-desc">The guardrail agent runs three independent checks in sequence. <strong>Rail 1:</strong> NeMo input rail scans the accumulated state object for adversarial patterns, prompt injection attempts, or policy override signals — PASS. <strong>Rail 2:</strong> PII tokenization audit verifies no plain-text sensitive data exists anywhere in the state — PASS. <strong>Rail 3:</strong> Output schema pre-validates the eligibility manifest structure before it's passed to the calculation agent — PASS. All three pass — the route_on_compliance() function returns "passed".</div>
+        <div class="wt-code">rail_1 = nemo.input_guard(state)        # PASS ✓
+rail_2 = pii_auditor.verify(state)      # PASS ✓
+rail_3 = schema.validate(eligibility)   # PASS ✓
+state["compliance_passed"] = True
+# Routes to: refund_calculation</div>
+        <div class="wt-tags">
+          <span class="wt-tag" style="border-color:var(--red);color:var(--red)">NeMo Guardrails</span>
+          <span class="wt-tag" style="border-color:var(--red);color:var(--red)">PII Audit</span>
+          <span class="wt-tag" style="border-color:var(--red);color:var(--red)">Schema Validation</span>
+        </div>
+      </div>
+
+      <div class="wt-step" style="border-left:3px solid var(--yellow);">
+        <div style="position:absolute;left:-23px;top:22px;width:12px;height:12px;border-radius:50%;background:var(--yellow);border:2px solid var(--bg);"></div>
+        <div class="wt-num" style="color:var(--yellow)">STEP 06 · T+18s</div>
+        <div class="wt-title">Refund Calculation Agent — Amount Per Patron</div>
+        <div class="wt-desc">Applies the refund formula for SIGNAL_FAILURE type: flat $15.50 service disruption credit + 100% of base fare for each affected trip. Validates every calculated amount against the $500 hard cap. All 1,189 eligible patrons in this event are below $500 — no cap exceptions. The signed RefundManifest is written to state. The conditional edge routes directly to payment execution.</div>
+        <div class="wt-code">for patron in eligible_patrons:
+  amount = flat_credit(15.50) + full_fare(patron.fare)
+  assert amount <= 500, "Route to HITL"
+  refund_manifest.add(patron.token, amount)
+state["cap_exceptions"] = []  # empty → no HITL needed
+# Routes to: payment_execution</div>
+        <div class="wt-tags">
+          <span class="wt-tag" style="border-color:var(--yellow);color:var(--yellow)">Business Logic</span>
+          <span class="wt-tag" style="border-color:var(--yellow);color:var(--yellow)">$500 Cap Enforced</span>
+        </div>
+      </div>
+
+      <div class="wt-step" style="border-left:3px solid var(--orange);">
+        <div style="position:absolute;left:-23px;top:22px;width:12px;height:12px;border-radius:50%;background:var(--orange);border:2px solid var(--bg);"></div>
+        <div class="wt-num" style="color:var(--orange)">STEP 07 · T+22s → T+65s</div>
+        <div class="wt-title">Payment Orchestration Agent — Individual Refunds + Retry Cycle</div>
+        <div class="wt-desc">Fires 1,189 individual refund requests asynchronously to the payment gateways, routed by payment method. Each request carries a unique idempotency key to prevent double-refund. 1,156 succeed immediately. 33 timeout. LangGraph's <strong>cycle</strong> kicks in — the conditional edge routes BACK to payment_execution with the 33 in the retry queue. Exponential backoff retry: attempt 2 after 2s, attempt 3 after 4s. 31 of 33 succeed on retry. 2 routed to failed-payment queue for manual recovery.</div>
+        <div class="wt-code"># CYCLE ITERATION 1: 1189 → 1156 complete, 33 retry
+state["retry_queue"] = [33 patron tokens]
+# route_on_payment_status returns "retry"
+# LangGraph loops back to payment_execution node
+
+# CYCLE ITERATION 2: 33 → 31 complete, 2 failed (max retries)
+state["retry_queue"] = []  # empty → route to notification</div>
+        <div class="wt-tags">
+          <span class="wt-tag" style="border-color:var(--orange);color:var(--orange)">LangGraph Cycle</span>
+          <span class="wt-tag" style="border-color:var(--orange);color:var(--orange)">Exponential Backoff</span>
+          <span class="wt-tag" style="border-color:var(--orange);color:var(--orange)">Idempotency Keys</span>
+        </div>
+      </div>
+
+      <div class="wt-step" style="border-left:3px solid var(--green);">
+        <div style="position:absolute;left:-23px;top:22px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--bg);"></div>
+        <div class="wt-num" style="color:var(--green)">STEP 08 · T+67s → T+85s</div>
+        <div class="wt-title">Notification Agent — Real-Time Per-Patron Delivery</div>
+        <div class="wt-desc">Critically, notifications fire <strong>per patron on individual payment confirmation</strong> — not after the entire batch. Patron #1 gets their push notification at T+25s when their individual refund clears. This is the design choice that creates the "real-time" experience. Multi-channel: push notification first (78% app-installed), SMS fallback, email tertiary. Message personalised with exact refund amount, explanation, and timeline. Multi-lingual based on account preferences.</div>
+        <div class="wt-code"># Fires per-patron, not per-batch:
+on_payment_confirmed(patron_id):
+  channel = select_channel(patron.preferences)
+  msg = personalise(template, patron, amount, reason)
+  notify(patron, channel, msg)  # T+N seconds per patron</div>
+        <div class="wt-tags">
+          <span class="wt-tag" style="border-color:var(--green);color:var(--green)">Per-Patron Trigger</span>
+          <span class="wt-tag" style="border-color:var(--green);color:var(--green)">Multi-Channel</span>
+          <span class="wt-tag" style="border-color:var(--green);color:var(--green)">Personalised</span>
+        </div>
+      </div>
+
+      <div class="wt-step" style="border-left:3px solid var(--teal);background:rgba(0,229,200,0.04);">
+        <div style="position:absolute;left:-23px;top:22px;width:12px;height:12px;border-radius:50%;background:var(--teal);border:2px solid var(--bg);"></div>
+        <div class="wt-num" style="color:var(--teal)">COMPLETE · T+87s</div>
+        <div class="wt-title">✅ Graph Reaches END Node — Event Complete</div>
+        <div class="wt-desc">LangGraph transitions to the END node. Final state snapshot written to persistent store. Audit log closed. Supervisor dashboard updated with event summary: 1,187 refunds processed, 2 failed (manual recovery queue), total value $18,247, time elapsed 87 seconds. Post-event audit job scheduled for T+24hrs. Shadow system comparison job scheduled immediately.</div>
+        <div class="wt-code">final_summary = {processed: 1187, failed: 2,
+  total_value: 18247.50, elapsed_seconds: 87,
+  agents_completed: ["disruption_analysis", "eligibility_validation",
+    "compliance_check", "refund_calculation", "payment_execution",
+    "notification_delivery"], status: "COMPLETE"}</div>
+      </div>
+
+    </div><!-- working-timeline -->
+
+    <!-- Right sidebar: Key Concepts -->
+    <div>
+      <div class="sec-label">KEY LANGGRAPH CONCEPTS</div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:700;color:var(--teal);margin-bottom:12px;">Why LangGraph vs LangChain?</div>
+        <div style="font-size:11px;color:var(--gray2);line-height:1.9;">
+          <div style="margin-bottom:8px;"><span style="color:var(--red)">LangChain alone:</span> Linear sequence only. No cycles, no conditional branching, no state persistence across steps.</div>
+          <div><span style="color:var(--teal)">LangGraph adds:</span><br>
+          → <strong style="color:#fff">Stateful graph</strong> — shared AgentState travels through all nodes<br>
+          → <strong style="color:#fff">Cycles</strong> — payment retry loop impossible in chain<br>
+          → <strong style="color:#fff">Conditional edges</strong> — route on confidence, compliance, caps<br>
+          → <strong style="color:#fff">Interrupts</strong> — pause graph at HITL node, resume after human<br>
+          → <strong style="color:#fff">Checkpointing</strong> — crash recovery from last good state</div>
+        </div>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:700;color:var(--yellow);margin-bottom:12px;">HITL Interrupt Mechanism</div>
+        <div style="font-size:11px;color:var(--gray2);line-height:1.9;">
+          LangGraph's <code style="background:rgba(255,255,255,0.05);padding:1px 5px;border-radius:3px;">interrupt_before=["hitl_queue"]</code> pauses graph execution before the HITL node runs. The graph state is checkpointed. A supervisor reviews the state in the dashboard. On approval: <code style="background:rgba(255,255,255,0.05);padding:1px 5px;border-radius:3px;">app.invoke(None, config)</code> resumes from the checkpoint. On rejection: graph terminates and switches to manual mode.
+        </div>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:700;color:var(--orange);margin-bottom:12px;">Payment Retry Cycle</div>
+        <div style="font-size:11px;color:var(--gray2);line-height:1.9;">
+          LangGraph supports cycles — a node can route back to itself or a previous node. The payment retry cycle is the key reason LangChain alone was insufficient. The graph loops back to <code style="background:rgba(255,255,255,0.05);padding:1px 5px;border-radius:3px;">payment_execution</code> with only the retry queue — not the full patron list. State persists between iterations.
+        </div>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;">
+        <div style="font-size:13px;font-weight:700;color:var(--purple);margin-bottom:12px;">Checkpointing = Crash Safety</div>
+        <div style="font-size:11px;color:var(--gray2);line-height:1.9;">
+          Every state transition is checkpointed to persistent storage. If the system crashes after processing 800 of 1,189 payments, on restart LangGraph reads the checkpoint, identifies the 389 remaining, and resumes — without reprocessing the 800 already complete. Idempotency keys at the payment gateway prevent any double-refund risk.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- TOOLTIP -->
+<div class="tooltip" id="tooltip">
+  <div class="tooltip-title" id="tt-title"></div>
+  <div id="tt-body"></div>
+</div>
+
+<script>
+// ── TAB SWITCHING ──────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  event.target.classList.add('active');
+  if (tab === 'sequence') drawSequence();
+}
+
+// ── TOOLTIP ───────────────────────────────────────
+const tooltip = document.getElementById('tooltip');
+document.querySelectorAll('.node').forEach(node => {
+  node.addEventListener('mouseenter', e => {
+    document.getElementById('tt-title').textContent = node.dataset.title || '';
+    document.getElementById('tt-body').textContent = node.dataset.desc || '';
+    tooltip.classList.add('show');
+  });
+  node.addEventListener('mousemove', e => {
+    let x = e.clientX + 16, y = e.clientY - 10;
+    if (x + 290 > window.innerWidth) x = e.clientX - 306;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = y + 'px';
+  });
+  node.addEventListener('mouseleave', () => tooltip.classList.remove('show'));
+});
+
+// ── DRAW ARROWS (Tab 1) ───────────────────────────
+function getCenter(el) {
+  const parent = el.offsetParent;
+  const pw = parent ? parent.offsetWidth : 0;
+  return {
+    x: el.offsetLeft + el.offsetWidth / 2,
+    y: el.offsetTop + el.offsetHeight / 2,
+    t: el.offsetTop,
+    b: el.offsetTop + el.offsetHeight,
+    l: el.offsetLeft,
+    r: el.offsetLeft + el.offsetWidth,
+  };
+}
+
+function drawArrow(svg, x1, y1, x2, y2, color, dashed, label) {
+  const dx = x2 - x1, dy = y2 - y1;
+  const len = Math.sqrt(dx*dx + dy*dy);
+  const ux = dx/len, uy = dy/len;
+  const ex = x2 - ux*8, ey = y2 - uy*8;
+
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  const cx1 = x1 + dx*0.4, cy1 = y1 + dy*0.1;
+  const cx2 = x1 + dx*0.6, cy2 = y1 + dy*0.9;
+  path.setAttribute('d', `M${x1},${y1} C${cx1},${cy1} ${cx2},${cy2} ${ex},${ey}`);
+  path.setAttribute('stroke', color);
+  path.setAttribute('stroke-width', '1.5');
+  path.setAttribute('fill', 'none');
+  if (dashed) path.setAttribute('stroke-dasharray', '5,3');
+  path.setAttribute('opacity', '0.7');
+  svg.appendChild(path);
+
+  // Arrowhead
+  const ang = Math.atan2(ey - cy2, ex - cx2);
+  const ah = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  const a1x = ex + Math.cos(ang+2.5)*7, a1y = ey + Math.sin(ang+2.5)*7;
+  const a2x = ex + Math.cos(ang-2.5)*7, a2y = ey + Math.sin(ang-2.5)*7;
+  ah.setAttribute('points', `${x2},${y2} ${a1x},${a1y} ${a2x},${a2y}`);
+  ah.setAttribute('fill', color);
+  ah.setAttribute('opacity', '0.8');
+  svg.appendChild(ah);
+
+  if (label) {
+    const mx = (x1+x2)/2 + 5, my = (y1+y2)/2 - 6;
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('x', mx); t.setAttribute('y', my);
+    t.setAttribute('font-size', '9'); t.setAttribute('fill', color);
+    t.setAttribute('font-family', 'JetBrains Mono, monospace');
+    t.setAttribute('opacity', '0.8');
+    t.textContent = label;
+    svg.appendChild(t);
+  }
+}
+
+setTimeout(() => {
+  const svg = document.getElementById('arrowSvg');
+  if (!svg) return;
+
+  const ids = ['n-trigger','n-orch','n-a1','n-a2','n-a3','n-a4','n-a5','n-a6','n-conf','n-hitl','n-rag','n-guard','n-end'];
+  const pos = {};
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) pos[id] = getCenter(el);
+  });
+
+  const teal = '#00e5c8', blue = '#3d8ef8', gray = '#475569',
+        yellow = '#fbbf24', red = '#f87171', green = '#34d399',
+        purple = '#a78bfa', orange = '#fb923c';
+
+  // Trigger → Orchestrator
+  drawArrow(svg, pos['n-trigger'].x, pos['n-trigger'].b, pos['n-orch'].x, pos['n-orch'].t, teal, false, '');
+
+  // Orchestrator → agents (fan out)
+  const agents = ['n-a1','n-a2','n-a3','n-a4','n-a5','n-a6'];
+  const colors = [blue, purple, red, green, orange, teal];
+  agents.forEach((id, i) => {
+    drawArrow(svg, pos['n-orch'].x, pos['n-orch'].b, pos[id].x, pos[id].t, colors[i], false);
+  });
+
+  // Sequential agent flow
+  drawArrow(svg, pos['n-a1'].r, pos['n-a1'].y, pos['n-a2'].l, pos['n-a2'].y, blue, false);
+  drawArrow(svg, pos['n-a2'].r, pos['n-a2'].y, pos['n-a3'].l, pos['n-a3'].y, purple, false);
+  drawArrow(svg, pos['n-a3'].r, pos['n-a3'].y, pos['n-a4'].l, pos['n-a4'].y, red, false);
+  drawArrow(svg, pos['n-a4'].r, pos['n-a4'].y, pos['n-a5'].l, pos['n-a5'].y, green, false);
+  drawArrow(svg, pos['n-a5'].r, pos['n-a5'].y, pos['n-a6'].l, pos['n-a6'].y, orange, false);
+
+  // Confidence gate + HITL
+  drawArrow(svg, pos['n-a3'].x, pos['n-a3'].b, pos['n-conf'].x, pos['n-conf'].t, red, true, 'confidence?');
+  drawArrow(svg, pos['n-conf'].r, pos['n-conf'].y, pos['n-hitl'].l, pos['n-hitl'].y, yellow, true, '< 85%');
+  drawArrow(svg, pos['n-hitl'].x, pos['n-hitl'].b + 20, pos['n-a3'].r + 10, pos['n-a3'].b + 20, yellow, true, 'resume');
+
+  // RAG connections (from agents)
+  ['n-a2','n-a3','n-a4'].forEach(id => {
+    drawArrow(svg, pos[id].x, pos[id].b, pos['n-rag'].x + (Math.random()-0.5)*100, pos['n-rag'].t, purple, true);
+  });
+
+  // Guard layer
+  drawArrow(svg, pos['n-rag'].x, pos['n-rag'].b, pos['n-guard'].x, pos['n-guard'].t, red, false);
+
+  // End
+  drawArrow(svg, pos['n-guard'].x, pos['n-guard'].b, pos['n-end'].x, pos['n-end'].t, green, false);
+}, 300);
+
+// ── SEQUENCE DIAGRAM ──────────────────────────────
+function drawSequence() {
+  const svg = document.getElementById('seqSvg');
+  if (!svg || svg.children.length > 0) return;
+  svg.innerHTML = '';
+
+  const W = svg.parentElement.offsetWidth || 1000;
+  const actors = [
+    { name: 'GTFS /\nOperator', color: '#3d8ef8' },
+    { name: 'Orchestrator\n(LangGraph)', color: '#00e5c8' },
+    { name: 'Analysis\nAgent', color: '#3d8ef8' },
+    { name: 'Eligibility\nAgent', color: '#a78bfa' },
+    { name: 'Guardrail\nAgent', color: '#f87171' },
+    { name: 'Refund\nCalc Agent', color: '#34d399' },
+    { name: 'Payment\nAgent', color: '#fb923c' },
+    { name: 'Notify\nAgent', color: '#00e5c8' },
+    { name: 'HITL /\nSupervisor', color: '#fbbf24' },
+  ];
+
+  const n = actors.length;
+  const padding = 40;
+  const colW = (W - padding*2) / n;
+  const cols = actors.map((_, i) => padding + colW * i + colW/2);
+  const headerH = 80;
+  const rowH = 52;
+
+  const messages = [
+    { from:0, to:1, label:'disruption_event{}', color:'#3d8ef8', t:0 },
+    { from:1, to:2, label:'invoke(state)', color:'#00e5c8', t:1 },
+    { from:2, to:2, label:'get_gtfs_trips() · tokenize_pii()', color:'#3d8ef8', t:2, self:true },
+    { from:2, to:1, label:'trip_manifest{}', color:'#3d8ef8', t:3, ret:true },
+    { from:1, to:3, label:'invoke(state)', color:'#00e5c8', t:4 },
+    { from:3, to:3, label:'rag.hybrid_search() · llm.reason()', color:'#a78bfa', t:5, self:true },
+    { from:3, to:1, label:'eligibility_result{} confidence=0.91', color:'#a78bfa', t:6, ret:true },
+    { from:1, to:1, label:'route_on_confidence() → "proceed"', color:'#00e5c8', t:7, self:true },
+    { from:1, to:4, label:'invoke(state)', color:'#00e5c8', t:8 },
+    { from:4, to:4, label:'nemo.rail() · pii_audit() · schema.validate()', color:'#f87171', t:9, self:true },
+    { from:4, to:1, label:'compliance_passed=True', color:'#f87171', t:10, ret:true },
+    { from:1, to:5, label:'invoke(state)', color:'#00e5c8', t:11 },
+    { from:5, to:5, label:'calculate_amounts() · validate_caps()', color:'#34d399', t:12, self:true },
+    { from:5, to:1, label:'refund_manifest{} cap_exceptions=[]', color:'#34d399', t:13, ret:true },
+    { from:1, to:6, label:'invoke(state)', color:'#00e5c8', t:14 },
+    { from:6, to:6, label:'fire_refund_requests() [1189 async]', color:'#fb923c', t:15, self:true },
+    { from:6, to:6, label:'retry_queue=[33] → CYCLE BACK', color:'#fb923c', t:16, self:true },
+    { from:6, to:1, label:'payment_status{completed:1187, failed:2}', color:'#fb923c', t:17, ret:true },
+    { from:1, to:7, label:'invoke(state) [per patron]', color:'#00e5c8', t:18 },
+    { from:7, to:7, label:'personalise() · push/SMS/email()', color:'#00e5c8', t:19, self:true },
+    { from:7, to:1, label:'notifications_delivered=1185', color:'#00e5c8', t:20, ret:true },
+    { from:1, to:1, label:'→ END · write_audit_log()', color:'#00e5c8', t:21, self:true },
+  ];
+
+  const totalH = headerH + messages.length * rowH + 80;
+  svg.setAttribute('height', totalH);
+
+  const ns = 'http://www.w3.org/2000/svg';
+  const mk = id => { const d = document.createElementNS(ns,'defs'); const m = document.createElementNS(ns,'marker'); m.setAttribute('id',id+'Arrow'); m.setAttribute('markerWidth','6'); m.setAttribute('markerHeight','6'); m.setAttribute('refX','5'); m.setAttribute('refY','3'); m.setAttribute('orient','auto'); const p = document.createElementNS(ns,'polygon'); p.setAttribute('points','0 0, 6 3, 0 6'); p.setAttribute('fill', id === 'ret' ? '#94a3b8' : '#00e5c8'); m.appendChild(p); d.appendChild(m); svg.appendChild(d); };
+  mk('fwd'); mk('ret');
+
+  // Header boxes
+  actors.forEach((a, i) => {
+    const x = cols[i];
+    const rect = document.createElementNS(ns,'rect');
+    rect.setAttribute('x', x-48); rect.setAttribute('y', 8);
+    rect.setAttribute('width', 96); rect.setAttribute('height', 52);
+    rect.setAttribute('rx', 8);
+    rect.setAttribute('fill', '#0f2236');
+    rect.setAttribute('stroke', a.color); rect.setAttribute('stroke-width','1.5');
+    svg.appendChild(rect);
+    const lines = a.name.split('\n');
+    lines.forEach((line, li) => {
+      const t = document.createElementNS(ns,'text');
+      t.setAttribute('x', x); t.setAttribute('y', 28 + li*16);
+      t.setAttribute('text-anchor','middle');
+      t.setAttribute('font-size','9.5'); t.setAttribute('font-weight','600');
+      t.setAttribute('fill', a.color);
+      t.setAttribute('font-family','DM Sans, sans-serif');
+      t.textContent = line;
+      svg.appendChild(t);
+    });
+
+    // Lifeline
+    const line = document.createElementNS(ns,'line');
+    line.setAttribute('x1', x); line.setAttribute('y1', 62);
+    line.setAttribute('x2', x); line.setAttribute('y2', totalH - 20);
+    line.setAttribute('stroke', '#1e3a5f'); line.setAttribute('stroke-width','1');
+    line.setAttribute('stroke-dasharray','4,4');
+    svg.appendChild(line);
+  });
+
+  // Messages
+  messages.forEach((msg, mi) => {
+    const y = headerH + mi * rowH + 20;
+    const x1 = cols[msg.from], x2 = cols[msg.to];
+    const color = msg.ret ? '#94a3b8' : msg.color;
+
+    if (msg.self) {
+      // Self-call loop
+      const rx = x1 + 30;
+      const path = document.createElementNS(ns,'path');
+      path.setAttribute('d', `M${x1},${y} Q${rx+30},${y-10} ${rx+30},${y+10} Q${rx+30},${y+24} ${x1},${y+24}`);
+      path.setAttribute('stroke', color); path.setAttribute('stroke-width','1.2');
+      path.setAttribute('fill','none'); path.setAttribute('stroke-dasharray', msg.ret ? '4,2' : 'none');
+      path.setAttribute('marker-end',`url(#${msg.ret?'ret':'fwd'}Arrow)`);
+      svg.appendChild(path);
+    } else {
+      const line = document.createElementNS(ns,'line');
+      const fromX = x1 < x2 ? x1+2 : x1-2;
+      const toX = x1 < x2 ? x2-2 : x2+2;
+      line.setAttribute('x1', fromX); line.setAttribute('y1', y);
+      line.setAttribute('x2', toX); line.setAttribute('y2', y);
+      line.setAttribute('stroke', color); line.setAttribute('stroke-width','1.5');
+      line.setAttribute('stroke-dasharray', msg.ret ? '5,3' : 'none');
+      line.setAttribute('marker-end',`url(#${msg.ret?'ret':'fwd'}Arrow)`);
+      svg.appendChild(line);
+    }
+
+    // Label
+    const mx = msg.self ? x1 + 50 : (x1 + x2) / 2;
+    const t = document.createElementNS(ns,'text');
+    t.setAttribute('x', mx); t.setAttribute('y', y - 5);
+    t.setAttribute('text-anchor','middle');
+    t.setAttribute('font-size','9'); t.setAttribute('fill', color);
+    t.setAttribute('font-family','JetBrains Mono, monospace');
+    t.textContent = msg.label;
+    svg.appendChild(t);
+
+    // Activation box on receiving actor
+    const actX = msg.self ? x1 : x2;
+    const box = document.createElementNS(ns,'rect');
+    box.setAttribute('x', actX-5); box.setAttribute('y', y);
+    box.setAttribute('width','10'); box.setAttribute('height','28');
+    box.setAttribute('fill', color); box.setAttribute('opacity','0.2');
+    box.setAttribute('rx','2');
+    svg.appendChild(box);
+  });
+}
+</script>
+</body>
+</html>

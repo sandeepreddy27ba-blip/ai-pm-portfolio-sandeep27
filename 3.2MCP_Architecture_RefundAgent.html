@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MCP Architecture — Autonomous Transit Refund Agent</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600&display=swap');
+
+/* ─── DESIGN DIRECTION: Industrial / terminal-punk ─────────────────────
+   Dark amber-on-black terminal aesthetic. Feels like a protocol debugger.
+   Grid lines, scan-line texture, amber + cyan accent on near-black.
+   Font: Fira Code for everything — monospaced, technical, uncompromising.
+──────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --bg:       #040608;
+  --surf:     #070c10;
+  --panel:    #0a1018;
+  --panel2:   #0d1520;
+  --border:   rgba(255,180,50,0.08);
+  --amber:    #ffb832;
+  --amber2:   #ff8c00;
+  --cyan:     #00e5ff;
+  --cyan2:    #00b8d4;
+  --green:    #39ff7a;
+  --red:      #ff4444;
+  --purple:   #bf7fff;
+  --gray1:    #c8d8e8;
+  --gray2:    #6a8090;
+  --gray3:    #2a3a48;
+  --mono:     'Fira Code', monospace;
+  --scan-line: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.15) 2px,
+    rgba(0,0,0,0.15) 4px
+  );
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--bg);
+  color:var(--gray1);
+  font-family:var(--mono);
+  min-height:100vh;
+  overflow-x:hidden;
+  /* subtle grid */
+  background-image:
+    linear-gradient(rgba(255,184,50,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,184,50,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--amber2);border-radius:2px;opacity:0.4;}
+
+/* ── SCANLINE OVERLAY ── */
+body::before {
+  content:'';
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:var(--scan-line);
+  pointer-events:none;z-index:1000;opacity:0.4;
+}
+
+/* ── HEADER ── */
+header {
+  background:linear-gradient(90deg, #040608 0%, #07100a 100%);
+  border-bottom:1px solid rgba(255,184,50,0.15);
+  padding:16px 36px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:500;
+}
+.h-left{display:flex;align-items:center;gap:14px;}
+.h-logo{
+  width:38px;height:38px;border-radius:6px;
+  background:transparent;
+  border:1.5px solid var(--amber);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+  box-shadow:0 0 12px rgba(255,184,50,0.2);
+}
+.h-title{font-size:14px;font-weight:600;color:var(--amber);letter-spacing:1px;}
+.h-sub{font-size:9px;color:var(--gray2);letter-spacing:3px;margin-top:2px;}
+.h-right{display:flex;gap:20px;align-items:center;}
+.h-pill{
+  font-size:9px;font-weight:500;padding:5px 12px;
+  border-radius:3px;letter-spacing:1px;
+  border:1px solid rgba(0,229,255,0.25);
+  color:var(--cyan);background:rgba(0,229,255,0.04);
+}
+
+/* ── TABS ── */
+.tab-bar{
+  background:var(--surf);
+  border-bottom:1px solid var(--border);
+  display:flex;padding:0 36px;overflow-x:auto;
+}
+.tb{
+  padding:12px 22px;font-size:10px;font-weight:500;
+  color:var(--gray3);border:none;background:none;
+  cursor:pointer;border-bottom:2px solid transparent;
+  transition:all 0.2s;white-space:nowrap;
+  font-family:var(--mono);letter-spacing:1px;
+  text-transform:uppercase;
+}
+.tb:hover{color:var(--gray2);}
+.tb.active{color:var(--amber);border-bottom-color:var(--amber);}
+
+/* ── PAGES ── */
+.page{display:none;padding:28px 36px;max-width:1440px;margin:0 auto;}
+.page.active{display:block;}
+
+/* ── SECTION LABELS ── */
+.slabel{
+  font-size:9px;font-weight:500;letter-spacing:3px;
+  color:var(--amber);margin-bottom:16px;
+  display:flex;align-items:center;gap:12px;
+  text-transform:uppercase;
+}
+.slabel::after{content:'';flex:1;height:1px;background:rgba(255,184,50,0.12);}
+
+/* ── WHAT IS MCP SECTION ── */
+.mcp-intro{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px;
+}
+.intro-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;padding:20px;
+  position:relative;overflow:hidden;
+}
+.intro-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+}
+.ic-amber::before{background:var(--amber);}
+.ic-cyan::before{background:var(--cyan);}
+.ic-green::before{background:var(--green);}
+.ic-purple::before{background:var(--purple);}
+
+.ic-title{font-size:12px;font-weight:600;color:var(--amber);margin-bottom:10px;letter-spacing:0.5px;}
+.ic-body{font-size:11px;color:var(--gray2);line-height:1.9;}
+.ic-body strong{color:var(--gray1);}
+
+/* ── PROTOCOL ANATOMY ── */
+.anatomy-wrap{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:6px;padding:24px;margin-bottom:24px;
+}
+.anatomy-flow{
+  display:flex;align-items:center;gap:0;
+  margin-bottom:20px;overflow-x:auto;
+}
+.anat-block{
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:12px 16px;
+  text-align:center;
+  min-width:130px;
+  flex-shrink:0;
+}
+.anat-block.highlight{border-color:var(--amber);box-shadow:0 0 12px rgba(255,184,50,0.12);}
+.anat-block.highlight2{border-color:var(--cyan);box-shadow:0 0 12px rgba(0,229,255,0.1);}
+.anat-label{font-size:9px;color:var(--gray2);letter-spacing:1px;margin-bottom:6px;}
+.anat-val{font-size:11px;font-weight:600;color:var(--gray1);}
+.anat-arrow{
+  flex-shrink:0;padding:0 8px;
+  color:var(--amber);font-size:16px;opacity:0.6;
+}
+
+/* ── MCP SERVERS TABLE ── */
+.servers-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;
+}
+.server-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  overflow:hidden;
+  transition:border-color 0.2s;
+}
+.server-card:hover{border-color:rgba(255,184,50,0.2);}
+.sc-head{
+  background:var(--panel2);
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.sc-icon{font-size:18px;}
+.sc-name{font-size:11px;font-weight:600;color:var(--amber);}
+.sc-type{font-size:9px;color:var(--gray3);letter-spacing:1px;margin-top:2px;}
+.sc-body{padding:14px 16px;}
+.sc-tools{font-size:10px;color:var(--gray2);line-height:1.9;}
+.sc-tools .tool{color:var(--cyan);margin-right:6px;}
+.sc-tools .desc{color:var(--gray2);}
+
+/* ── FLOW DIAGRAM ── */
+.flow-canvas{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:28px;
+  position:relative;
+  overflow:hidden;
+  margin-bottom:24px;
+}
+.flow-inner{position:relative;width:100%;height:680px;}
+.flow-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;}
+
+/* Flow nodes */
+.fn{
+  position:absolute;
+  border-radius:4px;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.2s;
+  z-index:10;
+  padding:10px;
+}
+.fn:hover{transform:scale(1.05);z-index:20;}
+.fn-label{font-size:10px;font-weight:600;line-height:1.3;font-family:var(--mono);}
+.fn-sub{font-size:8px;opacity:0.6;margin-top:3px;}
+.fn-icon{font-size:18px;margin-bottom:5px;}
+
+.fn-llm{
+  width:160px;height:80px;
+  background:rgba(255,184,50,0.06);
+  border:1.5px solid var(--amber);
+  color:var(--amber);
+  box-shadow:0 0 16px rgba(255,184,50,0.1);
+}
+.fn-server{
+  width:140px;height:75px;
+  background:rgba(0,229,255,0.05);
+  border:1px solid rgba(0,229,255,0.3);
+  color:var(--cyan);
+}
+.fn-server:hover{border-color:var(--cyan);box-shadow:0 0 14px rgba(0,229,255,0.15);}
+.fn-external{
+  width:130px;height:65px;
+  background:rgba(57,255,122,0.04);
+  border:1px solid rgba(57,255,122,0.25);
+  color:var(--green);
+}
+.fn-protocol{
+  width:500px;height:44px;
+  background:rgba(255,184,50,0.03);
+  border:1px dashed rgba(255,184,50,0.2);
+  color:var(--amber);
+  flex-direction:row;gap:10px;
+}
+.fn-guardrail{
+  width:500px;height:40px;
+  background:rgba(255,68,68,0.03);
+  border:1px dashed rgba(255,68,68,0.2);
+  color:#ff6666;
+  flex-direction:row;gap:10px;
+}
+.fn-host{
+  width:140px;height:80px;
+  background:rgba(191,127,255,0.05);
+  border:1px solid rgba(191,127,255,0.3);
+  color:var(--purple);
+}
+
+/* Legend */
+.flow-legend{
+  display:flex;flex-wrap:wrap;gap:14px;
+  margin-top:16px;padding-top:14px;
+  border-top:1px solid var(--border);
+}
+.leg{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--gray2);}
+.leg-line{width:24px;height:2px;}
+
+/* ── SEQUENCE DIAGRAM ── */
+.seq-wrap{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:6px;padding:28px;overflow-x:auto;
+  margin-bottom:24px;
+}
+
+/* ── PROTOCOL MESSAGES ── */
+.proto-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+.proto-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:6px;overflow:hidden;
+}
+.proto-head{
+  background:var(--panel2);padding:10px 16px;
+  border-bottom:1px solid var(--border);
+  font-size:10px;font-weight:600;color:var(--amber);
+  letter-spacing:0.5px;display:flex;align-items:center;gap:8px;
+}
+.proto-body{padding:14px 16px;}
+.proto-json{
+  background:#020406;
+  border:1px solid rgba(255,184,50,0.08);
+  border-radius:4px;padding:12px 14px;
+  font-size:10px;line-height:1.9;
+  white-space:pre;overflow-x:auto;
+}
+.j-key{color:var(--cyan);}
+.j-str{color:var(--green);}
+.j-num{color:var(--amber);}
+.j-bool{color:var(--purple);}
+.j-cmt{color:var(--gray3);font-style:italic;}
+
+/* ── WORKING TAB ── */
+.working-cols{display:grid;grid-template-columns:1fr 380px;gap:20px;}
+.timeline{position:relative;padding-left:28px;}
+.timeline::before{
+  content:'';position:absolute;left:9px;top:4px;bottom:4px;
+  width:1px;
+  background:linear-gradient(to bottom, var(--amber), var(--cyan), var(--green));
+}
+.tl-step{
+  position:relative;margin-bottom:20px;
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:6px;padding:16px 18px;
+  transition:border-color 0.2s;
+}
+.tl-step:hover{border-color:rgba(255,184,50,0.2);}
+.tl-dot{
+  position:absolute;left:-22px;top:18px;
+  width:10px;height:10px;border-radius:50%;
+  border:1px solid var(--bg);
+}
+.tl-step-num{font-size:9px;color:var(--gray3);letter-spacing:2px;margin-bottom:5px;}
+.tl-step-title{font-size:12px;font-weight:600;color:var(--gray1);margin-bottom:8px;}
+.tl-step-body{font-size:11px;color:var(--gray2);line-height:1.8;}
+.tl-code{
+  font-size:9.5px;background:#020406;
+  border:1px solid rgba(0,229,255,0.1);
+  border-left:2px solid var(--cyan);
+  border-radius:0 4px 4px 0;
+  padding:10px 12px;margin-top:10px;
+  color:var(--cyan);line-height:1.7;
+  white-space:pre-wrap;
+}
+.tl-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.tl-tag{
+  font-size:9px;padding:2px 8px;border-radius:3px;
+  border:1px solid;font-weight:500;
+}
+
+/* Sidebar boxes */
+.side-box{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:6px;padding:16px;margin-bottom:14px;
+}
+.side-title{font-size:11px;font-weight:600;color:var(--amber);margin-bottom:10px;letter-spacing:0.5px;}
+.side-body{font-size:10px;color:var(--gray2);line-height:1.9;}
+.side-body strong{color:var(--gray1);}
+
+/* Tooltip */
+.tip{
+  position:fixed;z-index:9999;
+  background:var(--panel2);
+  border:1px solid rgba(255,184,50,0.3);
+  border-radius:6px;
+  padding:12px 16px;
+  font-size:11px;line-height:1.7;
+  max-width:260px;
+  pointer-events:none;
+  opacity:0;transition:opacity 0.15s;
+  box-shadow:0 8px 32px rgba(0,0,0,0.6);
+}
+.tip.show{opacity:1;}
+.tip-title{font-weight:600;color:var(--amber);margin-bottom:5px;font-size:12px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-left">
+    <div class="h-logo">⬡</div>
+    <div>
+      <div class="h-title">MCP Architecture</div>
+      <div class="h-sub">MODEL CONTEXT PROTOCOL · TRANSIT REFUND AGENT</div>
+    </div>
+  </div>
+  <div class="h-right">
+    <div class="h-pill">JSON-RPC 2.0 over stdio/SSE</div>
+    <div class="h-pill">6 MCP Servers · 24 Tools</div>
+    <div class="h-pill">Hover nodes for details</div>
+  </div>
+</header>
+
+<div class="tab-bar">
+  <button class="tb active" onclick="switchTab('what')">① What is MCP?</button>
+  <button class="tb" onclick="switchTab('flow')">② System Flow</button>
+  <button class="tb" onclick="switchTab('sequence')">③ Sequence Diagram</button>
+  <button class="tb" onclick="switchTab('protocol')">④ Protocol Messages</button>
+  <button class="tb" onclick="switchTab('working')">⑤ How It Works</button>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- TAB 1: WHAT IS MCP -->
+<!-- ══════════════════════════════════════ -->
+<div id="page-what" class="page active">
+
+  <div class="slabel">MCP — MODEL CONTEXT PROTOCOL · WHAT IT IS & WHY IT MATTERS</div>
+
+  <div class="mcp-intro">
+    <div class="intro-card ic-amber">
+      <div class="ic-title">⬡ What is MCP?</div>
+      <div class="ic-body">
+        MCP is an <strong>open standard protocol</strong> (by Anthropic, 2024) that defines how LLMs connect to external tools, data sources, and services. Think of it as <strong>USB-C for AI</strong> — a universal connector so any LLM can talk to any tool without custom integrations.<br><br>
+        Before MCP, every LLM-tool integration was bespoke — different API shapes, auth patterns, error handling. MCP standardises the entire contract: <strong>how tools are discovered, how they're called, how results come back, how context is managed.</strong>
+      </div>
+    </div>
+    <div class="intro-card ic-cyan">
+      <div class="ic-title">🔌 The Three Roles</div>
+      <div class="ic-body">
+        <strong>MCP Host</strong> — the LLM application (our Orchestrator Agent). Decides which servers to connect to and manages the overall session.<br><br>
+        <strong>MCP Client</strong> — lives inside the host. Maintains one-to-one connections with each server. Handles protocol-level communication.<br><br>
+        <strong>MCP Server</strong> — exposes a specific capability (GTFS data, payment gateway, policy store). Lightweight, single-purpose, language-agnostic.
+      </div>
+    </div>
+    <div class="intro-card ic-green">
+      <div class="ic-title">🛠 Three Primitives</div>
+      <div class="ic-body">
+        <strong>Tools</strong> — functions the LLM can call. Defined with JSON Schema. Examples: <code style="color:var(--green)">get_gtfs_trips()</code>, <code style="color:var(--green)">fire_refund()</code>.<br><br>
+        <strong>Resources</strong> — data the LLM can read. Like a filesystem. Examples: policy documents, trip records, audit logs.<br><br>
+        <strong>Prompts</strong> — reusable prompt templates. Examples: eligibility reasoning template, refund explanation template for patrons.
+      </div>
+    </div>
+    <div class="intro-card ic-purple">
+      <div class="ic-title">🚇 Why MCP in This Project?</div>
+      <div class="ic-body">
+        Six agents, each needing different external capabilities. Without MCP: 6 × N custom integrations = unmaintainable spaghetti.<br><br>
+        With MCP: each capability becomes <strong>one standardised server</strong>. The LLM discovers tools at runtime. Swapping from one payment gateway to another = swap one server, zero prompt changes.<br><br>
+        Critical for <strong>auditability</strong> — every tool call is a structured, logged JSON-RPC message. Not a black-box LLM action.
+      </div>
+    </div>
+  </div>
+
+  <!-- Protocol Anatomy -->
+  <div class="slabel">MCP PROTOCOL ANATOMY</div>
+  <div class="anatomy-wrap">
+    <div style="font-size:10px;color:var(--gray2);margin-bottom:16px;letter-spacing:0.5px;">
+      Every MCP interaction is a <strong style="color:var(--amber)">JSON-RPC 2.0 message</strong> over one of two transports: <strong style="color:var(--cyan)">stdio</strong> (local process, low latency) or <strong style="color:var(--cyan)">SSE</strong> (HTTP Server-Sent Events, remote server). Our project uses stdio for co-located agents and SSE for the payment gateway (remote, regulated).
+    </div>
+    <div class="anatomy-flow">
+      <div class="anat-block highlight">
+        <div class="anat-label">LAYER 1</div>
+        <div class="anat-val">LLM decides<br>to call a tool</div>
+      </div>
+      <div class="anat-arrow">→</div>
+      <div class="anat-block">
+        <div class="anat-label">LAYER 2</div>
+        <div class="anat-val">MCP Client<br>serialises call</div>
+      </div>
+      <div class="anat-arrow">→</div>
+      <div class="anat-block highlight2">
+        <div class="anat-label">LAYER 3 — TRANSPORT</div>
+        <div class="anat-val">stdio / SSE<br>JSON-RPC 2.0</div>
+      </div>
+      <div class="anat-arrow">→</div>
+      <div class="anat-block">
+        <div class="anat-label">LAYER 4</div>
+        <div class="anat-val">MCP Server<br>receives + executes</div>
+      </div>
+      <div class="anat-arrow">→</div>
+      <div class="anat-block">
+        <div class="anat-label">LAYER 5</div>
+        <div class="anat-val">Result returned<br>as structured JSON</div>
+      </div>
+      <div class="anat-arrow">→</div>
+      <div class="anat-block highlight">
+        <div class="anat-label">LAYER 6</div>
+        <div class="anat-val">LLM reasons<br>over result</div>
+      </div>
+    </div>
+
+    <!-- 6 MCP servers -->
+    <div class="slabel" style="margin-top:20px;">THE 6 MCP SERVERS IN THIS PROJECT</div>
+    <div class="servers-grid">
+      <div class="server-card">
+        <div class="sc-head"><span class="sc-icon">🚆</span><div><div class="sc-name">GTFS MCP Server</div><div class="sc-type">TRANSPORT · stdio</div></div></div>
+        <div class="sc-body"><div class="sc-tools">
+          <div><span class="tool">get_gtfs_trips()</span><span class="desc">→ trips in disruption window</span></div>
+          <div><span class="tool">get_trip_fare()</span><span class="desc">→ fare amount for trip</span></div>
+          <div><span class="tool">get_line_status()</span><span class="desc">→ real-time line state</span></div>
+          <div><span class="tool">validate_trip_window()</span><span class="desc">→ was trip in range?</span></div>
+          <div style="margin-top:8px;font-size:9px;color:var(--gray3);">Used by: Analysis Agent</div>
+        </div></div>
+      </div>
+      <div class="server-card">
+        <div class="sc-head"><span class="sc-icon">👤</span><div><div class="sc-name">Passenger DB MCP Server</div><div class="sc-type">DATABASE · stdio</div></div></div>
+        <div class="sc-body"><div class="sc-tools">
+          <div><span class="tool">query_passengers()</span><span class="desc">→ passengers on trips</span></div>
+          <div><span class="tool">get_fare_record()</span><span class="desc">→ transaction details</span></div>
+          <div><span class="tool">get_payment_method()</span><span class="desc">→ card/wallet/stored</span></div>
+          <div><span class="tool">tokenize_pii()</span><span class="desc">→ anonymise identifiers</span></div>
+          <div style="margin-top:8px;font-size:9px;color:var(--gray3);">Used by: Analysis Agent</div>
+        </div></div>
+      </div>
+      <div class="server-card">
+        <div class="sc-head"><span class="sc-icon">📚</span><div><div class="sc-name">Policy RAG MCP Server</div><div class="sc-type">VECTOR STORE · stdio</div></div></div>
+        <div class="sc-body"><div class="sc-tools">
+          <div><span class="tool">semantic_search()</span><span class="desc">→ policy chunks by meaning</span></div>
+          <div><span class="tool">bm25_search()</span><span class="desc">→ exact term retrieval</span></div>
+          <div><span class="tool">get_policy_doc()</span><span class="desc">→ full policy resource</span></div>
+          <div><span class="tool">list_policy_versions()</span><span class="desc">→ doc history</span></div>
+          <div style="margin-top:8px;font-size:9px;color:var(--gray3);">Used by: Eligibility Agent, Calc Agent</div>
+        </div></div>
+      </div>
+      <div class="server-card">
+        <div class="sc-head"><span class="sc-icon">🏦</span><div><div class="sc-name">Payment Gateway MCP Server</div><div class="sc-type">FINANCIAL · SSE (remote)</div></div></div>
+        <div class="sc-body"><div class="sc-tools">
+          <div><span class="tool">initiate_refund()</span><span class="desc">→ fire single refund</span></div>
+          <div><span class="tool">check_status()</span><span class="desc">→ payment state</span></div>
+          <div><span class="tool">cancel_refund()</span><span class="desc">→ rollback if needed</span></div>
+          <div><span class="tool">get_gateway_health()</span><span class="desc">→ liveness check</span></div>
+          <div style="margin-top:8px;font-size:9px;color:var(--gray3);">Used by: Payment Agent · SSE transport</div>
+        </div></div>
+      </div>
+      <div class="server-card">
+        <div class="sc-head"><span class="sc-icon">📱</span><div><div class="sc-name">Notification MCP Server</div><div class="sc-type">MESSAGING · stdio</div></div></div>
+        <div class="sc-body"><div class="sc-tools">
+          <div><span class="tool">send_push()</span><span class="desc">→ mobile app notification</span></div>
+          <div><span class="tool">send_sms()</span><span class="desc">→ SMS via Twilio adapter</span></div>
+          <div><span class="tool">send_email()</span><span class="desc">→ email fallback</span></div>
+          <div><span class="tool">get_channel_pref()</span><span class="desc">→ patron preference</span></div>
+          <div style="margin-top:8px;font-size:9px;color:var(--gray3);">Used by: Notification Agent</div>
+        </div></div>
+      </div>
+      <div class="server-card">
+        <div class="sc-head"><span class="sc-icon">📋</span><div><div class="sc-name">Audit Log MCP Server</div><div class="sc-type">IMMUTABLE LOG · stdio</div></div></div>
+        <div class="sc-body"><div class="sc-tools">
+          <div><span class="tool">write_audit_entry()</span><span class="desc">→ immutable log write</span></div>
+          <div><span class="tool">read_audit_trail()</span><span class="desc">→ retrieve event history</span></div>
+          <div><span class="tool">get_reasoning_trace()</span><span class="desc">→ LLM CoT per decision</span></div>
+          <div><span class="tool">export_compliance_report()</span><span class="desc">→ regulator export</span></div>
+          <div style="margin-top:8px;font-size:9px;color:var(--gray3);">Used by: ALL agents (cross-cutting)</div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- TAB 2: SYSTEM FLOW -->
+<!-- ══════════════════════════════════════ -->
+<div id="page-flow" class="page">
+  <div class="slabel">MCP SYSTEM FLOW — AGENTS ↔ SERVERS ↔ EXTERNAL SYSTEMS</div>
+  <div class="flow-canvas">
+    <div class="flow-inner" id="flowInner">
+      <svg class="flow-svg" id="flowSvg"></svg>
+
+      <!-- LLM HOST -->
+      <div class="fn fn-host" id="f-host" style="left:520px;top:20px;"
+        data-title="MCP Host — LangGraph Orchestrator"
+        data-desc="The LLM application acts as the MCP Host. It initialises MCP Client sessions for each of the 6 servers at startup. Routes tool call requests from individual agents to the correct client. Manages the overall context window.">
+        <div class="fn-icon">🧠</div>
+        <div class="fn-label">MCP HOST<br>LangGraph Orchestrator</div>
+        <div class="fn-sub">Manages all 6 client sessions</div>
+      </div>
+
+      <!-- MCP CLIENTS (inside host) -->
+      <div class="fn fn-llm" id="f-a1" style="left:60px;top:160px;"
+        data-title="Analysis Agent + MCP Client"
+        data-desc="Maintains MCP client sessions to GTFS Server and Passenger DB Server. On tool call, the client serialises the request to JSON-RPC 2.0 and sends via stdio transport. Results injected back into agent context.">
+        <div class="fn-icon">🔍</div>
+        <div class="fn-label">Analysis Agent</div>
+        <div class="fn-sub">MCP Client × 2</div>
+      </div>
+      <div class="fn fn-llm" id="f-a2" style="left:250px;top:160px;"
+        data-title="Eligibility Agent + MCP Client"
+        data-desc="MCP client session to Policy RAG Server. Calls semantic_search() and bm25_search() tools. The LLM receives retrieved policy chunks as structured tool results, not raw text. Results are typed, versioned, and auditable.">
+        <div class="fn-icon">⚖️</div>
+        <div class="fn-label">Eligibility Agent</div>
+        <div class="fn-sub">MCP Client × 1 (RAG)</div>
+      </div>
+      <div class="fn fn-llm" id="f-a3" style="left:440px;top:160px;"
+        data-title="Guardrail Agent + MCP Client"
+        data-desc="MCP client session to Audit Log Server. Every guardrail check result (PASS/FAIL for each rail) is written as an immutable audit entry via write_audit_entry() tool. Cannot be modified after write.">
+        <div class="fn-icon">🔒</div>
+        <div class="fn-label">Guardrail Agent</div>
+        <div class="fn-sub">MCP Client × 1 (Audit)</div>
+      </div>
+      <div class="fn fn-llm" id="f-a4" style="left:630px;top:160px;"
+        data-title="Refund Calc Agent + MCP Client"
+        data-desc="MCP client sessions to Policy RAG Server (to retrieve refund formula) and Audit Log Server (to log signed RefundManifest). The signed manifest is written via write_audit_entry() with agent attestation.">
+        <div class="fn-icon">💰</div>
+        <div class="fn-label">Calc Agent</div>
+        <div class="fn-sub">MCP Client × 2</div>
+      </div>
+      <div class="fn fn-llm" id="f-a5" style="left:820px;top:160px;"
+        data-title="Payment Agent + MCP Client"
+        data-desc="MCP client session to Payment Gateway Server (SSE transport — remote, regulated). Uses SSE because the payment gateway is an external service behind a regulated API endpoint. Not co-located with agents.">
+        <div class="fn-icon">🏦</div>
+        <div class="fn-label">Payment Agent</div>
+        <div class="fn-sub">MCP Client × 1 (SSE)</div>
+      </div>
+      <div class="fn fn-llm" id="f-a6" style="left:1010px;top:160px;"
+        data-title="Notification Agent + MCP Client"
+        data-desc="MCP client session to Notification Server. Calls send_push(), send_sms(), send_email() tools per patron based on channel preference retrieved via get_channel_pref().">
+        <div class="fn-icon">📱</div>
+        <div class="fn-label">Notify Agent</div>
+        <div class="fn-sub">MCP Client × 1</div>
+      </div>
+
+      <!-- PROTOCOL BAND -->
+      <div class="fn fn-protocol" id="f-proto" style="left:130px;top:305px;">
+        <div class="fn-icon" style="font-size:14px;">⬡</div>
+        <div class="fn-label" style="font-size:9px;">MCP PROTOCOL LAYER &nbsp;·&nbsp; JSON-RPC 2.0 &nbsp;·&nbsp; stdio (local) &nbsp;/&nbsp; SSE (remote) &nbsp;·&nbsp; tool_call / tool_result / resource_read / prompt_get</div>
+      </div>
+
+      <!-- MCP SERVERS -->
+      <div class="fn fn-server" id="f-s1" style="left:60px;top:410px;"
+        data-title="GTFS MCP Server"
+        data-desc="Wraps the GTFS real-time feed API. Exposes 4 tools: get_gtfs_trips(), get_trip_fare(), get_line_status(), validate_trip_window(). Runs as a local stdio process co-located with the Analysis Agent. Stateless — each tool call is independent.">
+        <div class="fn-icon">🚆</div>
+        <div class="fn-label">GTFS Server</div>
+        <div class="fn-sub">4 tools · stdio</div>
+      </div>
+      <div class="fn fn-server" id="f-s2" style="left:225px;top:410px;"
+        data-title="Passenger DB MCP Server"
+        data-desc="Wraps the passenger database. Exposes tokenize_pii() as a critical tool — PII tokenization happens at the MCP server layer, not the LLM layer. The LLM never sees raw PII. Server enforces this boundary.">
+        <div class="fn-icon">👤</div>
+        <div class="fn-label">Passenger DB</div>
+        <div class="fn-sub">4 tools · stdio</div>
+      </div>
+      <div class="fn fn-server" id="f-s3" style="left:390px;top:410px;"
+        data-title="Policy RAG MCP Server"
+        data-desc="Wraps the vector store. Hybrid retrieval: semantic_search() calls the embedding model + cosine similarity search. bm25_search() does keyword matching. Results merged and ranked. Chunk metadata (source, date, section) included in tool result.">
+        <div class="fn-icon">📚</div>
+        <div class="fn-label">Policy RAG</div>
+        <div class="fn-sub">4 tools · stdio</div>
+      </div>
+      <div class="fn fn-server" id="f-s4" style="left:555px;top:410px;"
+        data-title="Payment Gateway MCP Server"
+        data-desc="CRITICAL: Uses SSE (HTTP) transport, not stdio. The payment gateway is an external regulated service. SSE allows the MCP server to be deployed at the gateway's API boundary. mTLS authentication required. $500 cap enforced at this layer — initiate_refund() API rejects >$500 regardless of LLM instruction.">
+        <div class="fn-icon">🏦</div>
+        <div class="fn-label">Payment Gateway</div>
+        <div class="fn-sub">4 tools · SSE ⚠</div>
+      </div>
+      <div class="fn fn-server" id="f-s5" style="left:720px;top:410px;"
+        data-title="Notification MCP Server"
+        data-desc="Wraps push, SMS, and email delivery services. Stateful: maintains delivery status per patron. send_push() returns immediate ACK; delivery confirmation comes via webhook. Server handles channel fallback logic internally.">
+        <div class="fn-icon">📱</div>
+        <div class="fn-label">Notification</div>
+        <div class="fn-sub">4 tools · stdio</div>
+      </div>
+      <div class="fn fn-server" id="f-s6" style="left:885px;top:410px;"
+        data-title="Audit Log MCP Server"
+        data-desc="Write-only MCP server for compliance. write_audit_entry() is append-only — no delete or update tools exist. Every agent writes to this server after each significant action. The immutable log enables regulatory audit, post-event replay, and shadow system comparison.">
+        <div class="fn-icon">📋</div>
+        <div class="fn-label">Audit Log</div>
+        <div class="fn-sub">4 tools · stdio</div>
+      </div>
+
+      <!-- GUARDRAIL BAND -->
+      <div class="fn fn-guardrail" style="left:130px;top:550px;">
+        <div class="fn-icon" style="font-size:14px;">🛡</div>
+        <div class="fn-label" style="font-size:9px;">GUARDRAIL LAYER &nbsp;·&nbsp; NeMo rails wrap every tool call &amp; result &nbsp;·&nbsp; PII audit at MCP server boundary &nbsp;·&nbsp; $500 cap enforced in Payment MCP Server API</div>
+      </div>
+
+      <!-- EXTERNAL SYSTEMS -->
+      <div class="fn fn-external" id="f-e1" style="left:60px;top:640px;"
+        data-title="GTFS Real-Time Feed"
+        data-desc="External GTFS-RT feed. The GTFS MCP Server polls this feed and caches results. Agents never call GTFS directly — always via MCP server.">
+        <div class="fn-icon">🛰</div>
+        <div class="fn-label">GTFS Feed</div>
+        <div class="fn-sub">External API</div>
+      </div>
+      <div class="fn fn-external" id="f-e2" style="left:225px;top:640px;"
+        data-title="Passenger Database"
+        data-desc="Internal passenger transaction database. MCP server handles auth, connection pooling, and PII tokenization before results leave the server.">
+        <div class="fn-icon">🗄</div>
+        <div class="fn-label">Passenger DB</div>
+        <div class="fn-sub">Internal DB</div>
+      </div>
+      <div class="fn fn-external" id="f-e3" style="left:390px;top:640px;"
+        data-title="Vector Store"
+        data-desc="Vector database storing policy embeddings. GTFS disruption history index. The Policy RAG MCP server is the only component that calls the vector store API.">
+        <div class="fn-icon">🔮</div>
+        <div class="fn-label">Vector Store</div>
+        <div class="fn-sub">Embeddings DB</div>
+      </div>
+      <div class="fn fn-external" id="f-e4" style="left:555px;top:640px;"
+        data-title="Payment Gateway API"
+        data-desc="External payment processor. Regulated financial infrastructure. $500 hard cap enforced here at API level. idempotency key required per request.">
+        <div class="fn-icon">💳</div>
+        <div class="fn-label">Payment API</div>
+        <div class="fn-sub">External · Regulated</div>
+      </div>
+      <div class="fn fn-external" id="f-e5" style="left:720px;top:640px;"
+        data-title="Push / SMS / Email Services"
+        data-desc="FCM for push notifications. Twilio for SMS. SMTP for email. The Notification MCP server abstracts all three — agents call one tool, server routes to the right delivery service.">
+        <div class="fn-icon">📡</div>
+        <div class="fn-label">Delivery Services</div>
+        <div class="fn-sub">FCM · Twilio · SMTP</div>
+      </div>
+      <div class="fn fn-external" id="f-e6" style="left:885px;top:640px;"
+        data-title="Immutable Audit Store"
+        data-desc="Append-only persistent store (e.g. Cloud Spanner / write-once S3). The Audit MCP server writes here. No agent has direct access to modify or delete entries.">
+        <div class="fn-icon">🔐</div>
+        <div class="fn-label">Audit Store</div>
+        <div class="fn-sub">Append-only</div>
+      </div>
+
+    </div>
+
+    <div class="flow-legend">
+      <div class="leg"><div class="leg-line" style="background:var(--amber)"></div>LLM / Agent layer</div>
+      <div class="leg"><div class="leg-line" style="background:var(--cyan)"></div>MCP Server</div>
+      <div class="leg"><div class="leg-line" style="background:var(--green)"></div>External system</div>
+      <div class="leg"><div class="leg-line" style="background:var(--amber);opacity:0.4" ></div>stdio transport</div>
+      <div class="leg"><div class="leg-line" style="background:var(--red);opacity:0.7"></div>SSE transport (remote)</div>
+      <div class="leg"><div class="leg-line" style="background:var(--gray3);border-top:1px dashed var(--gray3)"></div>Guardrail boundary</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- TAB 3: SEQUENCE DIAGRAM -->
+<!-- ══════════════════════════════════════ -->
+<div id="page-sequence" class="page">
+  <div class="slabel">MCP SEQUENCE DIAGRAM — ONE FULL REFUND EVENT · TOOL CALL FLOW</div>
+  <div class="seq-wrap">
+    <svg id="seqSvg" style="width:100%;display:block;" height="1820"></svg>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- TAB 4: PROTOCOL MESSAGES -->
+<!-- ══════════════════════════════════════ -->
+<div id="page-protocol" class="page">
+  <div class="slabel">MCP JSON-RPC 2.0 MESSAGES — REAL WIRE FORMAT</div>
+  <div class="proto-grid">
+
+    <div class="proto-card">
+      <div class="proto-head">① INITIALIZATION — Host connects to GTFS Server</div>
+      <div class="proto-body">
+        <div style="font-size:10px;color:var(--gray2);margin-bottom:8px;">Host → Server: initialize handshake</div>
+        <div class="proto-json"><span class="j-cmt">// Request (Host → GTFS MCP Server)</span>
+{
+  <span class="j-key">"jsonrpc"</span>: <span class="j-str">"2.0"</span>,
+  <span class="j-key">"method"</span>: <span class="j-str">"initialize"</span>,
+  <span class="j-key">"id"</span>: <span class="j-num">1</span>,
+  <span class="j-key">"params"</span>: {
+    <span class="j-key">"protocolVersion"</span>: <span class="j-str">"2024-11-05"</span>,
+    <span class="j-key">"capabilities"</span>: {
+      <span class="j-key">"tools"</span>: { <span class="j-key">"listChanged"</span>: <span class="j-bool">true</span> },
+      <span class="j-key">"sampling"</span>: {}
+    },
+    <span class="j-key">"clientInfo"</span>: {
+      <span class="j-key">"name"</span>: <span class="j-str">"transit-refund-orchestrator"</span>,
+      <span class="j-key">"version"</span>: <span class="j-str">"2.1.0"</span>
+    }
+  }
+}
+
+<span class="j-cmt">// Response (GTFS MCP Server → Host)</span>
+{
+  <span class="j-key">"jsonrpc"</span>: <span class="j-str">"2.0"</span>,
+  <span class="j-key">"id"</span>: <span class="j-num">1</span>,
+  <span class="j-key">"result"</span>: {
+    <span class="j-key">"protocolVersion"</span>: <span class="j-str">"2024-11-05"</span>,
+    <span class="j-key">"capabilities"</span>: {
+      <span class="j-key">"tools"</span>: {},
+      <span class="j-key">"resources"</span>: { <span class="j-key">"subscribe"</span>: <span class="j-bool">true</span> }
+    },
+    <span class="j-key">"serverInfo"</span>: {
+      <span class="j-key">"name"</span>: <span class="j-str">"gtfs-mcp-server"</span>,
+      <span class="j-key">"version"</span>: <span class="j-str">"1.4.2"</span>
+    }
+  }
+}</div>
+      </div>
+    </div>
+
+    <div class="proto-card">
+      <div class="proto-head">② TOOL DISCOVERY — LLM lists available tools</div>
+      <div class="proto-body">
+        <div style="font-size:10px;color:var(--gray2);margin-bottom:8px;">Host → Server: tools/list to discover capabilities at runtime</div>
+        <div class="proto-json"><span class="j-cmt">// Request</span>
+{
+  <span class="j-key">"jsonrpc"</span>: <span class="j-str">"2.0"</span>,
+  <span class="j-key">"method"</span>: <span class="j-str">"tools/list"</span>,
+  <span class="j-key">"id"</span>: <span class="j-num">2</span>
+}
+
+<span class="j-cmt">// Response — tools injected into LLM context</span>
+{
+  <span class="j-key">"result"</span>: {
+    <span class="j-key">"tools"</span>: [
+      {
+        <span class="j-key">"name"</span>: <span class="j-str">"get_gtfs_trips"</span>,
+        <span class="j-key">"description"</span>: <span class="j-str">"Get all trips on a line within time window"</span>,
+        <span class="j-key">"inputSchema"</span>: {
+          <span class="j-key">"type"</span>: <span class="j-str">"object"</span>,
+          <span class="j-key">"properties"</span>: {
+            <span class="j-key">"line_id"</span>: { <span class="j-key">"type"</span>: <span class="j-str">"string"</span> },
+            <span class="j-key">"start_time"</span>: { <span class="j-key">"type"</span>: <span class="j-str">"string"</span>,
+                              <span class="j-key">"format"</span>: <span class="j-str">"time"</span> },
+            <span class="j-key">"end_time"</span>:   { <span class="j-key">"type"</span>: <span class="j-str">"string"</span>,
+                              <span class="j-key">"format"</span>: <span class="j-str">"time"</span> }
+          },
+          <span class="j-key">"required"</span>: [<span class="j-str">"line_id"</span>, <span class="j-str">"start_time"</span>, <span class="j-str">"end_time"</span>]
+        }
+      }
+      <span class="j-cmt">// ... 3 more tools</span>
+    ]
+  }
+}</div>
+      </div>
+    </div>
+
+    <div class="proto-card">
+      <div class="proto-head">③ TOOL CALL — Analysis Agent calls get_gtfs_trips()</div>
+      <div class="proto-body">
+        <div style="font-size:10px;color:var(--gray2);margin-bottom:8px;">LLM generates function call → MCP Client serialises → sent to GTFS Server</div>
+        <div class="proto-json"><span class="j-cmt">// Request (Analysis Agent → GTFS MCP Server)</span>
+{
+  <span class="j-key">"jsonrpc"</span>: <span class="j-str">"2.0"</span>,
+  <span class="j-key">"method"</span>: <span class="j-str">"tools/call"</span>,
+  <span class="j-key">"id"</span>: <span class="j-num">7</span>,
+  <span class="j-key">"params"</span>: {
+    <span class="j-key">"name"</span>: <span class="j-str">"get_gtfs_trips"</span>,
+    <span class="j-key">"arguments"</span>: {
+      <span class="j-key">"line_id"</span>:    <span class="j-str">"BLUE"</span>,
+      <span class="j-key">"start_time"</span>: <span class="j-str">"06:15:00"</span>,
+      <span class="j-key">"end_time"</span>:   <span class="j-str">"09:30:00"</span>
+    }
+  }
+}
+
+<span class="j-cmt">// Response (GTFS Server → MCP Client → Agent context)</span>
+{
+  <span class="j-key">"jsonrpc"</span>: <span class="j-str">"2.0"</span>,
+  <span class="j-key">"id"</span>: <span class="j-num">7</span>,
+  <span class="j-key">"result"</span>: {
+    <span class="j-key">"content"</span>: [
+      {
+        <span class="j-key">"type"</span>: <span class="j-str">"text"</span>,
+        <span class="j-key">"text"</span>: <span class="j-str">"{\\"trips\\":[\\"TRP-0001\\",...\\"TRP-1247\\"],\\"count\\":1247,\\"line\\":\\"BLUE\\"}"</span>
+      }
+    ],
+    <span class="j-key">"isError"</span>: <span class="j-bool">false</span>
+  }
+}</div>
+      </div>
+    </div>
+
+    <div class="proto-card">
+      <div class="proto-head">④ TOOL CALL — Payment Agent fires initiate_refund() via SSE</div>
+      <div class="proto-body">
+        <div style="font-size:10px;color:var(--gray2);margin-bottom:8px;">SSE transport (HTTP) — payment gateway is remote. mTLS auth required. $500 cap enforced here.</div>
+        <div class="proto-json"><span class="j-cmt">// POST https://payment-gateway/mcp/sse</span>
+<span class="j-cmt">// mTLS + Bearer token required</span>
+{
+  <span class="j-key">"jsonrpc"</span>: <span class="j-str">"2.0"</span>,
+  <span class="j-key">"method"</span>: <span class="j-str">"tools/call"</span>,
+  <span class="j-key">"id"</span>: <span class="j-num">142</span>,
+  <span class="j-key">"params"</span>: {
+    <span class="j-key">"name"</span>: <span class="j-str">"initiate_refund"</span>,
+    <span class="j-key">"arguments"</span>: {
+      <span class="j-key">"patron_token"</span>:     <span class="j-str">"TKN-982-B4F2"</span>,
+      <span class="j-key">"amount"</span>:           <span class="j-num">27.90</span>,
+      <span class="j-key">"currency"</span>:         <span class="j-str">"USD"</span>,
+      <span class="j-key">"payment_method"</span>:   <span class="j-str">"CREDIT_CARD"</span>,
+      <span class="j-key">"idempotency_key"</span>:  <span class="j-str">"DIS-2024-0847-TKN-982-B4F2"</span>,
+      <span class="j-key">"disruption_ref"</span>:   <span class="j-str">"DIS-2024-0847"</span>
+    }
+  }
+}
+
+<span class="j-cmt">// Response — payment confirmed</span>
+{
+  <span class="j-key">"id"</span>: <span class="j-num">142</span>,
+  <span class="j-key">"result"</span>: {
+    <span class="j-key">"content"</span>: [{
+      <span class="j-key">"type"</span>: <span class="j-str">"text"</span>,
+      <span class="j-key">"text"</span>: <span class="j-str">"{\\"status\\":\\"SUCCESS\\",\\"txn_id\\":\\"TXN-4F2C-8841\\",\\"amount\\":27.90}"</span>
+    }],
+    <span class="j-key">"isError"</span>: <span class="j-bool">false</span>
+  }
+}
+
+<span class="j-cmt">// ⚠ If amount > 500 — server returns error:</span>
+<span class="j-cmt">// "isError": true, "code": "AMOUNT_EXCEEDS_CAP"</span></div>
+      </div>
+    </div>
+
+    <div class="proto-card">
+      <div class="proto-head">⑤ RESOURCE READ — Eligibility Agent reads policy document</div>
+      <div class="proto-body">
+        <div style="font-size:10px;color:var(--gray2);margin-bottom:8px;">Resources = data the LLM reads directly (not tool calls). Policy PDFs exposed as MCP resources.</div>
+        <div class="proto-json"><span class="j-cmt">// List available resources</span>
+{
+  <span class="j-key">"method"</span>: <span class="j-str">"resources/list"</span>,
+  <span class="j-key">"id"</span>: <span class="j-num">12</span>
+}
+<span class="j-cmt">// Response: [{uri:"policy://signal-failure-v2022",
+//  name:"Signal Failure Refund Policy 2022",
+//  mimeType:"application/json"}]</span>
+
+<span class="j-cmt">// Read specific resource</span>
+{
+  <span class="j-key">"method"</span>: <span class="j-str">"resources/read"</span>,
+  <span class="j-key">"id"</span>: <span class="j-num">13</span>,
+  <span class="j-key">"params"</span>: {
+    <span class="j-key">"uri"</span>: <span class="j-str">"policy://signal-failure-v2022"</span>
+  }
+}
+
+<span class="j-cmt">// Response: policy document injected into LLM context</span>
+{
+  <span class="j-key">"result"</span>: {
+    <span class="j-key">"contents"</span>: [{
+      <span class="j-key">"uri"</span>: <span class="j-str">"policy://signal-failure-v2022"</span>,
+      <span class="j-key">"mimeType"</span>: <span class="j-str">"text/plain"</span>,
+      <span class="j-key">"text"</span>: <span class="j-str">"Section 4.2 Signal Failure Policy..."</span>
+    }]
+  }
+}</div>
+      </div>
+    </div>
+
+    <div class="proto-card">
+      <div class="proto-head">⑥ AUDIT WRITE — Guardrail Agent logs compliance record</div>
+      <div class="proto-body">
+        <div style="font-size:10px;color:var(--gray2);margin-bottom:8px;">Every agent writes to Audit Log MCP Server after each action. Immutable. Cannot be deleted.</div>
+        <div class="proto-json"><span class="j-cmt">// Guardrail Agent → Audit Log MCP Server</span>
+{
+  <span class="j-key">"method"</span>: <span class="j-str">"tools/call"</span>,
+  <span class="j-key">"id"</span>: <span class="j-num">89</span>,
+  <span class="j-key">"params"</span>: {
+    <span class="j-key">"name"</span>: <span class="j-str">"write_audit_entry"</span>,
+    <span class="j-key">"arguments"</span>: {
+      <span class="j-key">"event_id"</span>:      <span class="j-str">"DIS-2024-0847"</span>,
+      <span class="j-key">"agent"</span>:         <span class="j-str">"guardrail_agent_v2.1"</span>,
+      <span class="j-key">"timestamp"</span>:     <span class="j-str">"2024-11-14T06:15:13.200Z"</span>,
+      <span class="j-key">"action"</span>:        <span class="j-str">"COMPLIANCE_CHECK"</span>,
+      <span class="j-key">"result"</span>: {
+        <span class="j-key">"rail_1_nemo"</span>:   <span class="j-bool">true</span>,
+        <span class="j-key">"rail_2_pii"</span>:    <span class="j-bool">true</span>,
+        <span class="j-key">"rail_3_schema"</span>: <span class="j-bool">true</span>,
+        <span class="j-key">"overall"</span>:       <span class="j-str">"PASSED"</span>
+      },
+      <span class="j-key">"hash"</span>: <span class="j-str">"sha256:a4f2c8d1..."</span>
+    }
+  }
+}
+<span class="j-cmt">// Server response: {"entry_id":"AUD-8841","status":"WRITTEN"}</span>
+<span class="j-cmt">// Note: no update or delete tools exist on this server.</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- TAB 5: HOW IT WORKS -->
+<!-- ══════════════════════════════════════ -->
+<div id="page-working" class="page">
+  <div class="slabel">MCP END-TO-END WORKING — STEP BY STEP</div>
+  <div class="working-cols">
+
+    <div class="timeline">
+
+      <div class="tl-step">
+        <div class="tl-dot" style="background:var(--amber)"></div>
+        <div class="tl-step-num">PHASE 01 · STARTUP · T-before-event</div>
+        <div class="tl-step-title">Host Initialises 6 MCP Client Sessions</div>
+        <div class="tl-step-body">Before any disruption event arrives, the LangGraph Orchestrator (MCP Host) boots up and creates one MCP Client session per server. Five sessions use <strong style="color:var(--amber)">stdio transport</strong> — the MCP server runs as a child process, communicating over stdin/stdout. The Payment Gateway session uses <strong style="color:var(--red)">SSE transport</strong> — an HTTP connection to the remote gateway endpoint. Each client performs the initialize handshake and then calls tools/list to discover available tools. All 24 tools across 6 servers are loaded into the host's tool registry.</div>
+        <div class="tl-code">// 5 stdio sessions (co-located):
+gtfs_client    = MCPClient(StdioTransport("./gtfs-server"))
+passenger_client = MCPClient(StdioTransport("./passenger-server"))
+policy_client  = MCPClient(StdioTransport("./policy-rag-server"))
+notify_client  = MCPClient(StdioTransport("./notify-server"))
+audit_client   = MCPClient(StdioTransport("./audit-server"))
+
+// 1 SSE session (remote payment gateway):
+payment_client = MCPClient(SSETransport("https://gateway.api/mcp"))</div>
+        <div class="tl-tags">
+          <span class="tl-tag" style="border-color:var(--amber);color:var(--amber)">stdio × 5</span>
+          <span class="tl-tag" style="border-color:var(--red);color:var(--red)">SSE × 1</span>
+          <span class="tl-tag" style="border-color:var(--cyan);color:var(--cyan)">tools/list</span>
+        </div>
+      </div>
+
+      <div class="tl-step">
+        <div class="tl-dot" style="background:var(--cyan)"></div>
+        <div class="tl-step-num">PHASE 02 · T+0s · ANALYSIS AGENT</div>
+        <div class="tl-step-title">LLM Decides to Call a Tool — MCP Serialises</div>
+        <div class="tl-step-body">The Analysis Agent receives the disruption state. The LLM generates a function call in its output: <code style="color:var(--cyan)">get_gtfs_trips(line_id="BLUE", start_time="06:15:00", end_time="09:30:00")</code>. The MCP Client intercepts this, serialises it to a JSON-RPC 2.0 <code style="color:var(--cyan)">tools/call</code> message, and sends it over the stdio pipe to the GTFS MCP Server process. <strong style="color:var(--gray1)">The LLM never directly calls any API</strong> — MCP is the only bridge.</div>
+        <div class="tl-code">// LLM output → MCP Client serialises:
+{"jsonrpc":"2.0","method":"tools/call","id":7,
+ "params":{"name":"get_gtfs_trips",
+           "arguments":{"line_id":"BLUE",
+                        "start_time":"06:15:00",
+                        "end_time":"09:30:00"}}}
+→ sent via stdio pipe → GTFS MCP Server process</div>
+        <div class="tl-tags">
+          <span class="tl-tag" style="border-color:var(--cyan);color:var(--cyan)">JSON-RPC 2.0</span>
+          <span class="tl-tag" style="border-color:var(--cyan);color:var(--cyan)">tools/call</span>
+          <span class="tl-tag" style="border-color:var(--amber);color:var(--amber)">stdio transport</span>
+        </div>
+      </div>
+
+      <div class="tl-step">
+        <div class="tl-dot" style="background:var(--green)"></div>
+        <div class="tl-step-num">PHASE 03 · T+2s · CRITICAL SECURITY BOUNDARY</div>
+        <div class="tl-step-title">PII Tokenization Happens at MCP Server — Never Reaches LLM Raw</div>
+        <div class="tl-step-body">The Passenger DB MCP Server is where PII tokenization is enforced. The Analysis Agent calls <code style="color:var(--cyan)">query_passengers(trip_ids=[...])</code> and <code style="color:var(--cyan)">tokenize_pii(records)</code>. The MCP server executes tokenization before returning results. The tool result that comes back to the LLM context contains only <code style="color:var(--green)">TKN-982-B4F2</code> — never the raw card number or patron name. <strong style="color:var(--gray1)">MCP server = PII boundary.</strong> Even if the LLM was compromised and tried to exfiltrate PII, it never had it.</div>
+        <div class="tl-code">// Tool result returned to LLM context:
+{"patron_token": "TKN-982-B4F2",  // ← never raw PII
+ "fare_amount": 12.40,
+ "payment_method": "CREDIT_CARD",  // ← type only, not card#
+ "trip_id": "TRP-0001"}
+// Raw card_number: 4532-xxxx-1234 stays in MCP server only</div>
+        <div class="tl-tags">
+          <span class="tl-tag" style="border-color:var(--green);color:var(--green)">PII Boundary</span>
+          <span class="tl-tag" style="border-color:var(--red);color:var(--red)">Security Critical</span>
+          <span class="tl-tag" style="border-color:var(--purple);color:var(--purple)">Data Minimisation</span>
+        </div>
+      </div>
+
+      <div class="tl-step">
+        <div class="tl-dot" style="background:var(--purple)"></div>
+        <div class="tl-step-num">PHASE 04 · T+4s · ELIGIBILITY AGENT</div>
+        <div class="tl-step-title">RAG via MCP — Hybrid Retrieval as Tool Calls</div>
+        <div class="tl-step-body">The Eligibility Agent calls two MCP tools on the Policy RAG Server: <code style="color:var(--cyan)">semantic_search(query="signal failure refund eligibility", threshold=0.7)</code> and <code style="color:var(--cyan)">bm25_search(query="SIGNAL_FAILURE Section 4.2")</code>. The Policy RAG MCP Server executes both searches, merges results, and returns structured chunks including metadata (source document, version, section number). The LLM receives the chunks as a tool result — not as raw text injected into the system prompt. This means retrieval quality can be monitored independently of the LLM.</div>
+        <div class="tl-code">// Policy RAG MCP Server returns structured result:
+{"chunks": [
+  {"text": "Section 4.2: All fare-paying passengers...",
+   "source": "Signal_Failure_Policy_v2022.pdf",
+   "section": "4.2", "relevance": 0.94,
+   "effective_date": "2022-03-01"},
+  ...
+], "retrieval_latency_ms": 161}</div>
+        <div class="tl-tags">
+          <span class="tl-tag" style="border-color:var(--purple);color:var(--purple)">semantic_search</span>
+          <span class="tl-tag" style="border-color:var(--purple);color:var(--purple)">bm25_search</span>
+          <span class="tl-tag" style="border-color:var(--cyan);color:var(--cyan)">Structured chunks</span>
+        </div>
+      </div>
+
+      <div class="tl-step">
+        <div class="tl-dot" style="background:var(--red)"></div>
+        <div class="tl-step-num">PHASE 05 · T+14s · GUARDRAIL AGENT</div>
+        <div class="tl-step-title">NeMo Rails Wrap Every MCP Tool Call and Result</div>
+        <div class="tl-step-body">NeMo Guardrails operate as a middleware layer around the MCP client. Before any <code style="color:var(--cyan)">tools/call</code> request leaves the agent, the NeMo input rail scans for adversarial patterns. After any tool result arrives, the NeMo output rail validates the content. This means guardrails are applied at the <strong style="color:var(--gray1)">protocol layer</strong> — not inside the LLM prompt. A compromised or drifted LLM cannot bypass guardrails by generating a malformed tool call — the MCP client rejects it before it even reaches the server.</div>
+        <div class="tl-code">// NeMo wraps MCP client:
+class GuardedMCPClient(MCPClient):
+  async def call_tool(self, name, args):
+    await nemo.input_rail(name, args)    # BEFORE
+    result = await super().call_tool(name, args)
+    await nemo.output_rail(name, result) # AFTER
+    return result</div>
+        <div class="tl-tags">
+          <span class="tl-tag" style="border-color:var(--red);color:var(--red)">NeMo Middleware</span>
+          <span class="tl-tag" style="border-color:var(--red);color:var(--red)">Protocol-level</span>
+          <span class="tl-tag" style="border-color:var(--amber);color:var(--amber)">Pre + Post validation</span>
+        </div>
+      </div>
+
+      <div class="tl-step">
+        <div class="tl-dot" style="background:var(--amber)"></div>
+        <div class="tl-step-num">PHASE 06 · T+22s · PAYMENT AGENT</div>
+        <div class="tl-step-title">$500 Cap Enforced at Payment MCP Server — Not the Prompt</div>
+        <div class="tl-step-body">The Payment Agent calls <code style="color:var(--cyan)">initiate_refund(amount=27.90, patron_token="TKN-982")</code> on the Payment Gateway MCP Server via SSE. <strong style="color:var(--gray1)">The SSE server is deployed at the payment gateway's API boundary</strong> — it is effectively the gateway's MCP adapter. The $500 cap is enforced here: if the LLM generates a tool call with <code>amount=550</code>, the MCP server returns <code style="color:var(--red)">isError:true, code:"AMOUNT_EXCEEDS_CAP"</code>. No prompt engineering change can override this — it is infrastructure enforcement.</div>
+        <div class="tl-code">// SSE transport (HTTP POST to remote gateway):
+// mTLS + Bearer JWT required
+// idempotency_key prevents double-refund on retry
+{"name":"initiate_refund",
+ "arguments":{"patron_token":"TKN-982-B4F2",
+               "amount":27.90,
+               "idempotency_key":"DIS-2024-0847-TKN-982"}}
+// Server enforces: if amount > 500 → AMOUNT_EXCEEDS_CAP error</div>
+        <div class="tl-tags">
+          <span class="tl-tag" style="border-color:var(--amber);color:var(--amber)">SSE transport</span>
+          <span class="tl-tag" style="border-color:var(--red);color:var(--red)">$500 Cap at API</span>
+          <span class="tl-tag" style="border-color:var(--green);color:var(--green)">Idempotency Key</span>
+        </div>
+      </div>
+
+      <div class="tl-step">
+        <div class="tl-dot" style="background:var(--green)"></div>
+        <div class="tl-step-num">PHASE 07 · T+25s · ALL AGENTS</div>
+        <div class="tl-step-title">Every Action Written to Audit Log via MCP</div>
+        <div class="tl-step-body">Every agent writes to the Audit Log MCP Server after each significant action. The <code style="color:var(--cyan)">write_audit_entry()</code> tool is append-only — the server exposes no delete or update tool. This is by design: <strong style="color:var(--gray1)">the immutability is enforced at the MCP server layer, not by policy.</strong> A compromised agent cannot rewrite history because the tool simply doesn't exist on the server. Each audit entry includes the agent name, timestamp, action, result, and a SHA-256 hash of the entry — enabling tamper detection.</div>
+        <div class="tl-code">// Called by every agent — cross-cutting concern:
+write_audit_entry({
+  event_id: "DIS-2024-0847",
+  agent: "payment_agent_v2.1",
+  action: "REFUND_INITIATED",
+  result: {txn_id:"TXN-4F2C",status:"SUCCESS",amount:27.90},
+  hash: sha256(entry)
+})
+// Server: append-only write. No delete/update tool exists.</div>
+        <div class="tl-tags">
+          <span class="tl-tag" style="border-color:var(--green);color:var(--green)">Append-only</span>
+          <span class="tl-tag" style="border-color:var(--green);color:var(--green)">SHA-256 hashed</span>
+          <span class="tl-tag" style="border-color:var(--cyan);color:var(--cyan)">Cross-cutting</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div>
+      <div class="side-box">
+        <div class="side-title">⬡ MCP vs Direct API Calls</div>
+        <div class="side-body">
+          <strong>Without MCP:</strong> each agent has custom code to call GTFS API, handle auth, parse response, manage errors. 6 agents × 6 systems = 36 bespoke integrations.<br><br>
+          <strong>With MCP:</strong> each agent calls <code style="color:var(--cyan)">mcp_client.call_tool("get_gtfs_trips", args)</code>. Same interface for all tools. Swap the GTFS provider → replace one MCP server. Zero agent code changes.<br><br>
+          <strong>Interview punchline:</strong> MCP is what makes this architecture maintainable at scale.
+        </div>
+      </div>
+      <div class="side-box">
+        <div class="side-title">🔌 stdio vs SSE — When to Use Which</div>
+        <div class="side-body">
+          <strong style="color:var(--amber)">stdio</strong> — local process, sub-millisecond latency, no network overhead. Used for co-located servers (GTFS, Passenger DB, Policy RAG, Notification, Audit).<br><br>
+          <strong style="color:var(--red)">SSE</strong> — HTTP transport, works across network boundaries. Used for Payment Gateway because: (1) it's a remote regulated service, (2) mTLS auth required at HTTP layer, (3) $500 cap enforced at the HTTP API endpoint itself.
+        </div>
+      </div>
+      <div class="side-box">
+        <div class="side-title">🛡 MCP as a Security Boundary</div>
+        <div class="side-body">
+          Three security properties enforced at MCP layer, not prompt level:<br><br>
+          <strong>1. PII never reaches LLM</strong> — tokenization in Passenger DB MCP Server.<br>
+          <strong>2. $500 cap unbreakable</strong> — enforced in Payment MCP Server API.<br>
+          <strong>3. Audit log immutable</strong> — no delete tool on Audit MCP Server.<br><br>
+          <strong>Why this matters:</strong> prompt engineering can be jailbroken. MCP server APIs cannot.
+        </div>
+      </div>
+      <div class="side-box">
+        <div class="side-title">📐 MCP Tool Schema = PM Spec</div>
+        <div class="side-body">
+          Each tool's <code style="color:var(--cyan)">inputSchema</code> (JSON Schema) is effectively a PM-authored contract. Writing the schema for <code style="color:var(--cyan)">initiate_refund()</code> — what fields are required, what types, what constraints — is a product decision, not an engineering one.<br><br>
+          The schema is what the LLM sees when it decides whether and how to call a tool. <strong>Schema quality = tool call quality.</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOOLTIP -->
+<div class="tip" id="tip">
+  <div class="tip-title" id="tipTitle"></div>
+  <div id="tipBody"></div>
+</div>
+
+<script>
+// ── TAB SWITCHING ────────────────────────────────
+function switchTab(t) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+t).classList.add('active');
+  event.target.classList.add('active');
+  if(t==='sequence') drawSeq();
+  if(t==='flow') drawFlow();
+}
+
+// ── TOOLTIP ──────────────────────────────────────
+const tip = document.getElementById('tip');
+document.querySelectorAll('.fn').forEach(n=>{
+  n.addEventListener('mouseenter',()=>{
+    document.getElementById('tipTitle').textContent = n.dataset.title||'';
+    document.getElementById('tipBody').textContent = n.dataset.desc||'';
+    tip.classList.add('show');
+  });
+  n.addEventListener('mousemove',e=>{
+    let x=e.clientX+14,y=e.clientY-8;
+    if(x+270>window.innerWidth) x=e.clientX-284;
+    tip.style.left=x+'px'; tip.style.top=y+'px';
+  });
+  n.addEventListener('mouseleave',()=>tip.classList.remove('show'));
+});
+
+// ── FLOW SVG ARROWS ──────────────────────────────
+function drawFlow(){
+  const svg = document.getElementById('flowSvg');
+  svg.innerHTML='';
+
+  function getPos(id){
+    const el=document.getElementById(id);
+    if(!el) return null;
+    return {
+      x:el.offsetLeft+el.offsetWidth/2,
+      y:el.offsetTop+el.offsetHeight/2,
+      t:el.offsetTop, b:el.offsetTop+el.offsetHeight,
+      l:el.offsetLeft, r:el.offsetLeft+el.offsetWidth,
+    };
+  }
+
+  const ns='http://www.w3.org/2000/svg';
+
+  function arrow(x1,y1,x2,y2,col,dashed){
+    const dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy);
+    const ux=dx/len,uy=dy/len;
+    const ex=x2-ux*8,ey=y2-uy*8;
+    const p=document.createElementNS(ns,'line');
+    p.setAttribute('x1',x1);p.setAttribute('y1',y1);
+    p.setAttribute('x2',ex);p.setAttribute('y2',ey);
+    p.setAttribute('stroke',col);p.setAttribute('stroke-width','1.2');
+    p.setAttribute('opacity','0.55');
+    if(dashed) p.setAttribute('stroke-dasharray','5,3');
+    svg.appendChild(p);
+    const ang=Math.atan2(ey-y1,ex-x1);
+    const ah=document.createElementNS(ns,'polygon');
+    const a1x=x2+Math.cos(ang+2.6)*7,a1y=y2+Math.sin(ang+2.6)*7;
+    const a2x=x2+Math.cos(ang-2.6)*7,a2y=y2+Math.sin(ang-2.6)*7;
+    ah.setAttribute('points',`${x2},${y2} ${a1x},${a1y} ${a2x},${a2y}`);
+    ah.setAttribute('fill',col);ah.setAttribute('opacity','0.65');
+    svg.appendChild(ah);
+  }
+
+  // Host to agents
+  const host=getPos('f-host');
+  const agents=['f-a1','f-a2','f-a3','f-a4','f-a5','f-a6'];
+  const acols=['#ffb832','#ffb832','#ffb832','#ffb832','#ff6644','#ffb832'];
+  agents.forEach((id,i)=>{
+    const a=getPos(id); if(!a||!host) return;
+    arrow(host.x,host.b,a.x,a.t,acols[i],false);
+  });
+
+  // Agents to proto band
+  const proto={t:305,b:349,x:380};
+  agents.forEach((id,i)=>{
+    const a=getPos(id); if(!a) return;
+    arrow(a.x,a.b, a.x, proto.t, acols[i], false);
+  });
+
+  // Proto to servers
+  const servers=['f-s1','f-s2','f-s3','f-s4','f-s5','f-s6'];
+  const scols=['#00e5ff','#00e5ff','#00e5ff','#ff4444','#00e5ff','#00e5ff'];
+  servers.forEach((id,i)=>{
+    const s=getPos(id); if(!s) return;
+    arrow(s.x,proto.b,s.x,s.t,scols[i],false);
+  });
+
+  // Servers to external
+  const ext=['f-e1','f-e2','f-e3','f-e4','f-e5','f-e6'];
+  const guard={b:590};
+  servers.forEach((id,i)=>{
+    const s=getPos(id); if(!s) return;
+    const e=getPos(ext[i]); if(!e) return;
+    arrow(s.x,s.b,e.x,e.t,scols[i],true);
+  });
+}
+
+// ── SEQUENCE DIAGRAM ─────────────────────────────
+function drawSeq(){
+  const svg=document.getElementById('seqSvg');
+  
+
+  const W=svg.parentElement.offsetWidth||1000;
+  const actors=[
+    {n:'LangGraph\nOrchestrator',  c:'#ffb832'},
+    {n:'Analysis\nAgent',          c:'#4d9fff'},
+    {n:'GTFS MCP\nServer',         c:'#00e5ff'},
+    {n:'Passenger\nMCP Server',    c:'#00e5ff'},
+    {n:'Eligibility\nAgent',       c:'#4d9fff'},
+    {n:'Policy RAG\nMCP Server',   c:'#bf7fff'},
+    {n:'Guardrail\nAgent',         c:'#4d9fff'},
+    {n:'Calc\nAgent',              c:'#4d9fff'},
+    {n:'Payment\nAgent',           c:'#4d9fff'},
+    {n:'Payment GW\nMCP (SSE)',    c:'#ff6644'},
+    {n:'Notify\nAgent',            c:'#4d9fff'},
+    {n:'Audit Log\nMCP Server',    c:'#39ff7a'},
+  ];
+
+  const n=actors.length;
+  const pad=30;
+  const colW=(W-pad*2)/n;
+  const cols=actors.map((_,i)=>pad+colW*i+colW/2);
+  const hH=72;
+  const rH=46;
+  const ns='http://www.w3.org/2000/svg';
+
+  // actor index:
+  // 0=Orchestrator 1=AnalysisAgent 2=GTFS_MCP 3=PassengerDB_MCP
+  // 4=EligibilityAgent 5=PolicyRAG_MCP 6=GuardrailAgent 7=CalcAgent
+  // 8=PaymentAgent 9=PaymentGW_MCP(SSE) 10=NotifyAgent 11=AuditLog_MCP
+  const msgs=[
+    // ANALYSIS AGENT
+    {f:0, t:1,  label:'[1] invoke analysis_agent',                         col:'#ffb832', ret:false},
+    {f:1, t:2,  label:'[2] tools/call: get_gtfs_trips(BLUE,06:15-09:30)', col:'#00e5ff', ret:false},
+    {f:2, t:1,  label:'[3] result: {trips:[...], count:1247}',            col:'#4d9fff', ret:true },
+    {f:1, t:3,  label:'[4] tools/call: query_passengers(trip_ids)',       col:'#00e5ff', ret:false},
+    {f:3, t:3,  label:'[5] tokenize_pii(records) — PII boundary',        col:'#ff4444', ret:false, self:true},
+    {f:3, t:1,  label:'[6] result: {patron_token:"TKN-*", fare, method}', col:'#4d9fff', ret:true },
+    {f:1, t:11, label:'[7] write_audit_entry(analysis_complete)',         col:'#39ff7a', ret:false},
+    {f:1, t:0,  label:'[8] return: TripManifest{count:1247}',            col:'#ffb832', ret:true },
+    // ELIGIBILITY AGENT
+    {f:0, t:4,  label:'[9] invoke eligibility_agent',                     col:'#ffb832', ret:false},
+    {f:4, t:5,  label:'[10] tools/call: semantic_search(signal_failure)', col:'#bf7fff', ret:false},
+    {f:4, t:5,  label:'[11] tools/call: bm25_search(Section 4.2)',       col:'#bf7fff', ret:false},
+    {f:5, t:4,  label:'[12] result: {chunks:[{text,source,relevance}]}', col:'#bf7fff', ret:true },
+    {f:4, t:4,  label:'[13] llm.reason(patron x policy_chunks) x1247',  col:'#4d9fff', ret:false, self:true},
+    {f:4, t:11, label:'[14] write_audit_entry(eligibility+reasoning)',   col:'#39ff7a', ret:false},
+    {f:4, t:0,  label:'[15] return: EligibilityResult{eligible:1189}',  col:'#ffb832', ret:true },
+    // GUARDRAIL AGENT
+    {f:0, t:6,  label:'[16] invoke guardrail_agent',                      col:'#ffb832', ret:false},
+    {f:6, t:6,  label:'[17] nemo_rail() + pii_audit() + schema_validate()',col:'#ff4444', ret:false, self:true},
+    {f:6, t:11, label:'[18] write_audit_entry(compliance: PASS)',        col:'#39ff7a', ret:false},
+    {f:6, t:0,  label:'[19] return: compliance_passed=true',            col:'#ffb832', ret:true },
+    // CALC AGENT
+    {f:0, t:7,  label:'[20] invoke refund_calc_agent',                    col:'#ffb832', ret:false},
+    {f:7, t:5,  label:'[21] tools/call: get_policy_formula(SIGNAL_FAIL)',col:'#bf7fff', ret:false},
+    {f:5, t:7,  label:'[22] result: {formula: flat$15.50+100%_fare}',   col:'#bf7fff', ret:true },
+    {f:7, t:7,  label:'[23] calculate_amounts() + validate_cap($500)',   col:'#39ff7a', ret:false, self:true},
+    {f:7, t:11, label:'[24] write_audit_entry(RefundManifest signed)',   col:'#39ff7a', ret:false},
+    {f:7, t:0,  label:'[25] return: RefundManifest{total:$18247.50}',   col:'#ffb832', ret:true },
+    // PAYMENT AGENT
+    {f:0, t:8,  label:'[26] invoke payment_agent',                        col:'#ffb832', ret:false},
+    {f:8, t:9,  label:'[27] tools/call: initiate_refund(TKN,27.90) SSE', col:'#ff6644', ret:false},
+    {f:9, t:9,  label:'[28] enforce $500 cap + idempotency_key check',  col:'#ff4444', ret:false, self:true},
+    {f:9, t:8,  label:'[29] result: {status:SUCCESS, txn_id:TXN-4F2C}', col:'#ff6644', ret:true },
+    {f:8, t:11, label:'[30] write_audit_entry(payment_confirmed)',       col:'#39ff7a', ret:false},
+    {f:8, t:0,  label:'[31] return: PaymentStatus{completed:1187}',     col:'#ffb832', ret:true },
+    // NOTIFICATION AGENT
+    {f:0, t:10, label:'[32] invoke notification_agent',                   col:'#ffb832', ret:false},
+    {f:10,t:10, label:'[33] get_channel_pref() + send_push()/sms()/email()',col:'#00e5ff', ret:false, self:true},
+    {f:10,t:11, label:'[34] write_audit_entry(notifications_delivered)', col:'#39ff7a', ret:false},
+    {f:10,t:0,  label:'[35] return: NotifyStatus{delivered:1185}',      col:'#ffb832', ret:true },
+    // GRAPH COMPLETE
+    {f:0, t:11, label:'[36] write_audit_entry(graph_complete, elapsed:87s)',col:'#39ff7a', ret:false},
+  ];
+
+
+  const totalH=hH+msgs.length*rH+80;
+  svg.setAttribute('height',totalH);
+
+  // Defs (arrowheads)
+  const defs=document.createElementNS(ns,'defs');
+  ['fwd','ret','red','grn'].forEach((id,i)=>{
+    const m=document.createElementNS(ns,'marker');
+    m.setAttribute('id',id+'Arr');m.setAttribute('markerWidth','7');
+    m.setAttribute('markerHeight','7');m.setAttribute('refX','6');m.setAttribute('refY','3.5');
+    m.setAttribute('orient','auto');
+    const p=document.createElementNS(ns,'polygon');
+    p.setAttribute('points','0 0, 7 3.5, 0 7');
+    const cols2=['#00e5ff','#4d9fff','#ff4444','#39ff7a'];
+    p.setAttribute('fill',cols2[i]);
+    m.appendChild(p);defs.appendChild(m);
+  });
+  svg.appendChild(defs);
+
+  // Header boxes
+  actors.forEach((a,i)=>{
+    const x=cols[i];
+    const r=document.createElementNS(ns,'rect');
+    r.setAttribute('x',x-46);r.setAttribute('y',6);
+    r.setAttribute('width',92);r.setAttribute('height',52);r.setAttribute('rx',4);
+    r.setAttribute('fill','#0a1018');r.setAttribute('stroke',a.c);r.setAttribute('stroke-width','1.2');
+    svg.appendChild(r);
+    const lines=a.n.split('\n');
+    lines.forEach((line,li)=>{
+      const t=document.createElementNS(ns,'text');
+      t.setAttribute('x',x);t.setAttribute('y',22+li*16);
+      t.setAttribute('text-anchor','middle');t.setAttribute('font-size','8.5');
+      t.setAttribute('font-weight','600');t.setAttribute('fill',a.c);
+      t.setAttribute('font-family','Fira Code, monospace');
+      t.textContent=line;svg.appendChild(t);
+    });
+    // Lifeline
+    const ll=document.createElementNS(ns,'line');
+    ll.setAttribute('x1',x);ll.setAttribute('y1',60);
+    ll.setAttribute('x2',x);ll.setAttribute('y2',totalH-20);
+    ll.setAttribute('stroke',a.c);ll.setAttribute('stroke-width','0.5');
+    ll.setAttribute('stroke-dasharray','4,4');ll.setAttribute('opacity','0.2');
+    svg.appendChild(ll);
+  });
+
+  // Messages
+  msgs.forEach((msg,mi)=>{
+    const y=hH+mi*rH+20;
+    const x1=cols[msg.f],x2=cols[msg.t];
+    const isRet=msg.ret;
+    const col=msg.col;
+    const markId=isRet?'retArr':(col==='#ff4444'?'redArr':(col==='#39ff7a'?'grnArr':'fwdArr'));
+
+    if(msg.self){
+      const rx=x1+35;
+      const path=document.createElementNS(ns,'path');
+      path.setAttribute('d',`M${x1},${y} Q${rx+28},${y-8} ${rx+28},${y+10} Q${rx+28},${y+24} ${x1},${y+24}`);
+      path.setAttribute('stroke',col);path.setAttribute('stroke-width','1.2');
+      path.setAttribute('fill','none');path.setAttribute('marker-end',`url(#${markId})`);
+      svg.appendChild(path);
+    } else {
+      const fromX=x1<x2?x1+2:x1-2;
+      const toX=x1<x2?x2-6:x2+6;
+      const line=document.createElementNS(ns,'line');
+      line.setAttribute('x1',fromX);line.setAttribute('y1',y);
+      line.setAttribute('x2',toX);line.setAttribute('y2',y);
+      line.setAttribute('stroke',col);line.setAttribute('stroke-width','1.2');
+      line.setAttribute('stroke-dasharray',isRet?'5,3':'none');
+      line.setAttribute('marker-end',`url(#${markId})`);
+      svg.appendChild(line);
+    }
+
+    // Label
+    const mx=msg.self?x1+55:(x1+x2)/2;
+    const t=document.createElementNS(ns,'text');
+    t.setAttribute('x',mx);t.setAttribute('y',y-5);
+    t.setAttribute('text-anchor','middle');t.setAttribute('font-size','8.5');
+    t.setAttribute('fill',col);t.setAttribute('font-family','Fira Code, monospace');
+    t.textContent=msg.label;svg.appendChild(t);
+
+    // Activation box
+    const bx=msg.self?x1:x2;
+    const box=document.createElementNS(ns,'rect');
+    box.setAttribute('x',bx-5);box.setAttribute('y',y);
+    box.setAttribute('width','10');box.setAttribute('height','24');
+    box.setAttribute('fill',col);box.setAttribute('opacity','0.15');box.setAttribute('rx','2');
+    svg.appendChild(box);
+  });
+}
+</script>
+</body>
+</html>
