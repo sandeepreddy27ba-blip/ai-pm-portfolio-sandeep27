@@ -1,452 +1,774 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Sandeep Kumar — AI PM Portfolio</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sandeep Kumar — AI Product Manager Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500&family=Nunito:wght@400;500;600;700;800&display=swap');
-
-:root{
-  --bg:#0d1117; --bg2:#161b22; --bg3:#1c2333;
-  --border:rgba(255,255,255,0.08);
-  --text:#e6edf3; --text2:#8b949e; --text3:#484f58;
-  --gold:#e8960f; --gold2:rgba(232,150,15,0.12);
-  --green:#3fb950; --green2:rgba(63,185,80,0.1);
-  --blue:#58a6ff; --blue2:rgba(88,166,255,0.1);
-  --purple:#bc8cff; --purple2:rgba(188,140,255,0.1);
-  --red:#f85149; --red2:rgba(248,81,73,0.1);
-  --serif:'DM Serif Display',serif;
-  --mono:'IBM Plex Mono',monospace;
-  --sans:'Nunito',sans-serif;
+:root {
+  --ink:     #0E1117;
+  --ink2:    #1C2333;
+  --teal:    #00C9A7;
+  --teal2:   #007B6E;
+  --gold:    #F5C542;
+  --cream:   #F7F4EF;
+  --mist:    #EBF0F5;
+  --slate:   #6B7C93;
+  --border:  rgba(0,201,167,0.18);
+  --card-bg: #ffffff;
+  --shadow:  0 2px 24px rgba(14,17,23,0.07);
 }
 
 *{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
-::-webkit-scrollbar{width:5px;}
-::-webkit-scrollbar-track{background:var(--bg2);}
-::-webkit-scrollbar-thumb{background:var(--text3);border-radius:3px;}
 
-/* subtle star field */
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.15) 0%, transparent 100%),
-    radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,.1) 0%, transparent 100%),
-    radial-gradient(1px 1px at 50% 70%, rgba(255,255,255,.08) 0%, transparent 100%),
-    radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,.1) 0%, transparent 100%),
-    radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,.12) 0%, transparent 100%);
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'Outfit', sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
 }
 
-/* ── HERO ── */
-.hero{
-  text-align:center;padding:72px 24px 56px;
-  position:relative;z-index:1;
-  background:linear-gradient(180deg,rgba(232,150,15,0.06) 0%,transparent 100%);
-  border-bottom:1px solid var(--border);
+/* ── NOISE TEXTURE OVERLAY ── */
+body::before {
+  content:'';
+  position:fixed;inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:0.5;
 }
-.hero-eyebrow{
-  font-family:var(--mono);font-size:11px;letter-spacing:3px;
-  color:var(--gold);text-transform:uppercase;margin-bottom:16px;
-  display:inline-flex;align-items:center;gap:8px;
-}
-.hero-eyebrow::before,.hero-eyebrow::after{content:'─────';opacity:.4;}
-.hero-name{
-  font-family:var(--serif);font-size:clamp(36px,5vw,64px);
-  color:var(--text);line-height:1.1;margin-bottom:8px;
-}
-.hero-name em{color:var(--gold);font-style:italic;}
-.hero-title{
-  font-family:var(--mono);font-size:13px;color:var(--text2);
-  letter-spacing:1px;margin-bottom:20px;
-}
-.hero-desc{
-  font-size:15px;color:var(--text2);line-height:1.8;
-  max-width:600px;margin:0 auto 28px;
-}
-.hero-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:32px;}
-.hero-tag{
-  font-family:var(--mono);font-size:10px;letter-spacing:1px;
-  padding:4px 12px;border-radius:20px;border:1px solid var(--border);
-  color:var(--text2);background:var(--bg2);
-}
-.hero-stats{
-  display:inline-flex;gap:40px;padding:16px 32px;
-  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
-}
-.hstat-v{font-family:var(--serif);font-size:28px;color:var(--gold);line-height:1;}
-.hstat-l{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:1px;margin-top:3px;}
 
 /* ── NAV ── */
-.nav{
-  position:sticky;top:0;z-index:400;
-  background:rgba(13,17,23,0.92);backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);
-  padding:0 52px;display:flex;align-items:center;gap:0;
+nav {
+  position: sticky; top:0; z-index:100;
+  background: rgba(247,244,239,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  padding: 0 2.5rem;
+  display: flex; align-items:center; justify-content:space-between;
+  height: 58px;
 }
-.nav-logo{
-  font-family:var(--mono);font-size:11px;color:var(--gold);
-  letter-spacing:2px;padding:14px 0;margin-right:32px;flex-shrink:0;
+.nav-brand {
+  font-family: 'Fraunces', serif;
+  font-weight: 700; font-size: 1.1rem;
+  letter-spacing: -0.02em;
+  display:flex;align-items:center;gap:0.6rem;
 }
-.nav-links{display:flex;gap:0;}
-.nav-link{
-  font-size:12px;font-weight:600;color:var(--text2);
-  padding:14px 16px;text-decoration:none;letter-spacing:.3px;
-  border-bottom:2px solid transparent;transition:.2s;
-  white-space:nowrap;
+.nav-dot {
+  width:8px;height:8px;border-radius:50%;
+  background: var(--teal);
+  box-shadow: 0 0 10px var(--teal);
 }
-.nav-link:hover{color:var(--text);border-bottom-color:var(--gold);}
-.nav-cta{
-  margin-left:auto;font-family:var(--mono);font-size:10px;
-  color:var(--bg);background:var(--gold);
-  padding:7px 16px;border-radius:4px;text-decoration:none;
-  letter-spacing:1px;font-weight:600;transition:.2s;flex-shrink:0;
+.nav-links { display:flex;gap:2rem; }
+.nav-links a {
+  font-size:0.82rem;font-weight:500;letter-spacing:0.04em;
+  color:var(--slate);text-decoration:none;text-transform:uppercase;
+  transition:color 0.2s;
 }
-.nav-cta:hover{background:var(--gold2);color:var(--gold);}
+.nav-links a:hover { color:var(--ink); }
+.nav-cta {
+  background: var(--ink); color:#fff;
+  padding:0.4rem 1.1rem; border-radius:6px;
+  font-size:0.78rem;font-weight:600;letter-spacing:0.04em;
+  text-decoration:none;text-transform:uppercase;
+  transition:background 0.2s;
+}
+.nav-cta:hover { background:var(--teal2); }
 
-/* ── SECTION ── */
-.section{padding:52px 52px;position:relative;z-index:1;max-width:1400px;margin:0 auto;}
-.section-label{
-  font-family:var(--mono);font-size:9px;letter-spacing:3px;
-  color:var(--text3);text-transform:uppercase;
-  display:flex;align-items:center;gap:12px;margin-bottom:24px;
+/* ── HERO ── */
+.hero {
+  position:relative;z-index:1;
+  padding: 6rem 2.5rem 5rem;
+  max-width: 1200px; margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;
 }
-.section-label::before{content:'//';color:var(--gold);opacity:.6;}
-.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.hero-eyebrow {
+  font-family:'DM Mono',monospace;
+  font-size:0.72rem;font-weight:500;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--teal2);
+  display:flex;align-items:center;gap:0.5rem;margin-bottom:1.2rem;
+}
+.hero-eyebrow::before { content:''; width:28px;height:2px;background:var(--teal); }
+.hero-name {
+  font-family:'Fraunces',serif;
+  font-size:clamp(3rem,5vw,4.5rem);
+  font-weight:700;line-height:1.0;
+  letter-spacing:-0.03em;
+  margin-bottom:0.5rem;
+}
+.hero-name em {
+  font-style:italic;font-weight:300;color:var(--teal2);
+}
+.hero-title {
+  font-size:1rem;font-weight:500;color:var(--slate);
+  letter-spacing:0.06em;text-transform:uppercase;
+  margin-bottom:1.5rem;font-family:'DM Mono',monospace;
+}
+.hero-desc {
+  font-size:1rem;color:#4A5568;line-height:1.75;
+  max-width:480px;margin-bottom:2rem;
+}
+.hero-tags {
+  display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:2.5rem;
+}
+.tag {
+  font-size:0.72rem;font-weight:600;letter-spacing:0.05em;
+  padding:0.3rem 0.75rem;border-radius:20px;
+  background:var(--mist);color:var(--ink2);
+  border:1px solid rgba(0,0,0,0.08);
+}
+.tag.accent { background:rgba(0,201,167,0.1);color:var(--teal2);border-color:rgba(0,201,167,0.25); }
 
-/* ── ARTIFACT CARDS ── */
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:18px;}
-.acard{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:10px;overflow:hidden;text-decoration:none;
-  transition:transform .2s,box-shadow .2s,border-color .2s;
+.hero-ctas { display:flex;gap:0.75rem;flex-wrap:wrap; }
+.btn-primary {
+  background:var(--ink);color:#fff;
+  padding:0.65rem 1.5rem;border-radius:8px;
+  font-size:0.82rem;font-weight:600;letter-spacing:0.04em;
+  text-decoration:none;text-transform:uppercase;
+  transition:all 0.2s;
+}
+.btn-primary:hover { background:var(--teal2);transform:translateY(-1px); }
+.btn-ghost {
+  background:transparent;color:var(--ink);
+  padding:0.65rem 1.5rem;border-radius:8px;
+  font-size:0.82rem;font-weight:600;letter-spacing:0.04em;
+  text-decoration:none;text-transform:uppercase;
+  border:1.5px solid rgba(0,0,0,0.15);
+  transition:all 0.2s;
+}
+.btn-ghost:hover { border-color:var(--teal);color:var(--teal2);transform:translateY(-1px); }
+
+/* Hero right: metrics */
+.hero-metrics {
+  display:grid;grid-template-columns:1fr 1fr;gap:1rem;
+}
+.metric-card {
+  background:var(--card-bg);
+  border:1px solid rgba(0,0,0,0.07);
+  border-radius:14px;padding:1.5rem 1.25rem;
+  box-shadow:var(--shadow);
+  transition:transform 0.2s;
+}
+.metric-card:hover { transform:translateY(-3px); }
+.metric-card.featured {
+  background:var(--ink2);color:#fff;
+  grid-column:1/-1;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+}
+.metric-val {
+  font-family:'Fraunces',serif;
+  font-size:2.5rem;font-weight:700;line-height:1;
+  color:var(--teal);
+}
+.metric-card.featured .metric-val { color:var(--teal); }
+.metric-lbl {
+  font-size:0.72rem;font-weight:600;letter-spacing:0.06em;
+  text-transform:uppercase;color:var(--slate);margin-top:0.3rem;
+}
+.metric-card.featured .metric-lbl { color:rgba(255,255,255,0.5); }
+.feat-right { text-align:right; }
+.feat-right .metric-val { font-size:2rem; }
+
+/* ── SECTION WRAPPER ── */
+.section {
+  position:relative;z-index:1;
+  max-width:1200px;margin:0 auto;
+  padding: 5rem 2.5rem;
+}
+.section-label {
+  font-family:'DM Mono',monospace;
+  font-size:0.7rem;font-weight:500;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--teal2);
+  display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;
+}
+.section-label::before { content:'';width:20px;height:2px;background:var(--teal); }
+.section-heading {
+  font-family:'Fraunces',serif;
+  font-size:clamp(1.8rem,3vw,2.6rem);font-weight:700;
+  letter-spacing:-0.02em;line-height:1.15;
+  margin-bottom:0.5rem;
+}
+.section-sub {
+  font-size:0.95rem;color:var(--slate);margin-bottom:3rem;max-width:600px;
+}
+
+/* ── DIVIDER ── */
+.divider {
+  height:1px;background:rgba(0,0,0,0.07);
+  margin:0 2.5rem;position:relative;z-index:1;
+}
+
+/* ── ARTIFACT GRID ── */
+.artifact-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1.25rem;
+}
+
+.artifact-card {
+  background:var(--card-bg);
+  border:1px solid rgba(0,0,0,0.08);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
   display:flex;flex-direction:column;
+  transition:transform 0.25s, box-shadow 0.25s;
+  text-decoration:none;color:inherit;
+  position:relative;
 }
-.acard:hover{
-  transform:translateY(-3px);
-  box-shadow:0 8px 32px rgba(0,0,0,.4);
-  border-color:var(--ac);
+.artifact-card:hover {
+  transform:translateY(-5px);
+  box-shadow:0 12px 40px rgba(14,17,23,0.13);
 }
-.acard-header{
-  padding:20px 22px 16px;
-  background:linear-gradient(135deg,var(--ac1),var(--ac2));
-  position:relative;overflow:hidden;
+.artifact-card::after {
+  content:'↗';
+  position:absolute;top:1rem;right:1rem;
+  font-size:1rem;color:rgba(0,0,0,0.15);
+  transition:color 0.2s,transform 0.2s;
 }
-.acard-header::after{
-  content:'';position:absolute;right:-30px;bottom:-30px;
-  width:100px;height:100px;border-radius:50%;
-  background:rgba(255,255,255,.05);
+.artifact-card:hover::after {
+  color:var(--teal);transform:translate(2px,-2px);
 }
-.acard-num{
-  font-family:var(--mono);font-size:9px;letter-spacing:2px;
-  color:rgba(255,255,255,.4);margin-bottom:8px;
-}
-.acard-icon{font-size:28px;margin-bottom:10px;display:block;}
-.acard-title{
-  font-family:var(--serif);font-size:20px;color:#fff;
-  line-height:1.2;margin-bottom:6px;
-}
-.acard-subtitle{font-size:11px;color:rgba(255,255,255,.55);line-height:1.5;}
-.acard-body{padding:18px 22px;flex:1;display:flex;flex-direction:column;}
-.acard-desc{font-size:12.5px;color:var(--text2);line-height:1.75;margin-bottom:14px;flex:1;}
-.acard-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px;}
-.acard-tag{
-  font-family:var(--mono);font-size:8px;letter-spacing:.5px;
-  padding:2px 8px;border-radius:2px;
-}
-.acard-metrics{
-  display:grid;grid-template-columns:1fr 1fr;gap:6px;
-  padding:10px 12px;background:var(--bg3);border-radius:6px;
-  margin-bottom:14px;
-}
-.am-val{font-family:var(--serif);font-size:20px;line-height:1;}
-.am-lbl{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:.5px;margin-top:2px;}
-.acard-btn{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  padding:9px 16px;border-radius:6px;
-  font-family:var(--mono);font-size:10px;font-weight:600;
-  letter-spacing:1px;text-decoration:none;
-  background:var(--ac);color:#000;
-  transition:.2s;border:none;cursor:pointer;
-}
-.acard-btn:hover{opacity:.85;}
-.acard-btn::after{content:'→';font-size:13px;}
 
-/* ── ABOUT SECTION ── */
-.about{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:12px;padding:32px 36px;
-  display:grid;grid-template-columns:1fr 1fr;gap:32px;
-  margin-bottom:20px;
+.card-accent {
+  height:4px;
+  background:linear-gradient(90deg, var(--teal), var(--teal2));
 }
-.about-title{font-family:var(--serif);font-size:28px;color:var(--text);margin-bottom:10px;}
-.about-body{font-size:13px;color:var(--text2);line-height:1.85;}
-.skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.skill-item{
-  display:flex;align-items:center;gap:8px;padding:8px 10px;
-  background:var(--bg3);border-radius:5px;border:1px solid var(--border);
+.card-accent.gold { background:linear-gradient(90deg,#F5C542,#E8A000); }
+.card-accent.blue { background:linear-gradient(90deg,#3D9BFF,#0066CC); }
+.card-accent.purple { background:linear-gradient(90deg,#A78BFA,#6D28D9); }
+.card-accent.red { background:linear-gradient(90deg,#FF6B6B,#CC0000); }
+.card-accent.orange { background:linear-gradient(90deg,#FF8C42,#CC5500); }
+
+.card-body { padding:1.5rem;flex:1;display:flex;flex-direction:column; }
+.card-num {
+  font-family:'DM Mono',monospace;
+  font-size:0.65rem;letter-spacing:0.1em;color:var(--slate);
+  margin-bottom:0.75rem;text-transform:uppercase;
 }
-.skill-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.skill-name{font-size:11.5px;color:var(--text2);}
+.card-icon { font-size:1.6rem;margin-bottom:0.75rem; }
+.card-title {
+  font-family:'Fraunces',serif;
+  font-size:1.15rem;font-weight:600;line-height:1.25;
+  margin-bottom:0.4rem;letter-spacing:-0.01em;
+}
+.card-subtitle {
+  font-size:0.72rem;font-weight:600;letter-spacing:0.07em;
+  text-transform:uppercase;color:var(--teal2);margin-bottom:0.75rem;
+}
+.card-desc {
+  font-size:0.82rem;color:#5A6474;line-height:1.65;
+  flex:1;margin-bottom:1.25rem;
+}
+.card-chips {
+  display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:1.25rem;
+}
+.chip {
+  font-size:0.62rem;font-weight:700;letter-spacing:0.06em;
+  padding:0.2rem 0.55rem;border-radius:4px;
+  background:var(--mist);color:var(--slate);
+  text-transform:uppercase;
+}
+.chip.hi { background:rgba(0,201,167,0.1);color:var(--teal2); }
+
+.card-stats {
+  display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;
+  border-top:1px solid rgba(0,0,0,0.06);padding-top:1rem;
+  margin-bottom:1.25rem;
+}
+.stat-item { text-align:center; }
+.stat-val {
+  font-family:'Fraunces',serif;
+  font-size:1.3rem;font-weight:700;color:var(--teal2);line-height:1;
+}
+.stat-lbl {
+  font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--slate);margin-top:0.2rem;
+}
+
+.card-cta {
+  display:inline-flex;align-items:center;gap:0.4rem;
+  font-size:0.78rem;font-weight:700;letter-spacing:0.06em;
+  text-transform:uppercase;color:var(--teal2);
+  padding:0.55rem 1rem;border-radius:7px;
+  background:rgba(0,201,167,0.08);
+  border:1.5px solid rgba(0,201,167,0.25);
+  text-decoration:none;
+  transition:all 0.2s;align-self:flex-start;
+}
+.card-cta:hover {
+  background:var(--teal2);color:#fff;border-color:var(--teal2);
+}
+
+/* WIDE CARD spans 2 cols */
+.card-wide { grid-column: span 2; }
+.card-wide .card-desc { max-width:520px; }
+.card-wide .card-body { flex-direction:column; }
+
+/* ── ABOUT STRIP ── */
+.about-strip {
+  background: var(--ink2);
+  color:#fff;
+  position:relative;z-index:1;
+}
+.about-inner {
+  max-width:1200px;margin:0 auto;
+  padding:5rem 2.5rem;
+  display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;
+}
+.about-label {
+  font-family:'DM Mono',monospace;font-size:0.7rem;
+  letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:1rem;
+}
+.about-heading {
+  font-family:'Fraunces',serif;
+  font-size:2.2rem;font-weight:700;line-height:1.15;
+  letter-spacing:-0.02em;margin-bottom:1.25rem;
+}
+.about-heading em { font-style:italic;color:var(--teal); }
+.about-body {
+  font-size:0.95rem;color:rgba(255,255,255,0.65);line-height:1.8;
+  margin-bottom:1.5rem;
+}
+.about-skills {
+  display:flex;flex-wrap:wrap;gap:0.5rem;
+}
+.about-skill {
+  font-size:0.72rem;font-weight:600;letter-spacing:0.05em;
+  padding:0.3rem 0.75rem;border-radius:20px;
+  background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7);
+  border:1px solid rgba(255,255,255,0.1);
+}
+.about-right { }
+.target-grid {
+  display:grid;grid-template-columns:1fr 1fr;gap:1rem;
+}
+.target-card {
+  padding:1.25rem;border-radius:12px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+}
+.target-logo {
+  font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;
+  margin-bottom:0.5rem;
+}
+.target-desc {
+  font-size:0.75rem;color:rgba(255,255,255,0.5);line-height:1.6;
+}
 
 /* ── CONTACT ── */
-.contact-bar{
-  background:linear-gradient(135deg,rgba(232,150,15,.15),rgba(88,166,255,.08));
-  border:1px solid rgba(232,150,15,.2);border-radius:12px;
-  padding:28px 36px;display:flex;align-items:center;gap:24px;
+.contact-strip {
+  position:relative;z-index:1;
+  background:var(--cream);
+}
+.contact-inner {
+  max-width:1200px;margin:0 auto;
+  padding:5rem 2.5rem;
+  display:flex;align-items:center;justify-content:space-between;gap:2rem;
   flex-wrap:wrap;
 }
-.contact-title{font-family:var(--serif);font-size:22px;color:var(--text);flex:1;min-width:200px;}
-.contact-links{display:flex;gap:12px;flex-wrap:wrap;}
-.contact-link{
-  display:flex;align-items:center;gap:7px;
-  font-family:var(--mono);font-size:10px;letter-spacing:1px;
-  padding:8px 16px;border-radius:6px;text-decoration:none;
-  border:1px solid var(--border);color:var(--text2);
-  background:var(--bg2);transition:.2s;
+.contact-left .contact-heading {
+  font-family:'Fraunces',serif;
+  font-size:2rem;font-weight:700;letter-spacing:-0.02em;
+  margin-bottom:0.5rem;
 }
-.contact-link:hover{border-color:var(--gold);color:var(--gold);}
+.contact-left p { font-size:0.95rem;color:var(--slate);max-width:400px; }
+.contact-links { display:flex;gap:0.75rem;flex-wrap:wrap; }
+.contact-btn {
+  display:inline-flex;align-items:center;gap:0.5rem;
+  padding:0.65rem 1.4rem;border-radius:8px;
+  font-size:0.82rem;font-weight:600;letter-spacing:0.04em;
+  text-decoration:none;text-transform:uppercase;
+  transition:all 0.2s;
+}
+.contact-btn.dark { background:var(--ink);color:#fff; }
+.contact-btn.dark:hover { background:var(--teal2);transform:translateY(-1px); }
+.contact-btn.outline { border:1.5px solid rgba(0,0,0,0.15);color:var(--ink); }
+.contact-btn.outline:hover { border-color:var(--teal);color:var(--teal2);transform:translateY(-1px); }
 
 /* ── FOOTER ── */
-.footer{
-  text-align:center;padding:28px;
-  font-family:var(--mono);font-size:10px;color:var(--text3);
-  border-top:1px solid var(--border);position:relative;z-index:1;
-  letter-spacing:1px;
+footer {
+  position:relative;z-index:1;
+  background:var(--ink);color:rgba(255,255,255,0.4);
+  text-align:center;padding:1.5rem;
+  font-size:0.72rem;letter-spacing:0.08em;font-family:'DM Mono',monospace;
 }
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.acard{animation:fadeUp .4s ease both;}
-.acard:nth-child(2){animation-delay:.07s}
-.acard:nth-child(3){animation-delay:.14s}
-.acard:nth-child(4){animation-delay:.21s}
-.acard:nth-child(5){animation-delay:.28s}
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity:0;transform:translateY(24px); }
+  to   { opacity:1;transform:translateY(0); }
+}
+.hero-left > * {
+  animation: fadeUp 0.6s ease both;
+}
+.hero-eyebrow { animation-delay:0.1s; }
+.hero-name    { animation-delay:0.2s; }
+.hero-title   { animation-delay:0.28s; }
+.hero-desc    { animation-delay:0.36s; }
+.hero-tags    { animation-delay:0.44s; }
+.hero-ctas    { animation-delay:0.52s; }
+.hero-metrics { animation: fadeUp 0.7s 0.3s ease both; }
+
+.artifact-card {
+  animation: fadeUp 0.5s ease both;
+}
+.artifact-card:nth-child(1) { animation-delay:0.05s; }
+.artifact-card:nth-child(2) { animation-delay:0.12s; }
+.artifact-card:nth-child(3) { animation-delay:0.19s; }
+.artifact-card:nth-child(4) { animation-delay:0.26s; }
+.artifact-card:nth-child(5) { animation-delay:0.33s; }
+.artifact-card:nth-child(6) { animation-delay:0.40s; }
+.artifact-card:nth-child(7) { animation-delay:0.47s; }
+
+@media(max-width:900px){
+  .hero { grid-template-columns:1fr;gap:3rem;padding:4rem 1.5rem 3rem; }
+  .artifact-grid { grid-template-columns:1fr; }
+  .card-wide { grid-column:span 1; }
+  .about-inner { grid-template-columns:1fr;gap:3rem;padding:4rem 1.5rem; }
+  .target-grid { grid-template-columns:1fr 1fr; }
+  nav { padding:0 1.5rem; }
+  .nav-links { display:none; }
+  .section { padding:4rem 1.5rem; }
+}
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav class="nav">
-  <div class="nav-logo">SK · AI PM</div>
-  <div class="nav-links">
-    <a class="nav-link" href="#artifacts">Portfolio</a>
-    <a class="nav-link" href="#about">About</a>
-    <a class="nav-link" href="#contact">Contact</a>
+<nav>
+  <div class="nav-brand">
+    <div class="nav-dot"></div>
+    Sandeep Kumar
   </div>
-  <a class="nav-cta" href="#contact">HIRE ME</a>
+  <div class="nav-links">
+    <a href="#artifacts">Portfolio</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <a href="#contact" class="nav-cta">Hire Me</a>
 </nav>
 
 <!-- HERO -->
-<section class="hero">
-  <div class="hero-eyebrow">AI Product Manager · Portfolio</div>
-  <h1 class="hero-name">Sandeep Kumar<br><em>AI Product Manager</em></h1>
-  <p class="hero-title">TRANSIT & MOBILITY · AGENTIC AI · RAG ARCHITECTURES · RESPONSIBLE AI</p>
-  <p class="hero-desc">10+ years in product ownership and business analysis. Currently building AI-powered transit systems at Cyient, Hyderabad. Targeting Senior AI PM roles at Google and Microsoft.</p>
-  <div class="hero-tags">
-    <span class="hero-tag">LangGraph</span>
-    <span class="hero-tag">RAG / Vector Search</span>
-    <span class="hero-tag">MCP Protocol</span>
-    <span class="hero-tag">NeMo Guardrails</span>
-    <span class="hero-tag">HITL Design</span>
-    <span class="hero-tag">SAFe / PI Planning</span>
-    <span class="hero-tag">OKRs</span>
-    <span class="hero-tag">Azure AI</span>
-    <span class="hero-tag">GPT-4o</span>
-    <span class="hero-tag">RICE · MoSCoW</span>
+<section class="hero" id="home">
+  <div class="hero-left">
+    <div class="hero-eyebrow">AI Product Manager · Portfolio</div>
+    <h1 class="hero-name">Sandeep Kumar<br><em>AI Product Manager</em></h1>
+    <div class="hero-title">Transit &amp; Mobility · Agentic AI · RAG · Responsible AI</div>
+    <p class="hero-desc">
+      10+ years in product ownership and business analysis. Building production-scale AI systems at Cyient, Hyderabad — from discovery and stakeholder alignment to LangGraph architecture, NeMo Guardrails, and enterprise deployment.
+    </p>
+    <div class="hero-tags">
+      <span class="tag accent">LangGraph</span>
+      <span class="tag accent">RAG / Vector Search</span>
+      <span class="tag accent">MCP Protocol</span>
+      <span class="tag accent">NeMo Guardrails</span>
+      <span class="tag">HITL Design</span>
+      <span class="tag">SAFe / PI Planning</span>
+      <span class="tag">Azure OpenAI</span>
+      <span class="tag">RICE · MoSCoW</span>
+    </div>
+    <div class="hero-ctas">
+      <a href="#artifacts" class="btn-primary">View Portfolio ↓</a>
+      <a href="#contact" class="btn-ghost">Get in Touch</a>
+    </div>
   </div>
-  <div class="hero-stats">
-    <div><div class="hstat-v" style="color:var(--green)">$1.84M</div><div class="hstat-l">ANNUAL ROI</div></div>
-    <div><div class="hstat-v" style="color:var(--blue)">94.2%</div><div class="hstat-l">STRAIGHT-THROUGH</div></div>
-    <div><div class="hstat-v" style="color:var(--gold)">4.7</div><div class="hstat-l">CSAT (WAS 2.8)</div></div>
-    <div><div class="hstat-v" style="color:var(--purple)">87s</div><div class="hstat-l">RESOLUTION TIME</div></div>
+
+  <div class="hero-metrics">
+    <div class="metric-card featured">
+      <div>
+        <div class="metric-val">$1.84M</div>
+        <div class="metric-lbl">Annual ROI — Refund Agent</div>
+      </div>
+      <div class="feat-right">
+        <div class="metric-val">$20.6M</div>
+        <div class="metric-lbl">Annual Value — Promotions Engine</div>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">94.2%</div>
+      <div class="metric-lbl">Straight-Through Rate</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">4.7</div>
+      <div class="metric-lbl">CSAT (was 2.8)</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">97%</div>
+      <div class="metric-lbl">Processing Time Reduction</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">0</div>
+      <div class="metric-lbl">Policy Violations Post-Launch</div>
+    </div>
   </div>
 </section>
 
+<div class="divider"></div>
+
 <!-- ARTIFACTS -->
-<div class="section" id="artifacts">
-  <div class="section-label">Flagship Project · Autonomous Transit Refund Agent · 5 Portfolio Artifacts</div>
+<section class="section" id="artifacts">
+  <div class="section-label">Flagship Project · Autonomous Transit Refund Agent</div>
+  <h2 class="section-heading">7 Production-Grade Portfolio Artifacts</h2>
+  <p class="section-sub">Every artifact below is an interactive, PM-authored deliverable — from discovery through architecture, testing, and live dashboard. Click any card to open it.</p>
 
-  <div class="cards">
+  <div class="artifact-grid">
 
-    <!-- Card 1: Product Roadmap -->
-    <a class="acard" href="ProductRoadmap_TransitRefundAgent.html"
-       style="--ac:#e8960f;--ac1:#7a5c00;--ac2:#4a3800;">
-      <div class="acard-header">
-        <div class="acard-num">ARTIFACT 01 · PM STRATEGY</div>
-        <span class="acard-icon">🗺️</span>
-        <div class="acard-title">Product Roadmap</div>
-        <div class="acard-subtitle">MoSCoW · RICE Scoring · Value vs Effort · User Personas · 4-Quarter Plan</div>
-      </div>
-      <div class="acard-body">
-        <p class="acard-desc">A complete PM product roadmap — 5 user personas (Rider, Ops Supervisor, Finance, Legal, VP Ops), 28 requirements in user-story format, MoSCoW prioritisation across 4 buckets, interactive Value vs Effort matrix, RICE scoring for all 24 features, and a 5-swimlane 4-quarter roadmap.</p>
-        <div class="acard-tags">
-          <span class="acard-tag" style="background:rgba(232,150,15,.15);color:var(--gold);">5 PERSONAS</span>
-          <span class="acard-tag" style="background:rgba(232,150,15,.15);color:var(--gold);">28 REQUIREMENTS</span>
-          <span class="acard-tag" style="background:rgba(232,150,15,.15);color:var(--gold);">RICE SCORING</span>
-          <span class="acard-tag" style="background:rgba(232,150,15,.15);color:var(--gold);">MoSCoW</span>
+    <!-- CARD 1: PM Discovery Deck -->
+    <a class="artifact-card" href="https://sandeepreddy27ba-blip.github.io/ai-pm-portfolio-sandeep27/1.PM_Discovery_Deck_RefundAgent.html" target="_blank">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-num">Artifact 01 · PM Strategy</div>
+        <div class="card-icon">🔍</div>
+        <div class="card-title">PM Discovery Deck</div>
+        <div class="card-subtitle">CSAT Analysis · ROI Model · PRD v1.0</div>
+        <p class="card-desc">The investigation that justified the build. CSAT deep-dive (200 tickets, 73% finding), 12 stakeholder interviews using JTBD framework, 2-day ops process shadow (47 refunds observed), error quantification ($380K/yr), ROI model ($1.84M), and PRD v1.0 with 10 data-traced requirements.</p>
+        <div class="card-chips">
+          <span class="chip hi">Discovery</span>
+          <span class="chip hi">ROI Model</span>
+          <span class="chip hi">PRD v1.0</span>
+          <span class="chip">JTBD</span>
+          <span class="chip">Stakeholder Interviews</span>
         </div>
-        <div class="acard-metrics">
-          <div><div class="am-val" style="color:var(--gold)">28</div><div class="am-lbl">USER STORIES</div></div>
-          <div><div class="am-val" style="color:var(--gold)">4</div><div class="am-lbl">QUARTERS PLANNED</div></div>
+        <div class="card-stats">
+          <div class="stat-item"><div class="stat-val">73%</div><div class="stat-lbl">Key Insight</div></div>
+          <div class="stat-item"><div class="stat-val">$1.84M</div><div class="stat-lbl">ROI Modelled</div></div>
         </div>
-        <div class="acard-btn" style="background:var(--gold);">VIEW ROADMAP</div>
+        <span class="card-cta">View Discovery ↗</span>
       </div>
     </a>
 
-    <!-- Card 2: PDLC -->
-    <a class="acard" href="PDLC_TransitRefundAgent.html"
-       style="--ac:#58a6ff;--ac1:#1a3a5c;--ac2:#0d2240;">
-      <div class="acard-header">
-        <div class="acard-num">ARTIFACT 02 · LIFECYCLE</div>
-        <span class="acard-icon">🏗️</span>
-        <div class="acard-title">Product Development Lifecycle</div>
-        <div class="acard-subtitle">14-Month PDLC · 5 Phases · Sprint Board · Shadow System · Launch</div>
-      </div>
-      <div class="acard-body">
-        <p class="acard-desc">Full lifecycle from a 2.8 CSAT score to a production AI system. Covers ideation (CSAT deep-dive, stakeholder interviews, ROI model), design (5 ADRs, MCP contracts, RAI framework), 8-sprint development, 90-day shadow testing, and post-launch optimization experiments.</p>
-        <div class="acard-tags">
-          <span class="acard-tag" style="background:var(--blue2);color:var(--blue);">5 PHASES</span>
-          <span class="acard-tag" style="background:var(--blue2);color:var(--blue);">8 SPRINTS</span>
-          <span class="acard-tag" style="background:var(--blue2);color:var(--blue);">90-DAY SHADOW</span>
-          <span class="acard-tag" style="background:var(--blue2);color:var(--blue);">GANTT CHARTS</span>
+    <!-- CARD 2: Product Roadmap -->
+    <a class="artifact-card" href="https://sandeepreddy27ba-blip.github.io/ai-pm-portfolio-sandeep27/2.ProductRoadmap_TransitRefundAgent.html" target="_blank">
+      <div class="card-accent gold"></div>
+      <div class="card-body">
+        <div class="card-num">Artifact 02 · PM Strategy</div>
+        <div class="card-icon">🗺️</div>
+        <div class="card-title">Product Roadmap</div>
+        <div class="card-subtitle">MoSCoW · RICE Scoring · 4-Quarter Plan</div>
+        <p class="card-desc">A complete PM roadmap — 5 user personas (Rider, Ops Supervisor, Finance, Legal, VP Ops), 28 requirements in user-story format, MoSCoW prioritisation, interactive Value vs Effort matrix, RICE scoring for 24 features, and a 5-swimlane 4-quarter delivery plan.</p>
+        <div class="card-chips">
+          <span class="chip hi">MoSCoW</span>
+          <span class="chip hi">RICE Scoring</span>
+          <span class="chip">5 Personas</span>
+          <span class="chip">Value vs Effort</span>
         </div>
-        <div class="acard-metrics">
-          <div><div class="am-val" style="color:var(--blue)">14mo</div><div class="am-lbl">DISCOVERY TO LAUNCH</div></div>
-          <div><div class="am-val" style="color:var(--blue)">68</div><div class="am-lbl">TEST CASES</div></div>
+        <div class="card-stats">
+          <div class="stat-item"><div class="stat-val">28</div><div class="stat-lbl">User Stories</div></div>
+          <div class="stat-item"><div class="stat-val">4</div><div class="stat-lbl">Quarters Planned</div></div>
         </div>
-        <div class="acard-btn" style="background:var(--blue);">VIEW PDLC</div>
+        <span class="card-cta">View Roadmap ↗</span>
       </div>
     </a>
 
-    <!-- Card 3: LangGraph -->
-    <a class="acard" href="LangGraph_Architecture_RefundAgent.html"
-       style="--ac:#3fb950;--ac1:#1a4a28;--ac2:#0d3018;">
-      <div class="acard-header">
-        <div class="acard-num">ARTIFACT 03 · ARCHITECTURE</div>
-        <span class="acard-icon">🔗</span>
-        <div class="acard-title">LangGraph Agent Architecture</div>
-        <div class="acard-subtitle">6-Agent Topology · HITL · Checkpointing · NeMo Guardrails · AgentState</div>
-      </div>
-      <div class="acard-body">
-        <p class="acard-desc">PM-authored system architecture for a 6-agent LangGraph orchestration system. Covers agent topology, conditional routing paths, HITL interrupt/resume design, crash recovery via checkpointing, AgentState schema (14 fields), and NeMo guardrail integration. Written for engineering-adjacent PM roles.</p>
-        <div class="acard-tags">
-          <span class="acard-tag" style="background:var(--green2);color:var(--green);">LANGGRAPH</span>
-          <span class="acard-tag" style="background:var(--green2);color:var(--green);">6 AGENTS</span>
-          <span class="acard-tag" style="background:var(--green2);color:var(--green);">HITL DESIGN</span>
-          <span class="acard-tag" style="background:var(--green2);color:var(--green);">RAG</span>
+    <!-- CARD 3: PDLC -->
+    <a class="artifact-card" href="https://sandeepreddy27ba-blip.github.io/ai-pm-portfolio-sandeep27/2.PDLC_TransitRefundAgent.html" target="_blank">
+      <div class="card-accent blue"></div>
+      <div class="card-body">
+        <div class="card-num">Artifact 03 · Lifecycle</div>
+        <div class="card-icon">🏗️</div>
+        <div class="card-title">Product Development Lifecycle</div>
+        <div class="card-subtitle">14-Month PDLC · 5 Phases · 8 Sprints</div>
+        <p class="card-desc">Full lifecycle from a 2.8 CSAT score to a production AI system. Covers ideation (CSAT deep-dive, stakeholder interviews, ROI model), design (5 ADRs, MCP contracts, RAI framework), 8-sprint development, 90-day shadow testing, and post-launch optimisation experiments.</p>
+        <div class="card-chips">
+          <span class="chip hi">5 Phases</span>
+          <span class="chip hi">8 Sprints</span>
+          <span class="chip">90-Day Shadow</span>
+          <span class="chip">ADRs</span>
+          <span class="chip">Gantt Charts</span>
         </div>
-        <div class="acard-metrics">
-          <div><div class="am-val" style="color:var(--green)">6</div><div class="am-lbl">AGENT NODES</div></div>
-          <div><div class="am-val" style="color:var(--green)">85%</div><div class="am-lbl">CONFIDENCE GATE</div></div>
+        <div class="card-stats">
+          <div class="stat-item"><div class="stat-val">14mo</div><div class="stat-lbl">Discovery to Launch</div></div>
+          <div class="stat-item"><div class="stat-val">5</div><div class="stat-lbl">ADRs Documented</div></div>
         </div>
-        <div class="acard-btn" style="background:var(--green);">VIEW ARCHITECTURE</div>
-      </div>
-    </a>
-
-    <!-- Card 4: MCP -->
-    <a class="acard" href="MCP_Architecture_RefundAgent.html"
-       style="--ac:#bc8cff;--ac1:#3d1a6b;--ac2:#280f4a;">
-      <div class="acard-header">
-        <div class="acard-num">ARTIFACT 04 · INTEGRATION</div>
-        <span class="acard-icon">⬡</span>
-        <div class="acard-title">MCP Server Architecture</div>
-        <div class="acard-subtitle">6 MCP Servers · Tool Contracts · stdio + SSE · $500 Cap · PII Boundary</div>
-      </div>
-      <div class="acard-body">
-        <p class="acard-desc">PM-authored MCP protocol architecture replacing 36 bespoke integrations with 6 standardised server contracts. Covers tool definitions, JSON Schema contracts, transport selection (stdio vs SSE), financial cap enforcement at API layer, and PII tokenization boundary design.</p>
-        <div class="acard-tags">
-          <span class="acard-tag" style="background:var(--purple2);color:var(--purple);">MCP PROTOCOL</span>
-          <span class="acard-tag" style="background:var(--purple2);color:var(--purple);">6 SERVERS</span>
-          <span class="acard-tag" style="background:var(--purple2);color:var(--purple);">24 TOOLS</span>
-          <span class="acard-tag" style="background:var(--purple2);color:var(--purple);">SECURITY</span>
-        </div>
-        <div class="acard-metrics">
-          <div><div class="am-val" style="color:var(--purple)">6</div><div class="am-lbl">MCP SERVERS</div></div>
-          <div><div class="am-val" style="color:var(--purple)">$500</div><div class="am-lbl">API CAP ENFORCED</div></div>
-        </div>
-        <div class="acard-btn" style="background:var(--purple);">VIEW MCP DESIGN</div>
+        <span class="card-cta">View PDLC ↗</span>
       </div>
     </a>
 
-    <!-- Card 5: PM Discovery -->
-    <a class="acard" href="PM_Discovery_Deck_RefundAgent.html"
-       style="--ac:#f85149;--ac1:#6b1a14;--ac2:#4a0f0d;">
-      <div class="acard-header">
-        <div class="acard-num">ARTIFACT 05 · DISCOVERY</div>
-        <span class="acard-icon">🔍</span>
-        <div class="acard-title">PM Discovery Deck</div>
-        <div class="acard-subtitle">CSAT Analysis · Ops Shadow · ROI Model · Stakeholder Interviews · PRD</div>
+    <!-- CARD 4: LangGraph Architecture — WIDE -->
+    <a class="artifact-card card-wide" href="https://sandeepreddy27ba-blip.github.io/ai-pm-portfolio-sandeep27/3.1Generic_LangGraph_Architecture_Diagram.html" target="_blank">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-num">Artifact 04 · Architecture</div>
+        <div class="card-icon">🔀</div>
+        <div class="card-title">LangGraph Agent Architecture</div>
+        <div class="card-subtitle">6-Agent Topology · State Machine · HITL · NeMo Guardrails · AgentState</div>
+        <p class="card-desc">PM-authored system architecture for a 6-agent LangGraph orchestration system. Covers agent topology, conditional routing paths, HITL interrupt/resume design, crash recovery via checkpointing, AgentState schema (14 fields), and NeMo guardrail integration. Four interactive views: Graph Flow, Sequence Diagram, Step-by-Step, and Concepts Glossary.</p>
+        <div class="card-chips">
+          <span class="chip hi">LangGraph</span>
+          <span class="chip hi">6 Agents</span>
+          <span class="chip hi">HITL Design</span>
+          <span class="chip hi">RAG</span>
+          <span class="chip">AgentState Schema</span>
+          <span class="chip">Conditional Edges</span>
+          <span class="chip">MCP Protocol</span>
+          <span class="chip">NeMo Guardrails</span>
+        </div>
+        <div class="card-stats">
+          <div class="stat-item"><div class="stat-val">6</div><div class="stat-lbl">Agent Nodes</div></div>
+          <div class="stat-item"><div class="stat-val">85%</div><div class="stat-lbl">Confidence Gate</div></div>
+        </div>
+        <span class="card-cta">View Architecture ↗</span>
       </div>
-      <div class="acard-body">
-        <p class="acard-desc">The investigation that justified the build. CSAT deep-dive (200 tickets, 73% finding), 12 stakeholder interviews (JTBD framework), 2-day ops process shadow (47 refunds observed), error quantification ($380K/yr), ROI model ($1.84M), and PRD v1.0 with 10 data-traced requirements.</p>
-        <div class="acard-tags">
-          <span class="acard-tag" style="background:var(--red2);color:var(--red);">DISCOVERY</span>
-          <span class="acard-tag" style="background:var(--red2);color:var(--red);">ROI MODEL</span>
-          <span class="acard-tag" style="background:var(--red2);color:var(--red);">PRD v1.0</span>
-          <span class="acard-tag" style="background:var(--red2);color:var(--red);">JTBD</span>
+    </a>
+
+    <!-- CARD 5: MCP Architecture -->
+    <a class="artifact-card" href="https://sandeepreddy27ba-blip.github.io/ai-pm-portfolio-sandeep27/3.2MCP_Architecture_RefundAgent.html" target="_blank">
+      <div class="card-accent purple"></div>
+      <div class="card-body">
+        <div class="card-num">Artifact 05 · Integration</div>
+        <div class="card-icon">⬡</div>
+        <div class="card-title">MCP Server Architecture</div>
+        <div class="card-subtitle">6 MCP Servers · 24 Tools · $500 Cap · PII Boundary</div>
+        <p class="card-desc">PM-authored MCP protocol architecture replacing 36 bespoke integrations with 6 standardised server contracts. Covers tool definitions, JSON Schema contracts, transport selection (stdio vs SSE), financial cap enforcement at the API layer, and PII tokenization boundary design.</p>
+        <div class="card-chips">
+          <span class="chip hi">MCP Protocol</span>
+          <span class="chip hi">6 Servers</span>
+          <span class="chip hi">24 Tools</span>
+          <span class="chip">Security</span>
+          <span class="chip">PII Boundary</span>
         </div>
-        <div class="acard-metrics">
-          <div><div class="am-val" style="color:var(--red)">73%</div><div class="am-lbl">KEY INSIGHT</div></div>
-          <div><div class="am-val" style="color:var(--red)">$1.84M</div><div class="am-lbl">ROI MODELLED</div></div>
+        <div class="card-stats">
+          <div class="stat-item"><div class="stat-val">6</div><div class="stat-lbl">MCP Servers</div></div>
+          <div class="stat-item"><div class="stat-val">$500</div><div class="stat-lbl">API Cap Enforced</div></div>
         </div>
-        <div class="acard-btn" style="background:var(--red);">VIEW DISCOVERY</div>
+        <span class="card-cta">View MCP Design ↗</span>
+      </div>
+    </a>
+
+    <!-- CARD 6: Test Cases & Node Logs -->
+    <a class="artifact-card" href="https://sandeepreddy27ba-blip.github.io/ai-pm-portfolio-sandeep27/4.TestCases_NodeLogs_RefundAgent.html" target="_blank">
+      <div class="card-accent orange"></div>
+      <div class="card-body">
+        <div class="card-num">Artifact 06 · Test Strategy</div>
+        <div class="card-icon">🧪</div>
+        <div class="card-title">Test Cases &amp; Node Logs</div>
+        <div class="card-subtitle">87 Test Cases · Live Log Simulator · 7 Layers</div>
+        <p class="card-desc">Full test strategy across 7 layers: unit, integration, E2E, guardrail, Responsible AI, performance, and chaos. Includes a live log simulator showing exact structured JSON logs emitted at each LangGraph node per agent — with 6 runnable scenarios including compliance fail, HITL escalation, and fraud detection.</p>
+        <div class="card-chips">
+          <span class="chip hi">87 Test Cases</span>
+          <span class="chip hi">Live Log Sim</span>
+          <span class="chip">Responsible AI</span>
+          <span class="chip">Chaos Tests</span>
+          <span class="chip">Node Logs</span>
+        </div>
+        <div class="card-stats">
+          <div class="stat-item"><div class="stat-val">87</div><div class="stat-lbl">Test Cases</div></div>
+          <div class="stat-item"><div class="stat-val">6</div><div class="stat-lbl">Log Scenarios</div></div>
+        </div>
+        <span class="card-cta">View Test Strategy ↗</span>
+      </div>
+    </a>
+
+    <!-- CARD 7: Live Dashboard — WIDE -->
+    <a class="artifact-card card-wide" href="https://sandeepreddy27ba-blip.github.io/ai-pm-portfolio-sandeep27/5.TransitRefundAgent_Dashboard_Generic.html" target="_blank">
+      <div class="card-accent red"></div>
+      <div class="card-body">
+        <div class="card-num">Artifact 07 · Live Dashboard</div>
+        <div class="card-icon">📊</div>
+        <div class="card-title">Autonomous Refund Agent — Live Dashboard</div>
+        <div class="card-subtitle">Real-time KPIs · Agent Status · Responsible AI · ROI · Roadmap</div>
+        <p class="card-desc">Production-grade 5-tab interactive dashboard simulating a live deployment: real-time KPI cards, agent health monitor, guardrail status, Responsible AI metrics (bias scores, PII compliance, fairness equity), 3-year ROI model ($1.84M annual value, 4.2-month payback), and phase roadmap with OKR tracking.</p>
+        <div class="card-chips">
+          <span class="chip hi">Live KPIs</span>
+          <span class="chip hi">Agent Monitor</span>
+          <span class="chip hi">Responsible AI</span>
+          <span class="chip">ROI Model</span>
+          <span class="chip">5 Tabs</span>
+          <span class="chip">Guardrail Health</span>
+          <span class="chip">RLHF Metrics</span>
+        </div>
+        <div class="card-stats">
+          <div class="stat-item"><div class="stat-val">$1.84M</div><div class="stat-lbl">Annual ROI</div></div>
+          <div class="stat-item"><div class="stat-val">94.2%</div><div class="stat-lbl">Straight-Through Rate</div></div>
+        </div>
+        <span class="card-cta">Open Live Dashboard ↗</span>
       </div>
     </a>
 
   </div>
-</div>
+</section>
+
+<div class="divider"></div>
 
 <!-- ABOUT -->
-<div class="section" id="about">
-  <div class="section-label">About</div>
-  <div class="about">
+<div class="about-strip" id="about">
+  <div class="about-inner">
     <div>
-      <h2 class="about-title">AI Product Manager<br>with Technical Depth</h2>
-      <p class="about-body" style="margin-bottom:14px;">10+ years spanning business analysis, scrum mastery, and product ownership in the Transit & Mobility domain. Currently at Cyient, Hyderabad, building AI-powered products for transit authorities.</p>
-      <p class="about-body" style="margin-bottom:14px;">Focused on the intersection of agentic AI, responsible AI governance, and enterprise product delivery. Comfortable owning the full stack from discovery (CSAT analysis, stakeholder interviews, ROI modelling) to architecture decisions (LangGraph vs LangChain, RAG vs fine-tuning, MCP protocol design) to post-launch experimentation.</p>
-      <p class="about-body">Targeting Senior AI PM roles at large technology companies where deep technical fluency and enterprise product experience combine.</p>
+      <div class="about-label">About</div>
+      <h2 class="about-heading">AI PM with<br><em>Technical Depth</em></h2>
+      <p class="about-body">
+        10+ years spanning business analysis, scrum mastery, and product ownership in the Transit &amp; Mobility domain. Currently at Cyient, Hyderabad, building AI-powered products for transit authorities serving 1.2M+ daily trips.
+      </p>
+      <p class="about-body">
+        Focused on the intersection of agentic AI, responsible AI governance, and enterprise product delivery. Comfortable owning the full stack — from discovery (CSAT analysis, stakeholder interviews, ROI modelling) to architecture decisions (LangGraph, RAG, MCP protocol) to post-launch RLHF experimentation.
+      </p>
+      <div class="about-skills">
+        <span class="about-skill">Agentic AI / LLM Products</span>
+        <span class="about-skill">RAG Architecture</span>
+        <span class="about-skill">LangGraph / LangChain</span>
+        <span class="about-skill">MCP Protocol</span>
+        <span class="about-skill">Responsible AI / NeMo</span>
+        <span class="about-skill">HITL System Design</span>
+        <span class="about-skill">SAFe / PI Planning</span>
+        <span class="about-skill">OKRs / RICE / MoSCoW</span>
+        <span class="about-skill">Azure AI / GPT-4o</span>
+        <span class="about-skill">Transit &amp; Mobility Domain</span>
+      </div>
     </div>
-    <div>
-      <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);margin-bottom:12px;">CORE COMPETENCIES</div>
-      <div class="skills-grid">
-        <div class="skill-item"><div class="skill-dot" style="background:var(--gold)"></div><span class="skill-name">Agentic AI / LLM Products</span></div>
-        <div class="skill-item"><div class="skill-dot" style="background:var(--blue)"></div><span class="skill-name">RAG Architecture</span></div>
-        <div class="skill-item"><div class="skill-dot" style="background:var(--green)"></div><span class="skill-name">LangGraph / LangChain</span></div>
-        <div class="skill-item"><div class="skill-dot" style="background:var(--purple)"></div><span class="skill-name">MCP Protocol</span></div>
-        <div class="skill-item"><div class="skill-dot" style="background:var(--red)"></div><span class="skill-name">Responsible AI / NeMo</span></div>
-        <div class="skill-item"><div class="skill-dot" style="background:var(--gold)"></div><span class="skill-name">HITL System Design</span></div>
-        <div class="skill-item"><div class="skill-dot" style="background:var(--blue)"></div><span class="skill-name">Product Discovery</span></div>
-        <div class="skill-item"><div class="skill-dot" style="background:var(--green)"></div><span class="skill-name">SAFe / PI Planning</span></div>
-        <div class="skill-item"><div class="skill-dot" style="background:var(--purple)"></div><span class="skill-name">OKRs / RICE / MoSCoW</span></div>
-        <div class="skill-item"><div class="skill-dot" style="background:var(--red)"></div><span class="skill-name">Transit & Mobility Domain</span></div>
-        <div class="skill-item"><div class="skill-dot" style="background:var(--gold)"></div><span class="skill-name">Azure AI / GPT-4o</span></div>
-        <div class="skill-item"><div class="skill-dot" style="background:var(--blue)"></div><span class="skill-name">GTFS / Transit Systems</span></div>
+
+    <div class="about-right">
+      <div style="font-size:0.7rem;font-family:'DM Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:var(--teal);margin-bottom:1rem;">Targeting Senior AI PM Roles</div>
+      <div class="target-grid">
+        <div class="target-card">
+          <div class="target-logo" style="color:var(--teal)">Google</div>
+          <div class="target-desc">Responsible AI · Gemini / Vertex fit · RAG at scale · Data-driven OKRs · Maps & Pay domain alignment</div>
+        </div>
+        <div class="target-card">
+          <div class="target-logo" style="color:#50B8FF">Microsoft</div>
+          <div class="target-desc">Azure OpenAI native · Copilot Studio · AI Foundry · Responsible AI framework · Enterprise-grade delivery</div>
+        </div>
+        <div class="target-card" style="grid-column:1/-1">
+          <div style="font-size:0.7rem;font-family:'DM Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.75rem;">Two production AI products shipped</div>
+          <div style="display:flex;gap:2rem;flex-wrap:wrap;">
+            <div>
+              <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:var(--teal);">$20.6M</div>
+              <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);letter-spacing:0.06em;text-transform:uppercase;">AI Promotions Engine</div>
+            </div>
+            <div>
+              <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:var(--teal);">$1.84M</div>
+              <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);letter-spacing:0.06em;text-transform:uppercase;">Autonomous Refund Agent</div>
+            </div>
+            <div>
+              <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:var(--teal);">10+ yrs</div>
+              <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);letter-spacing:0.06em;text-transform:uppercase;">Product Experience</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <!-- CONTACT -->
-<div class="section" id="contact">
-  <div class="section-label">Contact</div>
-  <div class="contact-bar">
-    <div class="contact-title">Open to Senior AI PM<br>opportunities at scale.</div>
+<div class="contact-strip" id="contact">
+  <div class="contact-inner">
+    <div class="contact-left">
+      <h2 class="contact-heading">Open to Senior AI PM<br>opportunities at scale.</h2>
+      <p>Targeting product roles at Google, Microsoft, and other large technology companies where deep technical fluency meets enterprise product delivery.</p>
+    </div>
     <div class="contact-links">
-      <a class="contact-link" href="https://linkedin.com/in/YOUR-LINKEDIN" target="_blank">
-        <span>💼</span> LINKEDIN
-      </a>
-      <a class="contact-link" href="mailto:YOUR-EMAIL">
-        <span>✉️</span> EMAIL
-      </a>
-      <a class="contact-link" href="https://github.com/YOUR-GITHUB" target="_blank">
-        <span>⌥</span> GITHUB
-      </a>
+      <a href="mailto:sandeepreddy27ba@gmail.com" class="contact-btn dark">✉ Email Me</a>
+      <a href="https://github.com/sandeepreddy27ba-blip/ai-pm-portfolio-sandeep27" target="_blank" class="contact-btn outline">⌥ GitHub Portfolio</a>
     </div>
   </div>
 </div>
 
-<footer class="footer">
-  © 2024 SANDEEP KUMAR · AI PM PORTFOLIO · BUILT TO DEMONSTRATE SENIOR AI PM CRAFT
+<!-- FOOTER -->
+<footer>
+  © 2025 Sandeep Kumar · AI PM Portfolio · Built to demonstrate senior AI PM craft
 </footer>
 
 </body>
