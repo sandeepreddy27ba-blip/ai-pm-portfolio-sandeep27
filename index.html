@@ -771,5 +771,29 @@ footer {
   © 2025 Sandeep Kumar · AI PM Portfolio · Built to demonstrate senior AI PM craft
 </footer>
 
+
+<!-- ACCESS RESTRICTED MODAL -->
+<div id="access-modal" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;" aria-modal="true" role="dialog">
+  <div id="access-modal-backdrop" style="position:absolute;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);cursor:pointer;"></div>
+  <div style="position:relative;z-index:1;background:#0f1117;border:1px solid rgba(255,255,255,0.09);border-radius:20px;padding:44px 40px 36px;max-width:400px;width:calc(100% - 32px);text-align:center;box-shadow:0 24px 64px rgba(0,0,0,0.6);animation:modalIn 0.28s cubic-bezier(0.34,1.56,0.64,1) both;">
+    <div style="width:60px;height:60px;margin:0 auto 18px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.28);border-radius:14px;display:flex;align-items:center;justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" fill="#ef4444" opacity="0.18"/><rect x="5" y="11" width="14" height="10" rx="2" stroke="#ef4444" stroke-width="1.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="16" r="1.5" fill="#ef4444"/><line x1="12" y1="17.5" x2="12" y2="19" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+    <p style="font-size:10.5px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#ef4444;margin:0 0 10px;font-family:monospace;">Restricted Access</p>
+    <h2 style="font-size:22px;font-weight:700;color:#f1f5f9;margin:0 0 10px;">Access Restricted</h2>
+    <p style="font-size:13.5px;line-height:1.65;color:#64748b;margin:0 0 28px;">This artifact is currently private.<br>Please reach out directly to request access.</p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <a href="#contact" onclick="closeAccessModal()" style="padding:10px 20px;background:#ef4444;color:#fff;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;">Contact Sandeep</a>
+      <button onclick="closeAccessModal()" style="padding:10px 20px;background:transparent;color:#64748b;border:1px solid rgba(255,255,255,0.12);border-radius:10px;font-size:13px;cursor:pointer;">Close</button>
+    </div>
+  </div>
+</div>
+<style>@keyframes modalIn{from{opacity:0;transform:scale(0.88) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}</style>
+<script>
+function openAccessModal(e){e.preventDefault();e.stopPropagation();var m=document.getElementById('access-modal');m.style.display='flex';document.body.style.overflow='hidden';}
+function closeAccessModal(){document.getElementById('access-modal').style.display='none';document.body.style.overflow='';}
+document.getElementById('access-modal-backdrop').addEventListener('click',closeAccessModal);
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeAccessModal();});
+document.addEventListener('DOMContentLoaded',function(){var r=['1.PM_Discovery_Deck_RefundAgent.html','2.ProductRoadmap_TransitRefundAgent.html'];document.querySelectorAll('a[href]').forEach(function(a){if(r.some(function(x){return(a.getAttribute('href')||'').includes(x);})){a.addEventListener('click',openAccessModal);}});});
+</script>
+<!-- END MODAL -->
 </body>
 </html>
