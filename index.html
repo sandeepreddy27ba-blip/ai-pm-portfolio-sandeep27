@@ -792,7 +792,7 @@ function openAccessModal(e){e.preventDefault();e.stopPropagation();var m=documen
 function closeAccessModal(){document.getElementById('access-modal').style.display='none';document.body.style.overflow='';}
 document.getElementById('access-modal-backdrop').addEventListener('click',closeAccessModal);
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeAccessModal();});
-document.addEventListener('DOMContentLoaded',function(){var r=['1.PM_Discovery_Deck_RefundAgent.html','2.ProductRoadmap_TransitRefundAgent.html','2.PDLC_TransitRefundAgent.html','3.1Generic_LangGraph_Architecture_Diagram.html','3.2MCP_Architecture_RefundAgent.html','4.TestCases_NodeLogs_RefundAgent.html','5.TransitRefundAgent_Dashboard_Generic.html'];document.querySelectorAll('a[href]').forEach(function(a){if(r.some(function(x){return(a.getAttribute('href')||'').includes(x);})){a.addEventListener('click',openAccessModal);}});});
+document.addEventListener('DOMContentLoaded',function(){var r=['2.ProductRoadmap_TransitRefundAgent.html','2.PDLC_TransitRefundAgent.html','3.1Generic_LangGraph_Architecture_Diagram.html','3.2MCP_Architecture_RefundAgent.html','4.TestCases_NodeLogs_RefundAgent.html','5.TransitRefundAgent_Dashboard_Generic.html'];document.querySelectorAll('a[href]').forEach(function(a){if(r.some(function(x){return(a.getAttribute('href')||'').includes(x);})){a.addEventListener('click',openAccessModal);}});});
 </script>
 <!-- END MODAL -->
 </body>
