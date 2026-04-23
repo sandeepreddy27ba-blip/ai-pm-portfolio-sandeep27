@@ -1,0 +1,2955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FinServe Lending — Finance & Banking BA Case Study · Sandeep Kumar</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  /* ── PORTFOLIO-MATCHED DESIGN TOKENS ── */
+  :root {
+    --bg:       #0a0a0f;
+    --bg2:      #111118;
+    --card:     #16161f;
+    --card2:    #1d1d28;
+    --border:   rgba(255,255,255,0.07);
+    --border2:  rgba(255,255,255,0.12);
+    --white:    #f0eff9;
+    --gray1:    #c8c6d8;
+    --gray2:    #8b89a0;
+    --gray3:    #5a5870;
+    --teal:     #00C9A7;
+    --teal-dim: rgba(0,201,167,0.12);
+    --blue:     #50B8FF;
+    --blue-dim: rgba(80,184,255,0.12);
+    --green:    #5CDB95;
+    --green-dim:rgba(92,219,149,0.12);
+    --orange:   #FFB347;
+    --orange-dim:rgba(255,179,71,0.12);
+    --red:      #FF6B6B;
+    --red-dim:  rgba(255,107,107,0.12);
+    --gold:     #F7C948;
+    --accent:   #00C9A7;
+    --r:        8px;
+    --r-lg:     14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--gray1);
+    font-size: 14px;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: rgba(10,10,15,0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-logo {
+    font-family: 'Fraunces', serif;
+    color: var(--white);
+    font-size: 17px;
+    letter-spacing: -0.3px;
+    margin-right: 36px;
+    white-space: nowrap;
+  }
+  .nav-logo span { color: var(--teal); font-style: italic; }
+  .nav-tabs {
+    display: flex;
+    gap: 2px;
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    background: none;
+    border: none;
+    color: var(--gray3);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0 14px;
+    height: 56px;
+    cursor: pointer;
+    transition: color 0.18s, border-bottom 0.18s;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+  }
+  .nav-tab:hover { color: var(--gray1); }
+  .nav-tab.active { color: var(--teal); border-bottom: 2px solid var(--teal); }
+  .nav-badge {
+    background: var(--teal-dim);
+    color: var(--teal);
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 4px;
+    margin-left: 4px;
+    font-weight: 600;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── HERO STRIP ── */
+  .hero {
+    background: linear-gradient(135deg, #0d0d16 0%, #0a0a0f 60%, #0f1220 100%);
+    padding: 36px 32px 30px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,201,167,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 10px;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    color: var(--white);
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .hero h1 em { color: var(--teal); font-style: italic; font-weight: 400; }
+  .hero-sub { color: var(--gray2); font-size: 13px; max-width: 680px; line-height: 1.65; }
+  .hero-pills { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+  .pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    border: 1px solid;
+  }
+  .pill-blue { background: var(--blue-dim); color: var(--blue); border-color: rgba(80,184,255,0.2); }
+  .pill-gold { background: rgba(247,201,72,0.1); color: var(--gold); border-color: rgba(247,201,72,0.2); }
+  .pill-green { background: var(--green-dim); color: var(--green); border-color: rgba(92,219,149,0.2); }
+  .pill-teal { background: var(--teal-dim); color: var(--teal); border-color: rgba(0,201,167,0.2); }
+
+  /* ── CONTENT ── */
+  .content { padding: 28px 32px; max-width: 1280px; }
+  .section { display: none; animation: fadeIn 0.3s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── GRIDS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 20px 22px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--border2); }
+  .card-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--gray3);
+    font-weight: 500;
+    margin-bottom: 14px;
+  }
+  .card h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  /* ── STAT CARDS ── */
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 18px 20px;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: var(--border2); }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--gray3);
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-sub { font-size: 11.5px; color: var(--gray3); }
+  .stat-accent { border-left: 2px solid var(--teal); }
+  .stat-accent .stat-value { color: var(--teal); }
+  .stat-gold { border-left: 2px solid var(--gold); }
+  .stat-gold .stat-value { color: var(--gold); }
+  .stat-green { border-left: 2px solid var(--green); }
+  .stat-green .stat-value { color: var(--green); }
+  .stat-warn { border-left: 2px solid var(--orange); }
+  .stat-warn .stat-value { color: var(--orange); }
+
+  /* ── SECTION HEADERS ── */
+  .sec-header { margin: 28px 0 16px; }
+  .sec-header h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+  .sec-header p { color: var(--gray2); font-size: 13px; }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 14px;
+    padding-top: 4px;
+  }
+
+  /* ── TAGS / BADGES ── */
+  .tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid;
+    letter-spacing: 0.03em;
+  }
+  .tag-blue { background: var(--blue-dim); color: var(--blue); border-color: rgba(80,184,255,0.2); }
+  .tag-gold { background: rgba(247,201,72,0.1); color: var(--gold); border-color: rgba(247,201,72,0.2); }
+  .tag-green { background: var(--green-dim); color: var(--green); border-color: rgba(92,219,149,0.2); }
+  .tag-warn { background: var(--orange-dim); color: var(--orange); border-color: rgba(255,179,71,0.2); }
+  .tag-danger { background: var(--red-dim); color: var(--red); border-color: rgba(255,107,107,0.2); }
+  .tag-gray { background: rgba(255,255,255,0.05); color: var(--gray2); border-color: var(--border); }
+  .tag-teal { background: var(--teal-dim); color: var(--teal); border-color: rgba(0,201,167,0.2); }
+
+  /* ── PROBLEM-SOLUTION ── */
+  .ps-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .ps-problem { background: rgba(255,107,107,0.06); padding: 16px 20px; border-right: 1px solid rgba(255,107,107,0.12); }
+  .ps-solution { background: rgba(0,201,167,0.06); padding: 16px 20px; }
+  .ps-label { font-family: 'DM Mono', monospace; font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.3px; font-weight: 700; margin-bottom: 7px; }
+  .ps-problem .ps-label { color: var(--red); }
+  .ps-solution .ps-label { color: var(--teal); }
+  .ps-text { font-size: 12.5px; line-height: 1.6; color: var(--gray2); }
+
+  /* ── FLOW STEPS ── */
+  .flow-step { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 6px; }
+  .step-num {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--teal-dim); border: 1px solid rgba(0,201,167,0.3);
+    color: var(--teal); font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .step-num.alt { background: var(--orange-dim); border-color: rgba(255,179,71,0.3); color: var(--orange); }
+  .step-num.done { background: var(--green-dim); border-color: rgba(92,219,149,0.3); color: var(--green); }
+  .step-body { flex: 1; }
+  .step-title { font-weight: 600; font-size: 13px; color: var(--white); margin-bottom: 3px; }
+  .step-desc { font-size: 12.5px; color: var(--gray2); line-height: 1.55; }
+  .step-connector { width: 1px; height: 14px; background: var(--border2); margin-left: 14px; }
+
+  /* ── QUESTION CARDS ── */
+  .q-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 18px; margin-bottom: 10px; }
+  .q-category { font-family: 'DM Mono', monospace; font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.3px; font-weight: 700; color: var(--teal); margin-bottom: 8px; }
+  .q-list { list-style: none; padding: 0; }
+  .q-list li { font-size: 12.5px; color: var(--gray2); padding: 5px 0 5px 16px; position: relative; border-bottom: 1px solid var(--border); line-height: 1.55; }
+  .q-list li:last-child { border-bottom: none; }
+  .q-list li::before { content: '?'; position: absolute; left: 0; color: var(--teal); font-weight: 700; font-size: 11px; top: 5px; font-family: 'DM Mono', monospace; }
+
+  /* ── ASSUMPTION CARDS ── */
+  .assumption-card { background: var(--card); border: 1px solid var(--border); border-left: 2px solid var(--gold); border-radius: var(--r); padding: 14px 18px; margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start; }
+  .assumption-num { font-family: 'Fraunces', serif; font-size: 24px; color: var(--gold); line-height: 1; flex-shrink: 0; margin-top: 2px; }
+  .assumption-text { font-size: 12.5px; color: var(--gray2); line-height: 1.6; }
+  .assumption-tag { font-family: 'DM Mono', monospace; font-size: 9.5px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; color: var(--gold); margin-bottom: 4px; }
+
+  /* ── PERSONA ── */
+  .persona-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+  .persona-header { background: var(--card2); padding: 20px 22px; display: flex; gap: 14px; align-items: center; border-bottom: 1px solid var(--border); }
+  .persona-avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--teal-dim); border: 1px solid rgba(0,201,167,0.3); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 18px; color: var(--teal); flex-shrink: 0; }
+  .persona-name { font-family: 'Fraunces', serif; color: var(--white); font-size: 17px; font-weight: 600; margin-bottom: 3px; }
+  .persona-desc { color: var(--gray3); font-size: 11.5px; }
+  .persona-body { padding: 18px 22px; }
+  .persona-section { margin-bottom: 16px; }
+  .persona-section-title { font-family: 'DM Mono', monospace; font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.3px; font-weight: 700; margin-bottom: 8px; color: var(--gray3); }
+  .pain-item { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .pain-item:last-child { border-bottom: none; }
+  .pain-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+  .pain-type { font-family: 'DM Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 2px; }
+  .pain-type.explicit { color: var(--red); }
+  .pain-type.implicit { color: var(--orange); }
+  .pain-text { font-size: 12px; color: var(--gray2); line-height: 1.55; }
+
+  /* ── COMPONENT TABLE ── */
+  .comp-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .comp-table th { text-align: left; font-family: 'DM Mono', monospace; font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--gray3); font-weight: 500; padding: 8px 12px; background: var(--card2); border-bottom: 1px solid var(--border); }
+  .comp-table td { padding: 12px 12px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--gray2); line-height: 1.5; }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .comp-name { font-weight: 600; color: var(--white); font-size: 13px; }
+
+  /* ── USE CASE TABLE ── */
+  .uc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .uc-table tr { border-bottom: 1px solid var(--border); }
+  .uc-table tr:last-child { border-bottom: none; }
+  .uc-key { width: 160px; font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--gray3); font-weight: 500; padding: 12px 16px 12px 0; vertical-align: top; white-space: nowrap; }
+  .uc-val { padding: 12px 0; color: var(--gray2); line-height: 1.65; vertical-align: top; }
+  .uc-val strong { color: var(--white); font-weight: 600; }
+
+  /* ── ALERT ── */
+  .alert { border-radius: var(--r); padding: 12px 16px; font-size: 13px; margin-bottom: 16px; display: flex; gap: 10px; align-items: flex-start; }
+  .alert-blue { background: var(--blue-dim); border: 1px solid rgba(80,184,255,0.2); color: var(--blue); }
+  .alert-gold { background: rgba(247,201,72,0.08); border: 1px solid rgba(247,201,72,0.2); color: var(--gold); }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  /* ── MINI FLOW ── */
+  .mini-flow { display: flex; align-items: center; gap: 0; overflow-x: auto; padding: 4px 0; scrollbar-width: none; }
+  .mini-flow::-webkit-scrollbar { display: none; }
+  .mini-step { background: var(--card2); border: 1px solid var(--border); border-radius: 7px; padding: 9px 13px; font-size: 11.5px; font-weight: 500; color: var(--gray1); white-space: nowrap; flex-shrink: 0; text-align: center; min-width: 100px; }
+  .mini-step.active { background: var(--teal-dim); border-color: rgba(0,201,167,0.3); color: var(--teal); }
+  .mini-step.done { background: var(--green-dim); border-color: rgba(92,219,149,0.25); color: var(--green); }
+  .mini-arrow { color: var(--gray3); font-size: 14px; padding: 0 6px; flex-shrink: 0; }
+
+  /* ── WIREFRAME CHROME ── */
+  .wireframe-frame { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+  .wf-topbar { background: #0f0f1e; height: 38px; display: flex; align-items: center; padding: 0 16px; gap: 6px; border-bottom: 1px solid var(--border); }
+  .wf-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .wf-url { background: rgba(255,255,255,0.05); border-radius: 5px; flex: 1; height: 20px; margin-left: 12px; display: flex; align-items: center; padding-left: 10px; color: rgba(255,255,255,0.25); font-size: 10.5px; font-family: 'DM Mono', monospace; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .ps-row { grid-template-columns: 1fr; }
+    .ps-problem { border-right: none; border-bottom: 1px solid rgba(255,107,107,0.12); }
+    .content { padding: 20px 16px; }
+    nav { padding: 0 16px; }
+    .hero { padding: 24px 16px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Portfolio attribution bar -->
+<div style="background:#050508; border-bottom:1px solid rgba(0,201,167,0.15); padding:8px 32px; display:flex; align-items:center; justify-content:space-between;">
+  <a href="https://sandeepreddy27ba-blip.github.io/ai-pm-portfolio-sandeep27/" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:rgba(255,255,255,0.35); font-family:'DM Mono',monospace; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; transition:color 0.18s;">
+    <span style="color:var(--teal,#00C9A7);">←</span> Sandeep Kumar · AI PM Portfolio
+  </a>
+  <div style="font-family:'DM Mono',monospace; font-size:10px; letter-spacing:1px; text-transform:uppercase; color:rgba(255,255,255,0.2);">Finance & Banking · BA Case Study · Interview Submission</div>
+  <div style="display:flex; gap:12px; align-items:center;">
+    <a href="mailto:sandeepreddy27pm@gmail.com" style="font-family:'DM Mono',monospace; font-size:10px; color:rgba(255,255,255,0.3); text-decoration:none; letter-spacing:0.5px; transition:color 0.18s;">✉ sandeepreddy27pm@gmail.com</a>
+    <span style="color:rgba(255,255,255,0.12);">·</span>
+    <span style="font-family:'DM Mono',monospace; font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:0.5px;">+91 83746 03823</span>
+  </div>
+</div>
+<nav>
+  <div class="nav-logo">Fin<span>Serve</span> Lending</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('overview')">Overview</button>
+    <button class="nav-tab" onclick="showSection('problems')">Problems & Solutions</button>
+    <button class="nav-tab" onclick="showSection('components')">Components <span class="nav-badge">8</span></button>
+    <button class="nav-tab" onclick="showSection('questions')">BA Questions</button>
+    <button class="nav-tab" onclick="showSection('assumptions')">Assumptions <span class="nav-badge">10</span></button>
+    <button class="nav-tab" onclick="showSection('usecase')">Use Case</button>
+    <button class="nav-tab" onclick="showSection('persona')">Persona & Pain Points</button>
+    <button class="nav-tab" onclick="showSection('wireframe')">Wireflow <span class="nav-badge">5</span></button>
+    <button class="nav-tab" onclick="showSection('appflow')">Application Flow</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-meta">Business Analysis · Finance &amp; Banking Case Study</div>
+  <h1>FinServe Lending — <em>IT Transformation</em> Proposal</h1>
+  <div class="hero-sub">A structured BA analysis covering system components, clarifying questions, assumptions, use cases, persona pain points, and full application flow for a US-based financial services company facing borrower management, document processing, and branch operations inefficiencies.</div>
+  <div class="hero-pills">
+    <span class="pill pill-blue">Borrower CRM</span>
+    <span class="pill pill-blue">Document Management</span>
+    <span class="pill pill-blue">Loan Processing</span>
+    <span class="pill pill-gold">Branch Analytics</span>
+    <span class="pill pill-gold">Communication Engine</span>
+    <span class="pill pill-green">10 Assumptions Stated</span>
+    <span class="pill pill-green">8 System Components</span>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ====== OVERVIEW ====== -->
+<div id="overview" class="section active">
+  <div class="alert alert-blue">
+    <span>ℹ</span>
+    <span>This dashboard is structured as a VP-ready BA submission. Navigate tabs above to explore each deliverable. The analysis is scoped strictly to the brief — no assumptions beyond what is stated or logically derivable.</span>
+  </div>
+
+  <div class="grid-4" style="margin-bottom: 24px;">
+    <div class="stat-card stat-accent">
+      <div class="stat-label">Core Problems</div>
+      <div class="stat-value">3</div>
+      <div class="stat-sub">Identified in brief</div>
+    </div>
+    <div class="stat-card stat-gold">
+      <div class="stat-label">System Components</div>
+      <div class="stat-value">8</div>
+      <div class="stat-sub">Recommended modules</div>
+    </div>
+    <div class="stat-card stat-green">
+      <div class="stat-label">BA Questions</div>
+      <div class="stat-value">18</div>
+      <div class="stat-sub">Across 4 categories</div>
+    </div>
+    <div class="stat-card stat-warn">
+      <div class="stat-label">Assumptions</div>
+      <div class="stat-value">10</div>
+      <div class="stat-sub">Clearly stated</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Business Context</div>
+      <p style="font-size:13px; color:var(--gray1); line-height:1.7; margin-bottom: 14px;">
+        A US financial services company headquartered in New York with multiple branch offices faces three compounding operational failures: no structured borrower data capture system, manual and slow document processing, and no visibility into branch-level performance.
+      </p>
+      <p style="font-size:13px; color:var(--gray1); line-height:1.7;">
+        These failures compound each other — poor data capture leads to poor communication, which leads to client frustration, which converts to competitor churn. The operational blindspot at branch level means leadership cannot identify or course-correct these issues in time.
+      </p>
+    </div>
+    <div class="card">
+      <div class="card-title">Proposed IT System — High Level</div>
+      <div class="mini-flow" style="margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+        <div class="mini-step done">Borrower CRM</div>
+        <div class="mini-arrow">→</div>
+        <div class="mini-step done">Loan Portal</div>
+        <div class="mini-arrow">→</div>
+        <div class="mini-step active">Document Mgmt</div>
+        <div class="mini-arrow">→</div>
+        <div class="mini-step">Workflow Engine</div>
+        <div class="mini-arrow">→</div>
+        <div class="mini-step">Comms Engine</div>
+        <div class="mini-arrow">→</div>
+        <div class="mini-step">Branch Dashboard</div>
+      </div>
+      <p style="font-size:13px; color:var(--gray1); line-height:1.65;">
+        The system is designed as an integrated platform — not siloed tools — so that borrower data flows seamlessly from application through processing to decision, with all communication and analytics derived from the same data source.
+      </p>
+    </div>
+  </div>
+
+  <div class="sec-header">
+    <h3>Three Core Problems at a Glance</h3>
+    <p>Each problem maps directly to a solution component in the proposed system.</p>
+  </div>
+
+  <div class="ps-row">
+    <div class="ps-problem">
+      <div class="ps-label">Problem 1 — Borrower Data</div>
+      <div class="ps-text">No structured system to capture borrower details. Communication post-finance is ad hoc, inconsistent, and often non-existent — damaging relationship continuity and repeat business potential.</div>
+    </div>
+    <div class="ps-solution">
+      <div class="ps-label">Solution — Borrower CRM + Communication Engine</div>
+      <div class="ps-text">Centralized borrower profile with lifecycle tracking. Automated event-triggered notifications (email + SMS) at every milestone. All communication logged against borrower record.</div>
+    </div>
+  </div>
+
+  <div class="ps-row">
+    <div class="ps-problem">
+      <div class="ps-label">Problem 2 — Document Processing</div>
+      <div class="ps-text">Manual, slow document handling causes client frustration and churn to competitors. No visibility into which documents are missing, pending, or rejected at any point in the process.</div>
+    </div>
+    <div class="ps-solution">
+      <div class="ps-label">Solution — Document Management System + Workflow Engine</div>
+      <div class="ps-text">Digital upload portal with format validation, virus scanning, classification, and checklist-driven status. SLA clocks on each case. Automated alerts for overdue items. Borrower gets specific, actionable feedback — not generic rejections.</div>
+    </div>
+  </div>
+
+  <div class="ps-row">
+    <div class="ps-problem">
+      <div class="ps-label">Problem 3 — Branch Operations Visibility</div>
+      <div class="ps-text">HQ has no reliable system to track application volumes, processing times, conversion rates, or revenue targets by branch. Management is flying blind on performance.</div>
+    </div>
+    <div class="ps-solution">
+      <div class="ps-label">Solution — Branch Operations Dashboard</div>
+      <div class="ps-text">Real-time dashboard for branch and regional managers. KPIs include: applications received, processed, converted; average cycle time; SLA breach rate; revenue vs. target. Refreshed every 15 minutes during business hours.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== PROBLEMS & SOLUTIONS ====== -->
+<div id="problems" class="section">
+  <div class="sec-header">
+    <h3>Detailed Problem–Solution Mapping</h3>
+    <p>Each identified problem, its root causes, impact, and the corresponding IT solution recommendation.</p>
+  </div>
+
+  <div class="grid-2" style="margin-bottom: 20px;">
+    <div class="card">
+      <div class="card-title">Problem 1 — Borrower Data & Communication</div>
+      <p style="font-size:13px; color:var(--gray1); margin-bottom:12px; line-height:1.65;"><strong style="color:var(--red);">Root cause:</strong> No CRM or structured data store for borrower profiles. Loan officers likely maintain spreadsheets or physical files — not searchable, not shareable, not automated.</p>
+      <p style="font-size:13px; color:var(--gray1); margin-bottom:12px; line-height:1.65;"><strong style="color:var(--red);">Business impact:</strong> Borrowers who financed once are not re-contacted for refinancing, top-up loans, or referral programs. Lost lifetime value. No audit trail of interactions.</p>
+      <p style="font-size:13px; color:var(--gray1); margin-bottom:12px; line-height:1.65;"><strong style="color:var(--green);">Solution:</strong> Centralized Borrower Management Module — persistent profile capturing identity, contact, employment, loan history, communication preferences. Communication Engine sends automated, personalized notifications at every milestone.</p>
+      <div><span class="tag tag-blue">Borrower CRM</span><span class="tag tag-blue">Communication Engine</span><span class="tag tag-green">Phase 1</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Problem 2 — Document Processing Delays</div>
+      <p style="font-size:13px; color:var(--gray1); margin-bottom:12px; line-height:1.65;"><strong style="color:var(--red);">Root cause:</strong> Documents are likely submitted physically or via unmanaged email. Loan officers manually verify format and completeness. No systematic tracking of what is received vs. outstanding.</p>
+      <p style="font-size:13px; color:var(--gray1); margin-bottom:12px; line-height:1.65;"><strong style="color:var(--red);">Business impact:</strong> Processing delays frustrate clients who have time-sensitive purchase decisions. They switch to competitors who offer faster turnaround. Reputational damage compounds over time.</p>
+      <p style="font-size:13px; color:var(--gray1); margin-bottom:12px; line-height:1.65;"><strong style="color:var(--green);">Solution:</strong> Document Management System with digital upload, automated validation, classification, and checklist tracking. Loan Processing Workflow Engine with SLA timers and escalation alerts.</p>
+      <div><span class="tag tag-blue">Document Management</span><span class="tag tag-blue">Workflow Engine</span><span class="tag tag-green">Phase 1</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 20px;">
+    <div class="card-title">Problem 3 — Branch Operations Tracking</div>
+    <div class="grid-2" style="margin-top: 8px;">
+      <div>
+        <p style="font-size:13px; color:var(--gray1); margin-bottom:12px; line-height:1.65;"><strong style="color:var(--red);">Root cause:</strong> Each branch operates in isolation with no standardized reporting structure. HQ cannot aggregate performance data in real time. Management visibility is delayed, inaccurate, or absent.</p>
+        <p style="font-size:13px; color:var(--gray1); line-height:1.65;"><strong style="color:var(--red);">Business impact:</strong> Underperforming branches go unidentified. Best practices from high-performing branches are not replicated. Revenue forecasting is unreliable. Resource allocation is inefficient.</p>
+      </div>
+      <div>
+        <p style="font-size:13px; color:var(--gray1); margin-bottom:12px; line-height:1.65;"><strong style="color:var(--green);">Solution:</strong> Branch Operations Dashboard — real-time aggregation of all application data by branch, region, and product line. Key metrics: volume, processing time, SLA compliance, conversion rate, disbursement value vs. target.</p>
+        <p style="font-size:13px; color:var(--gray1); line-height:1.65;"><strong>Phase 1:</strong> Report-based export for branch managers. <strong>Phase 2:</strong> Interactive real-time dashboard for HQ with drill-down to branch and loan officer level.</p>
+        <div style="margin-top: 10px;"><span class="tag tag-gold">Branch Dashboard</span><span class="tag tag-gold">HQ Analytics</span><span class="tag tag-warn">Phase 1 → Phase 2</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== COMPONENTS ====== -->
+<div id="components" class="section">
+  <div class="sec-header">
+    <h3>System Components & Features</h3>
+    <p>Eight recommended modules that collectively resolve all three identified problems. Each has a defined scope, release phase, and stakeholder owner.</p>
+  </div>
+
+  <div class="card" style="margin-bottom: 20px; padding: 0; overflow: hidden;">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th style="width:30px;">#</th>
+          <th style="width:190px;">Module</th>
+          <th>Key Features</th>
+          <th style="width:100px;">Phase</th>
+          <th style="width:130px;">Stakeholder</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:var(--teal); font-weight:700;">1</td>
+          <td><div class="comp-name">Borrower Management Module</div></td>
+          <td>Centralized borrower profile (identity, contact, employment, income, loan history). Persistent across lifecycle. Single source of truth for all downstream processes. Communication preference capture.</td>
+          <td><span class="tag tag-green">Phase 1</span></td>
+          <td><span class="tag tag-blue">Loan Officers</span><span class="tag tag-blue">Branch Mgr</span></td>
+        </tr>
+        <tr>
+          <td style="color:var(--teal); font-weight:700;">2</td>
+          <td><div class="comp-name">Loan Application Portal</div></td>
+          <td>Multi-step web form (5 steps). Inline validation, session auto-save, application reference number on start. Credit inquiry transparency tooltip. Progress stepper. Resume-from-anywhere link via email.</td>
+          <td><span class="tag tag-green">Phase 1</span></td>
+          <td><span class="tag tag-warn">Borrower</span></td>
+        </tr>
+        <tr>
+          <td style="color:var(--teal); font-weight:700;">3</td>
+          <td><div class="comp-name">Document Management System</div></td>
+          <td>Digital upload (PDF/JPG/PNG, up to 5MB). Automated format validation and virus scan. Document classification (identity, income, collateral). Checklist-driven status (received / pending / verified / rejected). Specific rejection reasons — not generic errors.</td>
+          <td><span class="tag tag-green">Phase 1</span></td>
+          <td><span class="tag tag-blue">Loan Officers</span><span class="tag tag-warn">Borrower</span></td>
+        </tr>
+        <tr>
+          <td style="color:var(--teal); font-weight:700;">4</td>
+          <td><div class="comp-name">Communication Engine</div></td>
+          <td>Event-triggered notifications via email (primary) and SMS (secondary). Personalized messages using borrower name, application ID, and specific next action. Milestones covered: received, doc missing, processing, decision, disbursement. 24-hour re-engagement for abandoned applications.</td>
+          <td><span class="tag tag-green">Phase 1</span></td>
+          <td><span class="tag tag-warn">Borrower</span></td>
+        </tr>
+        <tr>
+          <td style="color:var(--teal); font-weight:700;">5</td>
+          <td><div class="comp-name">Loan Processing Workflow Engine</div></td>
+          <td>Internal tool for loan officers: case queue, task assignment, decision logging, exception escalation. SLA clock per application with auto-alerts for overdue items. Status transitions: submitted → under review → docs pending → approved / rejected / referred.</td>
+          <td><span class="tag tag-green">Phase 1</span></td>
+          <td><span class="tag tag-blue">Loan Officers</span><span class="tag tag-blue">Branch Mgr</span></td>
+        </tr>
+        <tr>
+          <td style="color:var(--teal); font-weight:700;">6</td>
+          <td><div class="comp-name">Branch Operations Dashboard</div></td>
+          <td>Branch and regional KPI tracking: volume, processing time, SLA compliance, conversion rate, disbursement vs. target. Refreshed every 15 min. Phase 1: export-based. Phase 2: interactive real-time with drill-down.</td>
+          <td><span class="tag tag-warn">Phase 1→2</span></td>
+          <td><span class="tag tag-blue">Branch Mgr</span><span class="tag tag-gold">HQ/VP</span></td>
+        </tr>
+        <tr>
+          <td style="color:var(--teal); font-weight:700;">7</td>
+          <td><div class="comp-name">Audit & Compliance Log</div></td>
+          <td>Immutable record of every action on every application: who viewed, edited, approved, rejected, and when. Critical for regulatory compliance (GLBA). Dispute resolution support. Non-editable by any user role.</td>
+          <td><span class="tag tag-green">Phase 1</span></td>
+          <td><span class="tag tag-gold">Compliance</span><span class="tag tag-gold">IT Admin</span></td>
+        </tr>
+        <tr>
+          <td style="color:var(--teal); font-weight:700;">8</td>
+          <td><div class="comp-name">User Roles & Access Control</div></td>
+          <td>Five roles: Borrower (portal only), Loan Officer (own cases), Branch Manager (branch-wide), HQ Operations (cross-branch analytics), IT Admin (system config). Role-based UI: each actor sees only what is relevant to their function.</td>
+          <td><span class="tag tag-green">Phase 1</span></td>
+          <td><span class="tag tag-gold">IT Admin</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="alert alert-gold">
+    <span>⚑</span>
+    <span><strong>Phase 2 enhancements (out of scope for initial release):</strong> OCR & automated document extraction, interactive HQ real-time dashboard, HMDA regulatory reporting module, credit bureau API integration (conditional on availability), native mobile app, Spanish language support.</span>
+  </div>
+</div>
+
+<!-- ====== QUESTIONS ====== -->
+<div id="questions" class="section">
+  <div class="sec-header">
+    <h3>Clarifying Questions for Requirements Elicitation</h3>
+    <p>These are the questions a BA must raise before locking requirements. Unanswered, they represent design risk. Answered, they sharpen solution accuracy.</p>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="q-card">
+        <div class="q-category">Borrower Data & Communication</div>
+        <ul class="q-list">
+          <li>What communication channels do borrowers currently prefer — email, SMS, phone, or in-branch? Does this vary by age segment?</li>
+          <li>Does the company have a preferred CRM or marketing automation platform already in use, or is this greenfield?</li>
+          <li>Should the borrower portal be web-only, or is a mobile app expected within scope?</li>
+          <li>What languages must the system support? Is Spanish required given the US geography?</li>
+          <li>Should the system support co-applicants (e.g., joint home loans between spouses)?</li>
+        </ul>
+      </div>
+      <div class="q-card">
+        <div class="q-category">Document Processing</div>
+        <ul class="q-list">
+          <li>What is the current average document processing turnaround time, and what is the desired SLA target?</li>
+          <li>Are documents reviewed manually today, or is there any existing OCR or extraction tool in use?</li>
+          <li>What regulatory requirements govern document retention — how long must originals be stored?</li>
+          <li>Which document types are mandatory vs. optional per loan product (home loan, personal loan, SME)?</li>
+          <li>Is e-signature acceptable for declarations and consent forms, or are wet signatures required?</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q-card">
+        <div class="q-category">Branch Operations</div>
+        <ul class="q-list">
+          <li>How many branch offices are there, and is data currently in spreadsheets, a legacy system, or not captured at all?</li>
+          <li>Is the HQ view required in real-time, or is a daily-refreshed dashboard acceptable for Phase 1?</li>
+          <li>Should branch staff use the same platform as the borrower, or is a completely separate internal tool needed?</li>
+          <li>Which branch-level KPIs does leadership currently track informally — to ensure the dashboard replaces rather than duplicates?</li>
+        </ul>
+      </div>
+      <div class="q-card">
+        <div class="q-category">Business Context & Integrations</div>
+        <ul class="q-list">
+          <li>What loan products does the company offer? (Home, personal, auto, SME?) Each has distinct document and approval workflows.</li>
+          <li>What is the expected application volume per month, per branch?</li>
+          <li>Are third-party integrations anticipated — credit bureaus (Equifax/Experian/TransUnion), identity verification APIs (e.g., Jumio), e-signature services (DocuSign)?</li>
+          <li>Is there an existing core banking system the new IT platform must integrate with, or is this standalone?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== ASSUMPTIONS ====== -->
+<div id="assumptions" class="section">
+  <div class="sec-header">
+    <h3>Design Assumptions</h3>
+    <p>Stated clearly to make design decisions transparent and allow stakeholders to challenge any assumption before development begins.</p>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="assumption-card">
+        <div class="assumption-num">1</div>
+        <div>
+          <div class="assumption-tag">Loan Products</div>
+          <div class="assumption-text">The company offers at least two loan products: personal loans and home loans. The system is designed to be configurable per product, with its own required document checklist and approval workflow.</div>
+        </div>
+      </div>
+      <div class="assumption-card">
+        <div class="assumption-num">2</div>
+        <div>
+          <div class="assumption-tag">Borrower Portal Scope</div>
+          <div class="assumption-text">The portal will be web-based, desktop-primary, and mobile-responsive. A native mobile app is explicitly out of scope for the initial release.</div>
+        </div>
+      </div>
+      <div class="assumption-card">
+        <div class="assumption-num">3</div>
+        <div>
+          <div class="assumption-tag">CRM — Greenfield</div>
+          <div class="assumption-text">The company does not currently have a functional CRM. The new system will own the borrower profile and communication history from scratch — no data migration from an existing system.</div>
+        </div>
+      </div>
+      <div class="assumption-card">
+        <div class="assumption-num">4</div>
+        <div>
+          <div class="assumption-tag">Document Review — Human-Led (Phase 1)</div>
+          <div class="assumption-text">Document review remains human-led in Phase 1. OCR and automated data extraction are logged as Phase 2 enhancements — not blocking the initial release.</div>
+        </div>
+      </div>
+      <div class="assumption-card">
+        <div class="assumption-num">5</div>
+        <div>
+          <div class="assumption-tag">Communication Channels</div>
+          <div class="assumption-text">Communication is triggered via email (primary) and SMS (secondary). Phone call scheduling is a manual process and out of system scope. WhatsApp and in-app push are Phase 2 considerations.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="assumption-card">
+        <div class="assumption-num">6</div>
+        <div>
+          <div class="assumption-tag">Dashboard Refresh Rate</div>
+          <div class="assumption-text">The branch operations dashboard will show data refreshed at least every 15 minutes during business hours. True real-time streaming is a Phase 2 enhancement.</div>
+        </div>
+      </div>
+      <div class="assumption-card">
+        <div class="assumption-num">7</div>
+        <div>
+          <div class="assumption-tag">Regulatory Compliance</div>
+          <div class="assumption-text">The system must comply with GLBA (Gramm-Leach-Bliley Act) for data privacy and applicable fair lending regulations. HMDA reporting and CFPB-specific modules are Phase 2 scope.</div>
+        </div>
+      </div>
+      <div class="assumption-card">
+        <div class="assumption-num">8</div>
+        <div>
+          <div class="assumption-tag">User Roles — Phase 1</div>
+          <div class="assumption-text">Three roles in Phase 1: Borrower, Loan Officer, Branch Manager. HQ analytics is a report export in Phase 1. Interactive HQ dashboard with drill-down is Phase 2.</div>
+        </div>
+      </div>
+      <div class="assumption-card">
+        <div class="assumption-num">9</div>
+        <div>
+          <div class="assumption-tag">Credit Bureau Integration</div>
+          <div class="assumption-text">Integration with one major credit bureau (Experian) for automated credit score pull is in scope for Phase 1, subject to API availability and legal agreements. If unavailable, manual pull process is the fallback.</div>
+        </div>
+      </div>
+      <div class="assumption-card">
+        <div class="assumption-num">10</div>
+        <div>
+          <div class="assumption-tag">Infrastructure</div>
+          <div class="assumption-text">The system will be deployed on a cloud platform (AWS or Azure) with no dependency on on-premise servers. The existing IT infrastructure is confirmed cloud-ready by the company.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== USE CASE ====== -->
+<div id="usecase" class="section">
+  <div class="sec-header">
+    <h3>Use Case: Submit a Home Loan Application</h3>
+    <p>Scenario — borrower initiates and submits a home loan application through the online portal. This use case covers the primary success flow and four key alternate flows.</p>
+  </div>
+
+  <div class="grid-2" style="margin-bottom: 20px;">
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div style="padding: 18px 22px; background: var(--card2); border-bottom: 1px solid var(--border);">
+        <div class="card-title" style="margin-bottom: 0;">Use Case Metadata</div>
+      </div>
+      <div style="padding: 4px 0;">
+        <table class="uc-table" style="padding: 0 22px; width: calc(100% - 44px); margin: 0 22px;">
+          <tr>
+            <td class="uc-key">Use Case ID</td>
+            <td class="uc-val"><strong>UC-001</strong></td>
+          </tr>
+          <tr>
+            <td class="uc-key">Use Case Name</td>
+            <td class="uc-val">Submit a Home Loan Application</td>
+          </tr>
+          <tr>
+            <td class="uc-key">Primary Actor</td>
+            <td class="uc-val">Borrower (Applicant)</td>
+          </tr>
+          <tr>
+            <td class="uc-key">Secondary Actors</td>
+            <td class="uc-val">Loan Officer (downstream), Notification Engine, Credit Bureau API</td>
+          </tr>
+          <tr>
+            <td class="uc-key">Trigger</td>
+            <td class="uc-val">Borrower navigates to portal and selects "Apply for a Home Loan"</td>
+          </tr>
+          <tr>
+            <td class="uc-key">Precondition</td>
+            <td class="uc-val">Borrower has registered an account and is authenticated. Session timeout is 30 minutes.</td>
+          </tr>
+          <tr>
+            <td class="uc-key">Postcondition</td>
+            <td class="uc-val">Application is in "Submitted — Under Review" status. Loan officer queue updated. Borrower has reference number, assigned contact, and expected decision timeline.</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Application Progress Tracker</div>
+      <div class="mini-flow" style="margin-bottom: 20px;">
+        <div class="mini-step active" style="min-width:90px; font-size:11px;">Personal Info<br/><span style="font-weight:300; font-size:10px;">~3 min</span></div>
+        <div class="mini-arrow">→</div>
+        <div class="mini-step" style="min-width:90px; font-size:11px;">Loan Details<br/><span style="font-weight:300; font-size:10px;">~5 min</span></div>
+        <div class="mini-arrow">→</div>
+        <div class="mini-step" style="min-width:90px; font-size:11px;">Documents<br/><span style="font-weight:300; font-size:10px;">~5 min</span></div>
+        <div class="mini-arrow">→</div>
+        <div class="mini-step" style="min-width:90px; font-size:11px;">Review<br/><span style="font-weight:300; font-size:10px;">~2 min</span></div>
+        <div class="mini-arrow">→</div>
+        <div class="mini-step" style="min-width:90px; font-size:11px;">Decision<br/><span style="font-weight:300; font-size:10px;">3–5 days</span></div>
+      </div>
+      <p style="font-size:12.5px; color:var(--gray2); line-height:1.6;"><strong style="color:var(--white);">Design rationale:</strong> Showing total steps and time estimates upfront is a deliberate UX decision. Research shows that unknown journey length is the primary cause of form abandonment. The borrower must know what they're committing to before they commit.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 20px;">
+    <div class="card-title">Main Success Scenario — Step by Step</div>
+    <div style="margin-top: 4px;">
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Application Initiated — Reference Number Assigned</div>
+          <div class="step-desc">Borrower selects "Apply for a Home Loan." System immediately assigns Application Reference No. (e.g., APP-2024-10482) and displays it prominently. This gives the borrower tangible proof that something real has started — critical for trust.</div>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Progress Stepper Displayed with Time Estimates</div>
+          <div class="step-desc">A 5-step progress bar with estimated time per step is shown at the top. Borrower can see the complete journey before committing. Reduces the cognitive fear of an unknown-length form.</div>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="flow-step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Step 1 — Personal Information with Inline Validation</div>
+          <div class="step-desc">Borrower fills name, DOB, SSN, email, mobile, address, employment status, income. Inline validation fires on blur (field-by-field), not on final submit — errors corrected as they occur, not after a full-page failure message.</div>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="flow-step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Credit Inquiry Transparency — SSN Tooltip</div>
+          <div class="step-desc">When the SSN field is reached, a tooltip appears: "We use this to verify your identity and pull your credit report. This is a soft inquiry and will not affect your credit score at this stage." This single line resolves the borrower's single largest implicit anxiety.</div>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="flow-step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Save Progress — Resume-Link Email Sent</div>
+          <div class="step-desc">If borrower doesn't have all documents ready, they click "Save Progress." System auto-saves and sends a secure resume link via email. Session can be closed. Progress is not lost.</div>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="flow-step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <div class="step-title">Step 3 — Document Upload with Specific Checklist</div>
+          <div class="step-desc">Dynamic checklist: uploaded items show green checkmark, outstanding items show amber, rejected items show red with specific reason (e.g., "Document is blurry — please re-upload a clearer scan"). Not generic "invalid document."</div>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="flow-step">
+        <div class="step-num done">7</div>
+        <div class="step-body">
+          <div class="step-title">Application Submitted — Confirmation Screen + Assigned Officer</div>
+          <div class="step-desc">On-screen confirmation shows: reference number, list of submitted documents, estimated decision timeline (3–5 business days), and name and contact of the assigned loan officer. Email confirmation sent immediately. SMS at 24 hours: "Your application is with your officer. No action needed today."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Alternate Flows & Exception Handling</div>
+    <div style="margin-top: 4px;">
+      <div class="flow-step">
+        <div class="step-num alt">A1</div>
+        <div class="step-body">
+          <div class="step-title">Missing Document on Submission</div>
+          <div class="step-desc">System does not silently reject. It flags the specific document, shows exactly where to upload it, and allows the rest of the application to be submitted with that document logged as pending. Loan officer is notified to follow up proactively — borrower is not left to wonder.</div>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="flow-step">
+        <div class="step-num alt">A2</div>
+        <div class="step-body">
+          <div class="step-title">Session Timeout Warning</div>
+          <div class="step-desc">At the 25-minute mark, in-page warning appears: "Your session expires in 5 minutes. Save your progress now?" One click extends session. All progress entered is auto-saved regardless of whether the warning is seen.</div>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="flow-step">
+        <div class="step-num alt">A3</div>
+        <div class="step-body">
+          <div class="step-title">Borrower Drops Off Mid-Form</div>
+          <div class="step-desc">System triggers re-engagement email at 24 hours: personalized with borrower's name and the specific step they abandoned. Contains a direct deep-link back to that step. Not a generic "complete your application" blast.</div>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="flow-step">
+        <div class="step-num alt">A4</div>
+        <div class="step-body">
+          <div class="step-title">Credit Bureau API Unavailable</div>
+          <div class="step-desc">Application is accepted without credit pull. Loan officer is automatically flagged to initiate manual credit check within 24 hours. Borrower is not made aware — their experience is not degraded by a third-party outage.</div>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="flow-step">
+        <div class="step-num alt">A5</div>
+        <div class="step-body">
+          <div class="step-title">Document Fails Virus Scan</div>
+          <div class="step-desc">File is quarantined. Borrower receives a specific notification: "The file [filename] could not be processed for security reasons. Please re-upload the document from a different device." No technical jargon. Clear action required.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== PERSONA ====== -->
+<div id="persona" class="section">
+  <div class="sec-header">
+    <h3>Persona & Pain Point Analysis</h3>
+    <p>Deep-dive into the primary borrower persona — explicit and implicit pain points, emotional drivers, and design responses for each.</p>
+  </div>
+
+  <div class="grid-2" style="margin-bottom: 24px;">
+    <div class="persona-card">
+      <div class="persona-header">
+        <div class="persona-avatar">RS</div>
+        <div>
+          <div class="persona-name">Ravi Sharma, 34</div>
+          <div class="persona-desc">Software Engineer · Houston, TX · First-time home loan applicant</div>
+        </div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-section">
+          <div class="persona-section-title">Background</div>
+          <p style="font-size:13px; color:var(--gray1); line-height:1.65;">Ravi and his wife have been renting for six years and have finally saved enough for a down payment. He found FinServe via a Google search comparing rates. He is digitally comfortable but financially inexperienced with mortgages. He is comparing three lenders simultaneously — this company is not yet his first choice.</p>
+        </div>
+        <div class="persona-section">
+          <div class="persona-section-title">What Ravi Sees (Eyes)</div>
+          <p style="font-size:13px; color:var(--gray1); line-height:1.65;">He opens the portal on a Tuesday evening after his child is asleep. He immediately scans for: how long this will take, and whether the site looks secure and legitimate. He notices no visible security signal near the SSN field, no explanation of why SSN is needed, and no sense of how many pages he must complete. The form looks generic.</p>
+        </div>
+        <div class="persona-section">
+          <div class="persona-section-title">What Ravi Thinks (Mind)</div>
+          <p style="font-size:13px; color:var(--gray1); line-height:1.65;">He is building a mental scorecard against two competitor sites: "Is this trustworthy? Will I hear back? What if I make a mistake — can I fix it?" He does not know if filling out this form will trigger a hard credit inquiry. That fear alone may cause him to abandon — and he will never explain why.</p>
+        </div>
+        <div class="persona-section">
+          <div class="persona-section-title">What Ravi Feels (Heart)</div>
+          <p style="font-size:13px; color:var(--gray1); line-height:1.65;">Underneath the pragmatic checklist is the emotional weight of a life decision. This is his family's home. He wants to feel that the company he is trusting with his financial details is professional, organized, and will keep him informed. The moment the portal feels cold or opaque — he closes the tab.</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" style="margin-bottom: 16px;">
+        <div class="card-title">Explicit Pain Points <span style="color:var(--gray3); font-size:10px; margin-left: 4px;">— what Ravi would say out loud</span></div>
+        <div class="pain-item">
+          <div class="pain-icon">💬</div>
+          <div>
+            <div class="pain-type explicit">Explicit</div>
+            <div class="pain-text">"I don't know how long this will take." → Design response: progress stepper with time estimates per step shown upfront.</div>
+          </div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">💬</div>
+          <div>
+            <div class="pain-type explicit">Explicit</div>
+            <div class="pain-text">"I don't have all my documents right now — can I save and come back?" → Design response: auto-save with resume-link email.</div>
+          </div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">💬</div>
+          <div>
+            <div class="pain-type explicit">Explicit</div>
+            <div class="pain-text">"What format do my documents need to be in?" → Design response: explicit format guidance (PDF/JPG/PNG, max 5MB) on the upload zone.</div>
+          </div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">💬</div>
+          <div>
+            <div class="pain-type explicit">Explicit</div>
+            <div class="pain-text">"I submitted — why haven't I heard anything?" → Design response: on-screen confirmation + email immediately + 24-hour SMS nudge.</div>
+          </div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">💬</div>
+          <div>
+            <div class="pain-type explicit">Explicit</div>
+            <div class="pain-text">"I called the branch but no one answered." → Design response: live chat CTA and branch visit booking in the portal sidebar.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Implicit Pain Points <span style="color:var(--gray3); font-size:10px; margin-left: 4px;">— what Ravi will act on but never articulate</span></div>
+        <div class="pain-item">
+          <div class="pain-icon">🔒</div>
+          <div>
+            <div class="pain-type implicit">Implicit</div>
+            <div class="pain-text">He doesn't trust the site because there's no visible security signal near the SSN field. He may not complete the field. → Tooltip: "Your SSN is encrypted. This is a soft inquiry — your credit score will not be affected."</div>
+          </div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">📊</div>
+          <div>
+            <div class="pain-type implicit">Implicit</div>
+            <div class="pain-text">He is unsure if this application will harm his credit score and won't ask — he's embarrassed not to know. → Proactive tooltip on the SSN field answers without requiring him to ask.</div>
+          </div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">❌</div>
+          <div>
+            <div class="pain-type implicit">Implicit</div>
+            <div class="pain-text">He fears that a single wrong answer means the entire application is thrown out and he must start over. → Inline (not on-submit) validation, specific error messages, and ability to edit any step before final submission.</div>
+          </div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">💼</div>
+          <div>
+            <div class="pain-type implicit">Implicit</div>
+            <div class="pain-text">He recently switched jobs and fears this looks bad — but the form provides no context on how employment data will be used. → Contextual micro-copy near employment field: "Recent job changes are common. Your officer will review your full employment history."</div>
+          </div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">🤝</div>
+          <div>
+            <div class="pain-type implicit">Implicit</div>
+            <div class="pain-text">He wants human reassurance but doesn't want to call and explain everything to a stranger. → Assigned loan officer name shown post-submission. Branch visit booking via portal — no cold-call required.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Secondary Persona — Maria Chen, 58, Branch Loan Officer</div>
+    <div class="grid-2" style="margin-top: 4px;">
+      <div>
+        <p style="font-size:13px; color:var(--gray1); line-height:1.65; margin-bottom: 10px;">Maria has been processing loan applications at the Houston branch for 12 years. She manages 20–30 active cases simultaneously using a combination of email, physical files, and a basic spreadsheet. She is competent but overwhelmed.</p>
+        <p style="font-size:13px; color:var(--gray1); line-height:1.65;"><strong style="color:var(--white);">Explicit pain:</strong> "I spend half my day chasing clients for missing documents and the other half updating my spreadsheet. I have no time to actually process loans."</p>
+      </div>
+      <div>
+        <p style="font-size:13px; color:var(--gray1); line-height:1.65; margin-bottom: 10px;"><strong style="color:var(--white);">Implicit pain:</strong> She is afraid the new system will make her job harder, not easier. She has seen "digital transformation" projects that created more work. She needs to see immediate time-savings in the first week of use or she will revert to her spreadsheet.</p>
+        <p style="font-size:13px; color:var(--gray1); line-height:1.65;"><strong style="color:var(--white);">Design implication:</strong> The workflow engine must reduce her administrative load visibly. Document checklist status should be auto-updated by borrower uploads — she should never have to manually chase a document that is already in the system.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== WIREFRAME (FULL INTERACTIVE) ====== -->
+<div id="wireframe" class="section">
+  <div class="sec-header">
+    <h3>Interactive Wireflow — All 5 Application Screens</h3>
+    <p>Navigate through the complete borrower journey. Each screen is fully annotated with design decisions tied to persona pain points. Use the step buttons or click any step tab to jump directly.</p>
+  </div>
+
+  <!-- Wireflow styles scoped to #wf-embed -->
+  <style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #1a1a2e;
+  color: var(--white);
+  min-height: 100vh;
+}
+
+/* ── TOP CHROME ── */
+  #wf-embed .chrome-top {
+  background: #0f0f1e;
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+  #wf-embed .chrome-logo {
+  font-family: 'DM Serif Display', serif;
+  color: #fff;
+  font-size: 17px;
+  letter-spacing: -0.3px;
+}
+  #wf-embed .chrome-logo span { color: #6b8fff; }
+  #wf-embed .chrome-subtitle { color: rgba(255,255,255,0.35); font-size: 12px; margin-top: 2px; }
+  #wf-embed .chrome-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+  #wf-embed .chrome-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 6px;
+  transition: background 0.18s;
+}
+  #wf-embed .chrome-step:hover { background: rgba(255,255,255,0.06); }
+  #wf-embed .chrome-step.active { background: rgba(107,143,255,0.15); }
+  #wf-embed .cs-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; flex-shrink: 0;
+}
+  #wf-embed .cs-num.done { background: #0d7a4e; color: #fff; }
+  #wf-embed .cs-num.active { background: #6b8fff; color: #fff; }
+  #wf-embed .cs-num.pending { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.35); }
+  #wf-embed .cs-label { font-size: 11px; color: rgba(255,255,255,0.5); }
+  #wf-embed .cs-label.active { color: #fff; }
+  #wf-embed .cs-label.done { color: rgba(255,255,255,0.65); }
+  #wf-embed .step-sep { color: rgba(255,255,255,0.12); padding: 0 4px; font-size: 14px; }
+
+  #wf-embed .chrome-nav {
+  display: flex;
+  gap: 8px;
+}
+  #wf-embed .nav-btn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  padding: 7px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+  #wf-embed .nav-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  #wf-embed .nav-btn.primary { background: #1a4fd8; border-color: #1a4fd8; color: #fff; }
+  #wf-embed .nav-btn.primary:hover { background: #2457e8; }
+  #wf-embed .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ── SCREEN CONTAINER ── */
+  #wf-embed .screen-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 24px 48px;
+  gap: 24px;
+}
+
+/* ── ANNOTATION SIDEBAR ── */
+  #wf-embed .annotation-panel {
+  width: 260px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 88px;
+}
+  #wf-embed .ann-header {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.3);
+  font-weight: 600;
+  margin-bottom: 12px;
+  padding-left: 2px;
+}
+  #wf-embed .ann-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  transition: background 0.15s;
+}
+  #wf-embed .ann-item:hover { background: rgba(255,255,255,0.07); }
+  #wf-embed .ann-num-row { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+  #wf-embed .ann-badge {
+  font-size: 9px; font-weight: 700;
+  padding: 2px 6px; border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+  #wf-embed .ann-badge.blue { background: rgba(107,143,255,0.2); color: #6b8fff; }
+  #wf-embed .ann-badge.green { background: rgba(13,122,78,0.2); color: #2ecc9a; }
+  #wf-embed .ann-badge.amber { background: rgba(196,92,10,0.2); color: #f0a050; }
+  #wf-embed .ann-badge.red { background: rgba(192,57,43,0.2); color: #e87060; }
+  #wf-embed .ann-type { font-size: 9px; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 1px; }
+  #wf-embed .ann-text { font-size: 11.5px; color: rgba(255,255,255,0.55); line-height: 1.55; }
+
+/* ── BROWSER FRAME ── */
+  #wf-embed .browser-frame {
+  flex: 1;
+  max-width: 860px;
+  background: #2a2a3e;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+}
+  #wf-embed .browser-bar {
+  background: #1e1e30;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+  #wf-embed .b-dot { width: 10px; height: 10px; border-radius: 50%; }
+  #wf-embed .b-url {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border-radius: 5px;
+  height: 22px;
+  margin: 0 14px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.25);
+  font-family: 'DM Sans', monospace;
+}
+
+/* ── PORTAL SHELL ── */
+  #wf-embed .portal {
+  background: var(--card2);
+  min-height: 700px;
+}
+
+/* portal top nav */
+  #wf-embed .portal-nav {
+  background: #1a1a2e;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+}
+  #wf-embed .portal-logo {
+  font-family: 'DM Serif Display', serif;
+  color: #fff;
+  font-size: 15px;
+}
+  #wf-embed .portal-logo span { color: #6b8fff; }
+  #wf-embed .portal-nav-actions { display: flex; gap: 8px; }
+  #wf-embed .pna { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.55); font-size: 11px; padding: 4px 12px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.08); }
+
+/* stepper bar */
+  #wf-embed .stepper-bar {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  height: 60px;
+}
+  #wf-embed .sp-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+  #wf-embed .sp-circle {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600;
+}
+  #wf-embed .sp-circle.done { background: var(--green); color: #fff; }
+  #wf-embed .sp-circle.active { background: var(--accent); color: #fff; box-shadow: 0 0 0 3px rgba(26,79,216,0.15); }
+  #wf-embed .sp-circle.pending { background: #f0eff9; color: var(--gray3); }
+  #wf-embed .sp-info {}
+  #wf-embed .sp-name { font-size: 11px; font-weight: 500; color: var(--white); line-height: 1.2; }
+  #wf-embed .sp-name.active { color: var(--teal); }
+  #wf-embed .sp-name.pending { color: var(--gray3); }
+  #wf-embed .sp-name.done { color: var(--green); }
+  #wf-embed .sp-time { font-size: 9.5px; color: var(--gray3); }
+  #wf-embed .sp-line { flex: 1; height: 1px; background: var(--border); margin: 0 10px; border-top: 1px dashed var(--border-strong); min-width: 20px; }
+  #wf-embed .sp-line.done { background: var(--green); border-color: var(--green); }
+
+/* main layout */
+  #wf-embed .portal-body {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  min-height: calc(700px - 108px);
+}
+  #wf-embed .portal-form { padding: 24px 28px; }
+  #wf-embed .portal-sidebar {
+  background: var(--card2);
+  border-left: 1px solid var(--border);
+  padding: 20px 18px;
+}
+
+/* form elements */
+  #wf-embed .form-section-title {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 1.3px;
+  color: var(--gray2);
+  font-weight: 700;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+  #wf-embed .page-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 19px;
+  color: var(--white);
+  margin-bottom: 4px;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+}
+  #wf-embed .page-sub { font-size: 11.5px; color: var(--gray2); margin-bottom: 18px; line-height: 1.5; }
+  #wf-embed .secure-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--green-dim);
+  color: var(--green);
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+
+  #wf-embed .field-row { display: grid; gap: 14px; margin-bottom: 14px; }
+  #wf-embed .field-row.cols-2 { grid-template-columns: 1fr 1fr; }
+  #wf-embed .field-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  #wf-embed .field-row.cols-1 { grid-template-columns: 1fr; }
+
+  #wf-embed .field {}
+  #wf-embed .field-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--gray1);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+  #wf-embed .req { color: var(--teal); }
+  #wf-embed .field-input {
+  width: 100%;
+  height: 34px;
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding: 0 11px;
+  font-size: 11.5px;
+  color: var(--gray3);
+}
+  #wf-embed .field-input.filled { color: var(--gray1); border-color: var(--border-strong); }
+  #wf-embed .field-input.active { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(26,79,216,0.1); color: var(--gray1); }
+  #wf-embed .field-input.error { border-color: var(--red); background: var(--red-dim); color: var(--gray1); }
+  #wf-embed .field-input.success { border-color: var(--green); color: var(--gray1); }
+  #wf-embed .field-hint { font-size: 10px; color: var(--teal); margin-top: 3px; line-height: 1.4; }
+  #wf-embed .field-hint.success { color: var(--green); }
+  #wf-embed .field-hint.error { color: var(--red); }
+  #wf-embed .field-hint.gray { color: var(--gray3); }
+
+  #wf-embed .field-textarea {
+  width: 100%;
+  min-height: 72px;
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 9px 11px;
+  font-size: 11.5px;
+  color: var(--gray3);
+  line-height: 1.5;
+}
+  #wf-embed .field-select {
+  width: 100%;
+  height: 34px;
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 11px;
+  font-size: 11.5px;
+  color: var(--gray3);
+}
+  #wf-embed .field-select.chosen { color: var(--gray1); }
+  #wf-embed .select-arrow { font-size: 9px; color: var(--gray3); }
+
+/* upload zone */
+  #wf-embed .upload-zone {
+  border: 1.5px dashed var(--border-strong);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  background: var(--card2);
+  margin-bottom: 12px;
+  transition: border-color 0.2s, background 0.2s;
+}
+  #wf-embed .upload-zone:hover { border-color: var(--teal); background: var(--blue-dim); }
+  #wf-embed .upload-icon { font-size: 20px; margin-bottom: 6px; }
+  #wf-embed .upload-title { font-size: 12.5px; font-weight: 600; color: var(--gray1); margin-bottom: 3px; }
+  #wf-embed .upload-sub { font-size: 10.5px; color: var(--gray2); margin-bottom: 10px; }
+  #wf-embed .upload-btn {
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  padding: 6px 16px;
+  border-radius: 5px;
+  display: inline-block;
+  font-weight: 500;
+}
+
+/* doc checklist */
+  #wf-embed .doc-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  margin-bottom: 7px;
+  font-size: 12px;
+}
+  #wf-embed .doc-status {
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; flex-shrink: 0;
+}
+  #wf-embed .doc-status.done { background: var(--green-dim); color: var(--green); border: 1.5px solid #a8e6d0; }
+  #wf-embed .doc-status.pending { background: var(--orange-dim); color: var(--orange); border: 1.5px solid #f5c88a; }
+  #wf-embed .doc-status.error { background: var(--red-dim); color: var(--red); border: 1.5px solid #f5c6c2; }
+  #wf-embed .doc-status.empty { background: #f0eff9; color: var(--gray3); border: 1.5px solid var(--border); }
+  #wf-embed .doc-info { flex: 1; }
+  #wf-embed .doc-name { font-size: 11.5px; font-weight: 500; color: var(--gray1); margin-bottom: 1px; }
+  #wf-embed .doc-note { font-size: 10px; }
+  #wf-embed .doc-note.done { color: var(--green); }
+  #wf-embed .doc-note.pending { color: var(--orange); }
+  #wf-embed .doc-note.error { color: var(--red); }
+  #wf-embed .doc-note.empty { color: var(--gray3); }
+
+/* review rows */
+  #wf-embed .review-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+  #wf-embed .review-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--card2);
+  border-bottom: 1px solid var(--border);
+}
+  #wf-embed .review-section-name { font-size: 11px; font-weight: 600; color: var(--white); }
+  #wf-embed .review-edit { font-size: 10px; color: var(--teal); cursor: pointer; }
+  #wf-embed .review-grid { display: grid; grid-template-columns: 1fr 1fr; padding: 10px 14px; gap: 6px 16px; }
+  #wf-embed .review-kv {}
+  #wf-embed .review-k { font-size: 10px; color: var(--gray2); margin-bottom: 1px; }
+  #wf-embed .review-v { font-size: 12px; color: var(--gray1); font-weight: 500; }
+
+/* consent */
+  #wf-embed .consent-box {
+  background: var(--blue-dim);
+  border: 1px solid #c5d1fa;
+  border-radius: 7px;
+  padding: 13px 16px;
+  margin-bottom: 12px;
+  font-size: 11.5px;
+  color: var(--gray1);
+  line-height: 1.6;
+}
+  #wf-embed .consent-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 11.5px;
+  color: var(--gray1);
+  line-height: 1.5;
+}
+  #wf-embed .consent-check:last-child { border-bottom: none; }
+  #wf-embed .checkbox-mock {
+  width: 15px; height: 15px; border-radius: 3px;
+  border: 1.5px solid var(--border-strong);
+  flex-shrink: 0; margin-top: 2px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; background: var(--card);
+}
+  #wf-embed .checkbox-mock.checked { background: var(--accent); border-color: var(--teal); color: #fff; }
+
+/* decision */
+  #wf-embed .decision-card {
+  background: var(--card);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 28px 24px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+  #wf-embed .decision-icon { font-size: 36px; margin-bottom: 12px; }
+  #wf-embed .decision-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  color: var(--white);
+  font-weight: 400;
+  margin-bottom: 6px;
+}
+  #wf-embed .decision-sub { font-size: 12.5px; color: var(--gray2); max-width: 340px; margin: 0 auto 16px; line-height: 1.6; }
+  #wf-embed .decision-ref {
+  display: inline-block;
+  background: var(--blue-dim);
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 5px;
+  margin-bottom: 16px;
+  letter-spacing: 0.3px;
+}
+  #wf-embed .decision-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  text-align: left;
+}
+  #wf-embed .dg-item {
+  background: var(--card2);
+  border-radius: 7px;
+  padding: 11px 13px;
+}
+  #wf-embed .dg-label { font-size: 10px; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 3px; }
+  #wf-embed .dg-val { font-size: 13px; font-weight: 600; color: var(--white); }
+
+/* comms timeline */
+  #wf-embed .comms-item {
+  display: flex;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+  #wf-embed .comms-item:last-child { border-bottom: none; }
+  #wf-embed .comms-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  margin-top: 5px; flex-shrink: 0;
+}
+  #wf-embed .comms-dot.sent { background: var(--green); }
+  #wf-embed .comms-dot.pending { background: var(--warn); }
+  #wf-embed .comms-text { font-size: 11px; color: var(--gray2); line-height: 1.5; }
+  #wf-embed .comms-text strong { color: var(--gray1); }
+
+/* action buttons */
+  #wf-embed .form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 28px;
+  border-top: 1px solid var(--border);
+  background: var(--card);
+}
+  #wf-embed .btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  padding: 9px 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  border: none;
+  transition: all 0.15s;
+}
+  #wf-embed .btn-ghost { background: var(--card); border: 1px solid var(--border2); color: var(--gray2); }
+  #wf-embed .btn-ghost:hover { background: var(--card2); }
+  #wf-embed .btn-primary { background: var(--accent); color: #fff; }
+  #wf-embed .btn-primary:hover { background: #1e56e8; }
+  #wf-embed .btn-success { background: var(--green); color: #fff; }
+  #wf-embed .btn-save { background: var(--card2); border: 1px solid var(--border2); color: var(--gray1); font-size: 11px; padding: 7px 14px; }
+
+/* sidebar elements */
+  #wf-embed .sidebar-block { margin-bottom: 18px; }
+  #wf-embed .sidebar-title {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--gray2);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+  #wf-embed .sidebar-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+  #wf-embed .sidebar-ref { font-size: 12px; font-weight: 600; color: var(--teal); margin-bottom: 8px; }
+  #wf-embed .sidebar-kv { margin-bottom: 6px; }
+  #wf-embed .sidebar-k { font-size: 9.5px; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.8px; }
+  #wf-embed .sidebar-v { font-size: 11.5px; color: var(--gray1); font-weight: 500; }
+  #wf-embed .progress-bar-wrap { margin: 8px 0 4px; }
+  #wf-embed .progress-track { background: var(--border); border-radius: 4px; height: 5px; overflow: hidden; }
+  #wf-embed .progress-fill { height: 100%; border-radius: 4px; background: var(--accent); transition: width 0.4s; }
+  #wf-embed .progress-label { font-size: 10px; color: var(--gray2); margin-top: 3px; }
+
+  #wf-embed .sidebar-btn {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 11px;
+  color: var(--gray1);
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 6px;
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+}
+  #wf-embed .sidebar-btn:hover { background: var(--card2); }
+  #wf-embed .sidebar-btn.primary-light { background: var(--blue-dim); border-color: #c5d1fa; color: var(--teal); font-weight: 500; }
+
+  #wf-embed .autosave-banner {
+  background: var(--green-dim);
+  border: 1px solid rgba(92,219,149,0.25);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 11px;
+  color: var(--green);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.45;
+}
+
+/* loan amount display */
+  #wf-embed .loan-amount-display {
+  background: var(--accent);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+  #wf-embed .lad-label { font-size: 10.5px; color: rgba(255,255,255,0.65); margin-bottom: 3px; }
+  #wf-embed .lad-value { font-family: 'DM Serif Display', serif; font-size: 26px; color: #fff; font-weight: 400; }
+  #wf-embed .lad-sub { font-size: 10.5px; color: rgba(255,255,255,0.65); }
+
+/* slider mock */
+  #wf-embed .slider-mock {
+  height: 5px;
+  background: var(--border);
+  border-radius: 4px;
+  margin: 8px 0 4px;
+  position: relative;
+  overflow: visible;
+}
+  #wf-embed .slider-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+}
+  #wf-embed .slider-thumb {
+  width: 14px; height: 14px;
+  background: var(--accent);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: -5px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+/* tag */
+  #wf-embed .tag {
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+  #wf-embed .tag-blue { background: var(--blue-dim); color: var(--teal); }
+  #wf-embed .tag-green { background: var(--green-dim); color: var(--green); }
+  #wf-embed .tag-warn { background: var(--orange-dim); color: var(--orange); }
+  #wf-embed .tag-gray { background: #f0eff9; color: var(--gray1); }
+
+/* screen transitions */
+  #wf-embed .screen { display: none; animation: screenIn 0.3s ease; }
+  #wf-embed .screen.active { display: block; }
+@keyframes screenIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+
+/* step indicator banner */
+  #wf-embed .step-banner {
+  background: linear-gradient(135deg, #1a4fd8, #2457e8);
+  padding: 10px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+  #wf-embed .sb-step { font-size: 11px; color: rgba(255,255,255,0.7); }
+  #wf-embed .sb-step strong { color: #fff; }
+  #wf-embed .sb-save { font-size: 10.5px; color: rgba(255,255,255,0.55); cursor: pointer; text-decoration: underline; }
+
+/* bottom label */
+  #wf-embed .screen-label {
+  background: #0f0f1e;
+  padding: 10px 24px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.2);
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+/* Responsiveness */
+@media (max-width: 1100px) {
+  .annotation-panel { display: none; }
+  .chrome-step .cs-label { display: none; }
+}
+@media (max-width: 720px) {
+  .portal-body { grid-template-columns: 1fr; }
+  .portal-sidebar { display: none; }
+  .field-row.cols-3 { grid-template-columns: 1fr 1fr; }
+}
+
+  /* Override position:sticky for chrome inside dashboard */
+  #wf-embed .chrome-top { position: relative; top: auto; z-index: 10; border-radius: 12px 12px 0 0; }
+  #wf-embed .screen-wrapper { padding: 16px 0 24px; gap: 16px; }
+  #wf-embed .browser-frame { max-width: 100%; }
+  #wf-embed { background: #1a1a2e; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 0; }
+  </style>
+
+  <div id="wf-embed">
+    
+
+<!-- TOP CHROME -->
+<div class="chrome-top">
+  <div>
+    <div class="chrome-logo">Fin<span>Serve</span> Lending</div>
+    <div class="chrome-subtitle">Home Loan Application — Complete Wireflow (All 5 Screens)</div>
+  </div>
+
+  <div class="chrome-steps" id="stepIndicator">
+    <!-- populated by JS -->
+  </div>
+
+  <div class="chrome-nav">
+    <button class="nav-btn" id="btnBack" onclick="prevStep()" disabled>← Back</button>
+    <button class="nav-btn primary" id="btnNext" onclick="nextStep()">Continue →</button>
+  </div>
+</div>
+
+<!-- SCREEN WRAPPER -->
+<div class="screen-wrapper">
+
+  <!-- LEFT ANNOTATIONS -->
+  <div class="annotation-panel" id="annotationPanel">
+    <!-- populated by JS -->
+  </div>
+
+  <!-- BROWSER FRAME -->
+  <div class="browser-frame">
+    <div class="browser-bar">
+      <div class="b-dot" style="background:#ff5f57;"></div>
+      <div class="b-dot" style="background:#febc2e;"></div>
+      <div class="b-dot" style="background:#28c840;"></div>
+      <div class="b-url" id="urlBar">https://apply.finservelending.com/home-loan/step-1-personal-info</div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SCREEN 1 — PERSONAL INFORMATION
+    ══════════════════════════════════════ -->
+    <div class="screen active" id="screen-1">
+      <div class="portal">
+        <!-- Portal Nav -->
+        <div class="portal-nav">
+          <div class="portal-logo">Fin<span>Serve</span> Lending Portal</div>
+          <div class="portal-nav-actions">
+            <div class="pna">My Profile</div>
+            <div class="pna">Sign Out</div>
+          </div>
+        </div>
+
+        <!-- Stepper -->
+        <div class="stepper-bar">
+          <div class="sp-step">
+            <div class="sp-circle active">1</div>
+            <div class="sp-info"><div class="sp-name active">Personal Info</div><div class="sp-time">~3 min</div></div>
+          </div>
+          <div class="sp-line"></div>
+          <div class="sp-step">
+            <div class="sp-circle pending">2</div>
+            <div class="sp-info"><div class="sp-name pending">Loan Details</div><div class="sp-time">~5 min</div></div>
+          </div>
+          <div class="sp-line"></div>
+          <div class="sp-step">
+            <div class="sp-circle pending">3</div>
+            <div class="sp-info"><div class="sp-name pending">Documents</div><div class="sp-time">~5 min</div></div>
+          </div>
+          <div class="sp-line"></div>
+          <div class="sp-step">
+            <div class="sp-circle pending">4</div>
+            <div class="sp-info"><div class="sp-name pending">Review</div><div class="sp-time">~2 min</div></div>
+          </div>
+          <div class="sp-line"></div>
+          <div class="sp-step">
+            <div class="sp-circle pending">5</div>
+            <div class="sp-info"><div class="sp-name pending">Decision</div><div class="sp-time">3–5 days</div></div>
+          </div>
+        </div>
+
+        <!-- Step Banner -->
+        <div class="step-banner">
+          <div class="sb-step"><strong>Step 1 of 5</strong> — Personal Information</div>
+          <div class="sb-save">Save progress &amp; continue later</div>
+        </div>
+
+        <div class="portal-body">
+          <div class="portal-form">
+            <div class="page-title">Tell us about yourself</div>
+            <div class="page-sub">All fields marked <span style="color:var(--teal);">*</span> are required. Your data is encrypted in transit and at rest.</div>
+            <div class="secure-badge">🔒 256-bit SSL Encrypted · GLBA Compliant</div>
+
+            <div class="form-section-title">Applicant Details</div>
+
+            <div class="field-row cols-2">
+              <div class="field">
+                <div class="field-label">First Name <span class="req">*</span></div>
+                <div class="field-input filled">Ravi</div>
+              </div>
+              <div class="field">
+                <div class="field-label">Last Name <span class="req">*</span></div>
+                <div class="field-input filled">Sharma</div>
+              </div>
+            </div>
+
+            <div class="field-row cols-2">
+              <div class="field">
+                <div class="field-label">Date of Birth <span class="req">*</span></div>
+                <div class="field-input filled" style="justify-content:space-between;">03 / 14 / 1990 <span style="font-size:13px;">📅</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label">SSN / Tax ID <span class="req">*</span> <span style="background:var(--blue-dim);color:var(--teal);font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600;">ℹ soft inquiry</span></div>
+                <div class="field-input active">XXX – XX – 4821</div>
+                <div class="field-hint">Won't affect your credit score at this stage</div>
+              </div>
+            </div>
+
+            <div class="field-row cols-2">
+              <div class="field">
+                <div class="field-label">Email Address <span class="req">*</span></div>
+                <div class="field-input success">ravi.sharma@email.com</div>
+                <div class="field-hint success">✓ Verified</div>
+              </div>
+              <div class="field">
+                <div class="field-label">Mobile Number <span class="req">*</span></div>
+                <div class="field-input filled">+1 (713) 555-0182</div>
+              </div>
+            </div>
+
+            <div class="field-row cols-1">
+              <div class="field">
+                <div class="field-label">Residential Address <span class="req">*</span></div>
+                <div class="field-input filled">4821 Oak Ridge Lane, Houston, TX 77002</div>
+              </div>
+            </div>
+
+            <div class="form-section-title" style="margin-top:6px;">Employment & Income</div>
+
+            <div class="field-row cols-3">
+              <div class="field">
+                <div class="field-label">Employment Status <span class="req">*</span></div>
+                <div class="field-select chosen">Full-Time Employed <span class="select-arrow">▾</span></div>
+                <div class="field-hint gray">Recent job changes are fine — officer reviews full history</div>
+              </div>
+              <div class="field">
+                <div class="field-label">Employer Name</div>
+                <div class="field-input filled">Infosys Ltd.</div>
+              </div>
+              <div class="field">
+                <div class="field-label">Annual Income <span class="req">*</span></div>
+                <div class="field-input filled">$ 94,000</div>
+              </div>
+            </div>
+
+            <div class="field-row cols-2">
+              <div class="field">
+                <div class="field-label">Years at Current Employer</div>
+                <div class="field-select chosen">1–2 years <span class="select-arrow">▾</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label">Co-applicant?</div>
+                <div class="field-select chosen">Yes — spouse/partner <span class="select-arrow">▾</span></div>
+              </div>
+            </div>
+
+            <div class="autosave-banner">
+              <span>✓</span>
+              <span><strong>Auto-saved</strong> — close this tab anytime. We'll email you a secure link to resume exactly here.</span>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div class="portal-sidebar">
+            <div class="sidebar-block">
+              <div class="sidebar-title">Application Status</div>
+              <div class="sidebar-card">
+                <div class="sidebar-ref">APP-2024-10482</div>
+                <div class="sidebar-kv"><div class="sidebar-k">Started</div><div class="sidebar-v">Apr 22, 2024</div></div>
+                <div class="sidebar-kv" style="margin-top:6px;"><div class="sidebar-k">Est. Decision</div><div class="sidebar-v">3–5 business days</div></div>
+                <div class="progress-bar-wrap">
+                  <div class="sidebar-k">Completion</div>
+                  <div class="progress-track" style="margin-top:5px;">
+                    <div class="progress-fill" style="width:20%;"></div>
+                  </div>
+                  <div class="progress-label">Step 1 of 5 · 20%</div>
+                </div>
+              </div>
+            </div>
+            <div class="sidebar-block">
+              <div class="sidebar-title">Need Help?</div>
+              <div style="font-size:11px; color:var(--gray2); margin-bottom:8px; line-height:1.5;">1-800-FIN-SERV<br/>Mon–Fri 9am–6pm ET</div>
+              <button class="sidebar-btn">💬 Live Chat</button>
+              <button class="sidebar-btn">📅 Book Branch Visit</button>
+              <button class="sidebar-btn primary-light">📞 Request Callback</button>
+            </div>
+            <div class="sidebar-block">
+              <div class="sidebar-title">Communication Sent</div>
+              <div class="comms-item"><div class="comms-dot sent"></div><div class="comms-text"><strong>Email</strong> · Welcome + save link<br/>Apr 22, 9:34 PM</div></div>
+              <div class="comms-item"><div class="comms-dot pending"></div><div class="comms-text"><strong>SMS</strong> · Confirmation · Pending submit</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-ghost" disabled>← Back</button>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-save">Save &amp; Exit</button>
+            <button class="btn btn-primary" onclick="nextStep()">Save &amp; Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /screen-1 -->
+
+    <!-- ══════════════════════════════════════
+         SCREEN 2 — LOAN DETAILS
+    ══════════════════════════════════════ -->
+    <div class="screen" id="screen-2">
+      <div class="portal">
+        <div class="portal-nav">
+          <div class="portal-logo">Fin<span>Serve</span> Lending Portal</div>
+          <div class="portal-nav-actions"><div class="pna">My Profile</div><div class="pna">Sign Out</div></div>
+        </div>
+        <div class="stepper-bar">
+          <div class="sp-step"><div class="sp-circle done">✓</div><div class="sp-info"><div class="sp-name done">Personal Info</div><div class="sp-time">Complete</div></div></div>
+          <div class="sp-line done"></div>
+          <div class="sp-step"><div class="sp-circle active">2</div><div class="sp-info"><div class="sp-name active">Loan Details</div><div class="sp-time">~5 min</div></div></div>
+          <div class="sp-line"></div>
+          <div class="sp-step"><div class="sp-circle pending">3</div><div class="sp-info"><div class="sp-name pending">Documents</div><div class="sp-time">~5 min</div></div></div>
+          <div class="sp-line"></div>
+          <div class="sp-step"><div class="sp-circle pending">4</div><div class="sp-info"><div class="sp-name pending">Review</div><div class="sp-time">~2 min</div></div></div>
+          <div class="sp-line"></div>
+          <div class="sp-step"><div class="sp-circle pending">5</div><div class="sp-info"><div class="sp-name pending">Decision</div><div class="sp-time">3–5 days</div></div></div>
+        </div>
+        <div class="step-banner">
+          <div class="sb-step"><strong>Step 2 of 5</strong> — Loan Details</div>
+          <div class="sb-save">Save progress &amp; continue later</div>
+        </div>
+
+        <div class="portal-body">
+          <div class="portal-form">
+            <div class="page-title">Your loan requirements</div>
+            <div class="page-sub">Tell us about the property and the financing you need. We'll calculate your eligibility in real time.</div>
+
+            <!-- Loan amount display -->
+            <div class="loan-amount-display">
+              <div>
+                <div class="lad-label">Requested Loan Amount</div>
+                <div class="lad-value">$320,000</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="lad-label">LTV Ratio</div>
+                <div style="font-size:18px; color:#fff; font-weight:600;">80%</div>
+                <div class="lad-sub" style="color:rgba(255,255,255,0.55);">✓ Within eligible range</div>
+              </div>
+            </div>
+
+            <div class="form-section-title">Loan Parameters</div>
+
+            <div class="field-row cols-2">
+              <div class="field">
+                <div class="field-label">Loan Type <span class="req">*</span></div>
+                <div class="field-select chosen">Home Loan — Purchase <span class="select-arrow">▾</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label">Loan Amount ($) <span class="req">*</span></div>
+                <div class="field-input filled">$ 320,000</div>
+                <div class="slider-mock"><div class="slider-fill" style="width:64%;"></div><div class="slider-thumb" style="left:calc(64% - 7px);"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--gray3)"><span>$50K</span><span>$500K</span></div>
+              </div>
+            </div>
+
+            <div class="field-row cols-3">
+              <div class="field">
+                <div class="field-label">Loan Tenure <span class="req">*</span></div>
+                <div class="field-select chosen">20 Years <span class="select-arrow">▾</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label">Interest Type <span class="req">*</span></div>
+                <div class="field-select chosen">Fixed Rate <span class="select-arrow">▾</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label">Down Payment ($) <span class="req">*</span></div>
+                <div class="field-input filled">$ 80,000</div>
+              </div>
+            </div>
+
+            <div class="form-section-title" style="margin-top:4px;">Property Details</div>
+
+            <div class="field-row cols-2">
+              <div class="field">
+                <div class="field-label">Property Type <span class="req">*</span></div>
+                <div class="field-select chosen">Single Family Residence <span class="select-arrow">▾</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label">Property Value ($) <span class="req">*</span></div>
+                <div class="field-input filled">$ 400,000</div>
+              </div>
+            </div>
+
+            <div class="field-row cols-1">
+              <div class="field">
+                <div class="field-label">Property Address <span class="req">*</span></div>
+                <div class="field-input filled">1204 Riverside Drive, Houston, TX 77006</div>
+                <div class="field-hint gray">If not finalised, enter the best known address — can be updated later</div>
+              </div>
+            </div>
+
+            <div class="field-row cols-2">
+              <div class="field">
+                <div class="field-label">Purchase Agreement Signed?</div>
+                <div class="field-select chosen">Yes — signed Apr 10, 2024 <span class="select-arrow">▾</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label">Intended Use</div>
+                <div class="field-select chosen">Primary Residence <span class="select-arrow">▾</span></div>
+              </div>
+            </div>
+
+            <!-- Live EMI Calculator -->
+            <div style="background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-top:4px;">
+              <div class="form-section-title" style="margin-bottom:10px;">📊 Estimated Monthly Payment</div>
+              <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
+                <div style="background:#fff; border:1px solid var(--border); border-radius:6px; padding:10px 12px; text-align:center;">
+                  <div style="font-size:9.5px; color:var(--gray2); margin-bottom:3px;">Principal + Interest</div>
+                  <div style="font-family:'DM Serif Display',serif; font-size:18px; color:var(--teal);">$1,892</div>
+                </div>
+                <div style="background:#fff; border:1px solid var(--border); border-radius:6px; padding:10px 12px; text-align:center;">
+                  <div style="font-size:9.5px; color:var(--gray2); margin-bottom:3px;">Est. Interest Rate</div>
+                  <div style="font-family:'DM Serif Display',serif; font-size:18px; color:var(--white);">6.75%</div>
+                </div>
+                <div style="background:#fff; border:1px solid var(--border); border-radius:6px; padding:10px 12px; text-align:center;">
+                  <div style="font-size:9.5px; color:var(--gray2); margin-bottom:3px;">Total Repayment</div>
+                  <div style="font-family:'DM Serif Display',serif; font-size:18px; color:var(--white);">$454K</div>
+                </div>
+              </div>
+              <div style="font-size:10px; color:var(--gray3); margin-top:8px;">Estimates only. Final rate confirmed after credit assessment. <span style="color:var(--teal); cursor:pointer;">View amortisation schedule →</span></div>
+            </div>
+
+            <div class="autosave-banner" style="margin-top:14px;">
+              <span>✓</span>
+              <span><strong>Auto-saved</strong> — your loan details have been saved automatically.</span>
+            </div>
+          </div>
+
+          <div class="portal-sidebar">
+            <div class="sidebar-block">
+              <div class="sidebar-title">Application Status</div>
+              <div class="sidebar-card">
+                <div class="sidebar-ref">APP-2024-10482</div>
+                <div class="sidebar-kv"><div class="sidebar-k">Est. Decision</div><div class="sidebar-v">3–5 business days</div></div>
+                <div class="progress-bar-wrap">
+                  <div class="sidebar-k">Completion</div>
+                  <div class="progress-track" style="margin-top:5px;"><div class="progress-fill" style="width:40%;"></div></div>
+                  <div class="progress-label">Step 2 of 5 · 40%</div>
+                </div>
+              </div>
+            </div>
+            <div class="sidebar-block">
+              <div class="sidebar-title">Eligibility Check</div>
+              <div class="sidebar-card">
+                <div style="display:flex; align-items:center; gap:7px; margin-bottom:8px;">
+                  <div style="width:9px;height:9px;border-radius:50%;background:var(--success);"></div>
+                  <div style="font-size:11px; color:var(--green); font-weight:500;">LTV 80% — Eligible</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:7px; margin-bottom:8px;">
+                  <div style="width:9px;height:9px;border-radius:50%;background:var(--success);"></div>
+                  <div style="font-size:11px; color:var(--green); font-weight:500;">DTI ~38% — Acceptable</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:7px;">
+                  <div style="width:9px;height:9px;border-radius:50%;background:var(--warn);"></div>
+                  <div style="font-size:11px; color:var(--orange); font-weight:500;">Credit score pending</div>
+                </div>
+              </div>
+            </div>
+            <div class="sidebar-block">
+              <div class="sidebar-title">Need Help?</div>
+              <button class="sidebar-btn">💬 Live Chat</button>
+              <button class="sidebar-btn">📅 Book Branch Visit</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-ghost" onclick="prevStep()">← Back</button>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-save">Save &amp; Exit</button>
+            <button class="btn btn-primary" onclick="nextStep()">Save &amp; Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /screen-2 -->
+
+    <!-- ══════════════════════════════════════
+         SCREEN 3 — DOCUMENTS
+    ══════════════════════════════════════ -->
+    <div class="screen" id="screen-3">
+      <div class="portal">
+        <div class="portal-nav">
+          <div class="portal-logo">Fin<span>Serve</span> Lending Portal</div>
+          <div class="portal-nav-actions"><div class="pna">My Profile</div><div class="pna">Sign Out</div></div>
+        </div>
+        <div class="stepper-bar">
+          <div class="sp-step"><div class="sp-circle done">✓</div><div class="sp-info"><div class="sp-name done">Personal Info</div></div></div>
+          <div class="sp-line done"></div>
+          <div class="sp-step"><div class="sp-circle done">✓</div><div class="sp-info"><div class="sp-name done">Loan Details</div></div></div>
+          <div class="sp-line done"></div>
+          <div class="sp-step"><div class="sp-circle active">3</div><div class="sp-info"><div class="sp-name active">Documents</div><div class="sp-time">~5 min</div></div></div>
+          <div class="sp-line"></div>
+          <div class="sp-step"><div class="sp-circle pending">4</div><div class="sp-info"><div class="sp-name pending">Review</div></div></div>
+          <div class="sp-line"></div>
+          <div class="sp-step"><div class="sp-circle pending">5</div><div class="sp-info"><div class="sp-name pending">Decision</div></div></div>
+        </div>
+        <div class="step-banner">
+          <div class="sb-step"><strong>Step 3 of 5</strong> — Document Upload</div>
+          <div class="sb-save">Save progress &amp; continue later</div>
+        </div>
+
+        <div class="portal-body">
+          <div class="portal-form">
+            <div class="page-title">Upload your documents</div>
+            <div class="page-sub">Upload clearly scanned or photographed copies. PDF, JPG, PNG · Max 5 MB per file · We'll review all documents within 24 hours.</div>
+
+            <!-- Upload Zone -->
+            <div class="upload-zone" style="margin-bottom:18px;">
+              <div class="upload-icon">📁</div>
+              <div class="upload-title">Drag &amp; drop files here</div>
+              <div class="upload-sub">or click to browse from your device</div>
+              <div class="upload-btn">Browse Files</div>
+            </div>
+
+            <!-- Checklist -->
+            <div class="form-section-title">Document Checklist</div>
+
+            <div style="font-size:10px; color:var(--gray2); margin-bottom:10px; display:flex; gap:12px; flex-wrap:wrap;">
+              <span style="display:flex; align-items:center; gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block;"></span> Verified</span>
+              <span style="display:flex; align-items:center; gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--warn);display:inline-block;"></span> Uploaded — Under Review</span>
+              <span style="display:flex; align-items:center; gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--danger);display:inline-block;"></span> Action Required</span>
+              <span style="display:flex; align-items:center; gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--border-strong);display:inline-block;"></span> Not Uploaded</span>
+            </div>
+
+            <div class="form-section-title">Identity Documents</div>
+            <div class="doc-item">
+              <div class="doc-status done">✓</div>
+              <div class="doc-info"><div class="doc-name">Government-issued Photo ID (Passport / Driver's License)</div><div class="doc-note done">✓ passport_ravi_sharma.pdf · Verified</div></div>
+              <div style="font-size:10px; color:var(--green); cursor:pointer;">Replace</div>
+            </div>
+            <div class="doc-item">
+              <div class="doc-status done">✓</div>
+              <div class="doc-info"><div class="doc-name">Social Security Card</div><div class="doc-note done">✓ ssn_card.jpg · Verified</div></div>
+              <div style="font-size:10px; color:var(--green); cursor:pointer;">Replace</div>
+            </div>
+
+            <div class="form-section-title" style="margin-top:8px;">Income & Employment Documents</div>
+            <div class="doc-item">
+              <div class="doc-status done">✓</div>
+              <div class="doc-info"><div class="doc-name">Last 2 Years W-2 Forms</div><div class="doc-note done">✓ w2_2022.pdf, w2_2023.pdf · Verified</div></div>
+            </div>
+            <div class="doc-item" style="border-color:#f5c6c2; background:var(--red-dim);">
+              <div class="doc-status error">!</div>
+              <div class="doc-info"><div class="doc-name">Last 3 Months Pay Stubs</div><div class="doc-note error">⚠ paystub_march.pdf is blurry — please re-upload a clearer scan</div></div>
+              <div style="font-size:10px; color:var(--red); cursor:pointer; white-space:nowrap;">Re-upload</div>
+            </div>
+            <div class="doc-item">
+              <div class="doc-status pending">↻</div>
+              <div class="doc-info"><div class="doc-name">Most Recent Federal Tax Return (1040)</div><div class="doc-note pending">⏳ Uploaded — under officer review</div></div>
+            </div>
+            <div class="doc-item">
+              <div class="doc-status empty">—</div>
+              <div class="doc-info"><div class="doc-name">3 Months Bank Statements (all accounts)</div><div class="doc-note empty">Not uploaded yet — required to proceed</div></div>
+              <div style="font-size:10px; color:var(--teal); cursor:pointer;">Upload</div>
+            </div>
+
+            <div class="form-section-title" style="margin-top:8px;">Property Documents</div>
+            <div class="doc-item">
+              <div class="doc-status done">✓</div>
+              <div class="doc-info"><div class="doc-name">Purchase Agreement / Sales Contract</div><div class="doc-note done">✓ purchase_agreement_riverside.pdf · Verified</div></div>
+            </div>
+            <div class="doc-item">
+              <div class="doc-status empty">—</div>
+              <div class="doc-info"><div class="doc-name">Property Appraisal Report</div><div class="doc-note empty">Not uploaded — officer will initiate appraisal if not available</div></div>
+              <div style="font-size:10px; color:var(--gray3);">Optional</div>
+            </div>
+
+            <div style="background:var(--orange-dim); border:1px solid #f5c88a; border-radius:6px; padding:10px 14px; font-size:11.5px; color:var(--orange); margin-top:12px; margin-bottom:10px;">
+              ⚠ <strong>2 items need your attention</strong> before you can proceed: re-upload pay stub and upload bank statements.
+            </div>
+
+            <div class="autosave-banner">
+              <span>✓</span>
+              <span><strong>Auto-saved</strong> — uploaded files are securely stored. You can return later to complete remaining uploads.</span>
+            </div>
+          </div>
+
+          <div class="portal-sidebar">
+            <div class="sidebar-block">
+              <div class="sidebar-title">Application Status</div>
+              <div class="sidebar-card">
+                <div class="sidebar-ref">APP-2024-10482</div>
+                <div class="progress-bar-wrap">
+                  <div class="sidebar-k">Completion</div>
+                  <div class="progress-track" style="margin-top:5px;"><div class="progress-fill" style="width:60%;"></div></div>
+                  <div class="progress-label">Step 3 of 5 · 60%</div>
+                </div>
+              </div>
+            </div>
+            <div class="sidebar-block">
+              <div class="sidebar-title">Upload Summary</div>
+              <div class="sidebar-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <div style="font-size:11px; color:var(--green); font-weight:500;">✓ Verified</div>
+                  <div style="font-size:13px; font-weight:600; color:var(--green);">5</div>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <div style="font-size:11px; color:var(--orange); font-weight:500;">↻ Under Review</div>
+                  <div style="font-size:13px; font-weight:600; color:var(--orange);">1</div>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <div style="font-size:11px; color:var(--red); font-weight:500;">! Action Needed</div>
+                  <div style="font-size:13px; font-weight:600; color:var(--red);">1</div>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <div style="font-size:11px; color:var(--gray2);">Missing</div>
+                  <div style="font-size:13px; font-weight:600; color:var(--gray2);">1</div>
+                </div>
+              </div>
+            </div>
+            <div class="sidebar-block">
+              <div class="sidebar-title">Need Help?</div>
+              <button class="sidebar-btn">💬 Live Chat</button>
+              <button class="sidebar-btn">📅 Book Branch Visit</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-ghost" onclick="prevStep()">← Back</button>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <div style="font-size:11px; color:var(--orange);">⚠ 2 items need attention</div>
+            <button class="btn btn-save">Save &amp; Exit</button>
+            <button class="btn btn-primary" onclick="nextStep()">Continue to Review →</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /screen-3 -->
+
+    <!-- ══════════════════════════════════════
+         SCREEN 4 — REVIEW & SUBMIT
+    ══════════════════════════════════════ -->
+    <div class="screen" id="screen-4">
+      <div class="portal">
+        <div class="portal-nav">
+          <div class="portal-logo">Fin<span>Serve</span> Lending Portal</div>
+          <div class="portal-nav-actions"><div class="pna">My Profile</div><div class="pna">Sign Out</div></div>
+        </div>
+        <div class="stepper-bar">
+          <div class="sp-step"><div class="sp-circle done">✓</div><div class="sp-info"><div class="sp-name done">Personal Info</div></div></div>
+          <div class="sp-line done"></div>
+          <div class="sp-step"><div class="sp-circle done">✓</div><div class="sp-info"><div class="sp-name done">Loan Details</div></div></div>
+          <div class="sp-line done"></div>
+          <div class="sp-step"><div class="sp-circle done">✓</div><div class="sp-info"><div class="sp-name done">Documents</div></div></div>
+          <div class="sp-line done"></div>
+          <div class="sp-step"><div class="sp-circle active">4</div><div class="sp-info"><div class="sp-name active">Review &amp; Submit</div><div class="sp-time">~2 min</div></div></div>
+          <div class="sp-line"></div>
+          <div class="sp-step"><div class="sp-circle pending">5</div><div class="sp-info"><div class="sp-name pending">Decision</div></div></div>
+        </div>
+        <div class="step-banner" style="background:linear-gradient(135deg,#0d7a4e,#0f9060);">
+          <div class="sb-step"><strong>Step 4 of 5</strong> — Review &amp; Submit · Almost there!</div>
+          <div class="sb-save">Edit any section before submitting</div>
+        </div>
+
+        <div class="portal-body">
+          <div class="portal-form">
+            <div class="page-title">Review your application</div>
+            <div class="page-sub">Please review all details carefully. Once submitted, changes require contacting your loan officer directly.</div>
+
+            <div class="review-section">
+              <div class="review-section-head">
+                <div class="review-section-name">Personal Information</div>
+                <div class="review-edit" onclick="goToStep(1)">✏ Edit</div>
+              </div>
+              <div class="review-grid">
+                <div class="review-kv"><div class="review-k">Full Name</div><div class="review-v">Ravi Sharma</div></div>
+                <div class="review-kv"><div class="review-k">Date of Birth</div><div class="review-v">March 14, 1990</div></div>
+                <div class="review-kv"><div class="review-k">Email</div><div class="review-v">ravi.sharma@email.com</div></div>
+                <div class="review-kv"><div class="review-k">Mobile</div><div class="review-v">+1 (713) 555-0182</div></div>
+                <div class="review-kv" style="grid-column:1/-1;"><div class="review-k">Address</div><div class="review-v">4821 Oak Ridge Lane, Houston, TX 77002</div></div>
+                <div class="review-kv"><div class="review-k">Employment</div><div class="review-v">Full-Time · Infosys Ltd.</div></div>
+                <div class="review-kv"><div class="review-k">Annual Income</div><div class="review-v">$94,000</div></div>
+              </div>
+            </div>
+
+            <div class="review-section">
+              <div class="review-section-head">
+                <div class="review-section-name">Loan Details</div>
+                <div class="review-edit" onclick="goToStep(2)">✏ Edit</div>
+              </div>
+              <div class="review-grid">
+                <div class="review-kv"><div class="review-k">Loan Type</div><div class="review-v">Home Loan — Purchase</div></div>
+                <div class="review-kv"><div class="review-k">Loan Amount</div><div class="review-v">$320,000</div></div>
+                <div class="review-kv"><div class="review-k">Tenure</div><div class="review-v">20 Years · Fixed Rate</div></div>
+                <div class="review-kv"><div class="review-k">Down Payment</div><div class="review-v">$80,000 (20%)</div></div>
+                <div class="review-kv"><div class="review-k">Property Value</div><div class="review-v">$400,000</div></div>
+                <div class="review-kv"><div class="review-k">LTV Ratio</div><div class="review-v" style="color:var(--green); font-weight:600;">80% — Eligible ✓</div></div>
+                <div class="review-kv" style="grid-column:1/-1;"><div class="review-k">Property Address</div><div class="review-v">1204 Riverside Drive, Houston, TX 77006</div></div>
+                <div class="review-kv"><div class="review-k">Est. Monthly EMI</div><div class="review-v" style="color:var(--teal); font-weight:600;">$1,892 / month</div></div>
+                <div class="review-kv"><div class="review-k">Intended Use</div><div class="review-v">Primary Residence</div></div>
+              </div>
+            </div>
+
+            <div class="review-section">
+              <div class="review-section-head">
+                <div class="review-section-name">Documents</div>
+                <div class="review-edit" onclick="goToStep(3)">✏ Edit</div>
+              </div>
+              <div style="padding: 10px 14px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                  <div style="display:flex; gap:6px; align-items:center; font-size:11.5px; color:var(--green);"><span>✓</span> Photo ID — Verified</div>
+                  <div style="display:flex; gap:6px; align-items:center; font-size:11.5px; color:var(--green);"><span>✓</span> SSN Card — Verified</div>
+                  <div style="display:flex; gap:6px; align-items:center; font-size:11.5px; color:var(--green);"><span>✓</span> W-2 Forms (2022–23) — Verified</div>
+                  <div style="display:flex; gap:6px; align-items:center; font-size:11.5px; color:var(--green);"><span>✓</span> Purchase Agreement — Verified</div>
+                  <div style="display:flex; gap:6px; align-items:center; font-size:11.5px; color:var(--orange);"><span>↻</span> Tax Return 1040 — Under Review</div>
+                  <div style="display:flex; gap:6px; align-items:center; font-size:11.5px; color:var(--orange);"><span>↻</span> Pay Stubs — Pending Re-upload</div>
+                  <div style="display:flex; gap:6px; align-items:center; font-size:11.5px; color:var(--gray3);"><span>—</span> Bank Statements — Not Uploaded</div>
+                </div>
+                <div style="font-size:10.5px; color:var(--gray2); margin-top:8px; line-height:1.5;">Pending items can be provided post-submission. Your officer will follow up within 24 hours.</div>
+              </div>
+            </div>
+
+            <!-- Consent section -->
+            <div class="form-section-title" style="margin-top:4px;">Declarations &amp; Consent</div>
+            <div class="consent-box">
+              By submitting this application you confirm that all information provided is accurate and complete to the best of your knowledge. You authorise FinServe Lending to verify your information, contact your employer, and conduct a credit assessment as part of this application.
+            </div>
+            <div style="background:#fff; border:1px solid var(--border); border-radius:7px; padding:6px 14px;">
+              <div class="consent-check"><div class="checkbox-mock checked">✓</div>I confirm that all information provided is true, accurate, and complete.</div>
+              <div class="consent-check"><div class="checkbox-mock checked">✓</div>I consent to FinServe Lending conducting a credit assessment using the information provided.</div>
+              <div class="consent-check"><div class="checkbox-mock checked">✓</div>I have read and agree to the <span style="color:var(--teal); cursor:pointer;">Terms & Conditions</span> and <span style="color:var(--teal); cursor:pointer;">Privacy Policy</span>.</div>
+              <div class="consent-check"><div class="checkbox-mock"></div>I consent to receiving promotional communications from FinServe Lending. (Optional)</div>
+            </div>
+          </div>
+
+          <div class="portal-sidebar">
+            <div class="sidebar-block">
+              <div class="sidebar-title">Application Status</div>
+              <div class="sidebar-card">
+                <div class="sidebar-ref">APP-2024-10482</div>
+                <div class="sidebar-kv"><div class="sidebar-k">Loan Amount</div><div class="sidebar-v">$320,000</div></div>
+                <div class="sidebar-kv" style="margin-top:5px;"><div class="sidebar-k">Monthly EMI</div><div class="sidebar-v" style="color:var(--teal);">$1,892</div></div>
+                <div class="progress-bar-wrap">
+                  <div class="progress-track" style="margin-top:5px;"><div class="progress-fill" style="width:80%; background:var(--success);"></div></div>
+                  <div class="progress-label">Step 4 of 5 · 80%</div>
+                </div>
+              </div>
+            </div>
+            <div class="sidebar-block">
+              <div class="sidebar-title">What Happens Next?</div>
+              <div class="comms-item"><div class="comms-dot sent" style="background:var(--accent);"></div><div class="comms-text">You'll receive an email confirmation with your reference number</div></div>
+              <div class="comms-item"><div class="comms-dot sent" style="background:var(--accent);"></div><div class="comms-text">A loan officer will be assigned within 2 hours</div></div>
+              <div class="comms-item"><div class="comms-dot sent" style="background:var(--accent);"></div><div class="comms-text">Credit assessment initiated automatically</div></div>
+              <div class="comms-item"><div class="comms-dot sent" style="background:var(--accent);"></div><div class="comms-text">Decision in 3–5 business days</div></div>
+            </div>
+            <div class="sidebar-block">
+              <div class="sidebar-title">Need Help?</div>
+              <button class="sidebar-btn">💬 Live Chat</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions" style="background:var(--green-dim); border-top:1px solid #a8e6d0;">
+          <button class="btn btn-ghost" onclick="prevStep()">← Back</button>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <div style="font-size:11px; color:var(--green);">✓ Ready to submit — all required information provided</div>
+            <button class="btn btn-success" onclick="nextStep()">🔒 Submit Application →</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /screen-4 -->
+
+    <!-- ══════════════════════════════════════
+         SCREEN 5 — DECISION / CONFIRMATION
+    ══════════════════════════════════════ -->
+    <div class="screen" id="screen-5">
+      <div class="portal">
+        <div class="portal-nav">
+          <div class="portal-logo">Fin<span>Serve</span> Lending Portal</div>
+          <div class="portal-nav-actions"><div class="pna">My Profile</div><div class="pna">Sign Out</div></div>
+        </div>
+        <div class="stepper-bar">
+          <div class="sp-step"><div class="sp-circle done">✓</div><div class="sp-info"><div class="sp-name done">Personal Info</div></div></div>
+          <div class="sp-line done"></div>
+          <div class="sp-step"><div class="sp-circle done">✓</div><div class="sp-info"><div class="sp-name done">Loan Details</div></div></div>
+          <div class="sp-line done"></div>
+          <div class="sp-step"><div class="sp-circle done">✓</div><div class="sp-info"><div class="sp-name done">Documents</div></div></div>
+          <div class="sp-line done"></div>
+          <div class="sp-step"><div class="sp-circle done">✓</div><div class="sp-info"><div class="sp-name done">Review</div></div></div>
+          <div class="sp-line done"></div>
+          <div class="sp-step"><div class="sp-circle active" style="background:var(--success);">✓</div><div class="sp-info"><div class="sp-name active" style="color:var(--green);">Submitted!</div></div></div>
+        </div>
+        <div class="step-banner" style="background:linear-gradient(135deg,#0d7a4e,#0e8a58);">
+          <div class="sb-step"><strong>Application Submitted Successfully</strong> — Reference: APP-2024-10482</div>
+          <div class="sb-save" style="color:rgba(255,255,255,0.65);">Confirmation sent to ravi.sharma@email.com</div>
+        </div>
+
+        <div class="portal-body">
+          <div class="portal-form">
+            <!-- Success card -->
+            <div class="decision-card" style="border-color:#a8e6d0; border-width:2px;">
+              <div class="decision-icon">🎉</div>
+              <div class="decision-title">Application Received!</div>
+              <div class="decision-sub">Your home loan application has been submitted successfully. A dedicated loan officer has been assigned to your case and will contact you within 24 hours.</div>
+              <div class="decision-ref">Reference: APP-2024-10482</div>
+              <div class="decision-grid">
+                <div class="dg-item">
+                  <div class="dg-label">Submitted On</div>
+                  <div class="dg-val">Apr 22, 2024</div>
+                </div>
+                <div class="dg-item">
+                  <div class="dg-label">Loan Amount</div>
+                  <div class="dg-val">$320,000</div>
+                </div>
+                <div class="dg-item">
+                  <div class="dg-label">Est. Decision</div>
+                  <div class="dg-val">3–5 business days</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Assigned Officer -->
+            <div style="background:#fff; border:1px solid var(--border); border-radius:9px; padding:16px 20px; margin-bottom:14px; display:flex; align-items:center; gap:14px;">
+              <div style="width:44px; height:44px; border-radius:50%; background:var(--blue-dim); display:flex; align-items:center; justify-content:center; font-family:'DM Serif Display',serif; font-size:17px; color:var(--teal); flex-shrink:0;">MC</div>
+              <div style="flex:1;">
+                <div style="font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--gray2); margin-bottom:3px;">Your Assigned Loan Officer</div>
+                <div style="font-weight:600; font-size:14px; color:var(--white); margin-bottom:2px;">Maria Chen</div>
+                <div style="font-size:11.5px; color:var(--gray2);">Houston Branch · maria.chen@finservelending.com · (713) 555-0290</div>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <button class="btn btn-ghost" style="font-size:11px; padding:7px 14px;">📧 Email</button>
+                <button class="btn btn-ghost" style="font-size:11px; padding:7px 14px;">📞 Call</button>
+              </div>
+            </div>
+
+            <!-- What happens next -->
+            <div class="form-section-title">What Happens Next</div>
+            <div style="background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin-bottom:14px;">
+              <div class="flow-item" style="display:flex; gap:12px; padding:8px 0; border-bottom:1px solid var(--border); align-items:flex-start;">
+                <div style="width:26px; height:26px; border-radius:50%; background:var(--blue-dim); color:var(--teal); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">1</div>
+                <div><div style="font-weight:500; font-size:13px; color:var(--white); margin-bottom:2px;">Email confirmation sent</div><div style="font-size:11.5px; color:var(--gray2);">Check your inbox — ravi.sharma@email.com — for your reference number and submitted document list.</div></div>
+              </div>
+              <div class="flow-item" style="display:flex; gap:12px; padding:8px 0; border-bottom:1px solid var(--border); align-items:flex-start;">
+                <div style="width:26px; height:26px; border-radius:50%; background:var(--blue-dim); color:var(--teal); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">2</div>
+                <div><div style="font-weight:500; font-size:13px; color:var(--white); margin-bottom:2px;">Credit assessment — within 24 hours</div><div style="font-size:11.5px; color:var(--gray2);">Your officer will initiate a credit check via Experian. You'll be notified if any additional information is needed.</div></div>
+              </div>
+              <div class="flow-item" style="display:flex; gap:12px; padding:8px 0; border-bottom:1px solid var(--border); align-items:flex-start;">
+                <div style="width:26px; height:26px; border-radius:50%; background:var(--orange-dim); color:var(--orange); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">3</div>
+                <div><div style="font-weight:500; font-size:13px; color:var(--white); margin-bottom:2px;">Pending documents — action required</div><div style="font-size:11.5px; color:var(--orange);">Bank statements and corrected pay stub still needed. Maria will email you a direct upload link.</div></div>
+              </div>
+              <div class="flow-item" style="display:flex; gap:12px; padding:8px 0; align-items:flex-start;">
+                <div style="width:26px; height:26px; border-radius:50%; background:var(--green-dim); color:var(--green); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">4</div>
+                <div><div style="font-weight:500; font-size:13px; color:var(--white); margin-bottom:2px;">Decision — 3 to 5 business days</div><div style="font-size:11.5px; color:var(--gray2);">You'll receive your decision via email and through this portal. Estimated by April 29, 2024.</div></div>
+              </div>
+            </div>
+
+            <!-- Pending items reminder -->
+            <div style="background:var(--orange-dim); border:1px solid #f5c88a; border-radius:7px; padding:12px 16px; margin-bottom:14px; font-size:12px; color:var(--orange); line-height:1.6;">
+              <strong>⚠ 2 items still pending:</strong><br/>
+              1. Bank statements (3 months) — upload link sent to your email<br/>
+              2. Pay stubs (March) — re-upload a clearer scan using the link emailed to you
+            </div>
+
+            <!-- CTA Buttons -->
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-primary" style="flex:1; min-width:160px;">📊 Track Application Status</button>
+              <button class="btn btn-ghost" style="flex:1; min-width:160px;">📄 Download Confirmation</button>
+              <button class="btn btn-ghost" style="flex:1; min-width:160px;">📅 Book Branch Appointment</button>
+            </div>
+          </div>
+
+          <div class="portal-sidebar">
+            <div class="sidebar-block">
+              <div class="sidebar-title">Application Summary</div>
+              <div class="sidebar-card">
+                <div class="sidebar-ref">APP-2024-10482</div>
+                <div class="sidebar-kv"><div class="sidebar-k">Status</div><div class="sidebar-v" style="color:var(--green);">✓ Submitted</div></div>
+                <div class="sidebar-kv" style="margin-top:5px;"><div class="sidebar-k">Assigned Officer</div><div class="sidebar-v">Maria Chen</div></div>
+                <div class="sidebar-kv" style="margin-top:5px;"><div class="sidebar-k">Est. Decision By</div><div class="sidebar-v">Apr 29, 2024</div></div>
+                <div class="progress-bar-wrap">
+                  <div class="progress-track" style="margin-top:5px;"><div class="progress-fill" style="width:100%; background:var(--success);"></div></div>
+                  <div class="progress-label" style="color:var(--green);">Application submitted ✓</div>
+                </div>
+              </div>
+            </div>
+            <div class="sidebar-block">
+              <div class="sidebar-title">Communications Sent</div>
+              <div class="comms-item"><div class="comms-dot sent"></div><div class="comms-text"><strong>Email</strong> · Confirmation + doc list · Apr 22, 9:51 PM</div></div>
+              <div class="comms-item"><div class="comms-dot pending"></div><div class="comms-text"><strong>SMS</strong> · 24-hr nudge · Scheduled Apr 23</div></div>
+              <div class="comms-item"><div class="comms-dot pending"></div><div class="comms-text"><strong>Email</strong> · Missing doc upload link · Pending</div></div>
+            </div>
+            <div class="sidebar-block">
+              <div class="sidebar-title">Your Officer</div>
+              <div style="font-size:12px; color:var(--gray1); font-weight:500; margin-bottom:3px;">Maria Chen</div>
+              <div style="font-size:11px; color:var(--gray2); margin-bottom:10px;">(713) 555-0290<br/>Mon–Fri 9am–6pm ET</div>
+              <button class="sidebar-btn primary-light">📞 Call Maria</button>
+              <button class="sidebar-btn">💬 Send Message</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions" style="justify-content:center; background:var(--green-dim); border-top:1px solid #a8e6d0;">
+          <div style="font-size:12px; color:var(--green); text-align:center; line-height:1.6;">
+            ✓ <strong>Your application is in safe hands.</strong> Reference number APP-2024-10482 has been saved to your profile. <span style="color:var(--teal); cursor:pointer;">View application dashboard →</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- /screen-5 -->
+
+    <div class="screen-label" id="screenLabel">Screen 1 of 5 — Personal Information · FinServe Lending Portal Wireflow</div>
+  </div><!-- /browser-frame -->
+
+</div><!-- /screen-wrapper -->
+
+<script>
+const steps = [
+  { label: 'Personal Info', url: 'step-1-personal-info', time: '~3 min' },
+  { label: 'Loan Details',  url: 'step-2-loan-details',  time: '~5 min' },
+  { label: 'Documents',     url: 'step-3-documents',     time: '~5 min' },
+  { label: 'Review',        url: 'step-4-review-submit', time: '~2 min' },
+  { label: 'Decision',      url: 'step-5-decision',      time: '3–5 days' }
+];
+
+const annotations = [
+  // step 1
+  [
+    { badge: 'blue', type: 'UX Decision', text: 'Progress stepper with time estimates shown upfront — reduces the #1 cause of form abandonment: unknown journey length.' },
+    { badge: 'blue', type: 'Trust Signal', text: 'GLBA compliance badge + 256-bit SSL callout near SSN field — proactively resolves security anxiety before it forms.' },
+    { badge: 'amber', type: 'Pain Point ①', text: '"Won\'t affect your credit score" tooltip on SSN field — resolves the top implicit anxiety for first-time borrowers.' },
+    { badge: 'green', type: 'System Feature', text: 'Auto-save banner is persistent (not a toast) — borrowers who don\'t see a save signal will not trust return-later functionality.' },
+    { badge: 'blue', type: 'Inclusivity', text: '"Recent job changes are fine" micro-copy near employment field — removes implicit shame for recent job-switchers.' },
+    { badge: 'amber', type: 'Pain Point ②', text: 'Branch visit + callback CTAs in sidebar — escape valve for less digitally confident borrowers who would otherwise abandon.' }
+  ],
+  // step 2
+  [
+    { badge: 'blue', type: 'Live Calculator', text: 'EMI calculator updates in real time as loan amount changes — borrower can self-qualify mentally before submitting.' },
+    { badge: 'green', type: 'Trust Signal', text: 'Live LTV and DTI eligibility signals — tells borrower immediately if they\'re in range, preventing wasted submissions.' },
+    { badge: 'blue', type: 'UX Decision', text: 'Slider + text field for loan amount — dual input accommodates both precise and exploratory users.' },
+    { badge: 'amber', type: 'BA Note', text: '"Property address not finalised" hint — critical; many home buyers apply before contract is signed. Rigid form would block them.' },
+    { badge: 'blue', type: 'Transparency', text: 'Estimated interest rate shown with disclaimer — sets expectations on rate, prevents post-decision shock.' }
+  ],
+  // step 3
+  [
+    { badge: 'amber', type: 'Pain Point ③', text: 'Specific rejection reason: "paystub is blurry — re-upload a clearer scan" — NOT "invalid document." Specificity prevents re-submission loops.' },
+    { badge: 'blue', type: 'System Feature', text: 'Colour-coded checklist (✓ verified / ↻ pending / ! action / — missing) — officer never manually chases a doc the borrower already uploaded.' },
+    { badge: 'red',   type: 'Critical Flow', text: 'Missing docs don\'t block submission — borrower submits what they have, officer follows up. Blocking submission on missing docs is the #1 churn cause in lending portals.' },
+    { badge: 'green', type: 'UX Decision', text: 'Upload summary counter in sidebar — gives borrower an at-a-glance completion sense without reading every row.' },
+    { badge: 'amber', type: 'BA Note', text: '"Appraisal report optional — officer can initiate" — removes a blocker that most first-time buyers don\'t know how to resolve.' }
+  ],
+  // step 4
+  [
+    { badge: 'blue', type: 'UX Decision', text: 'Inline ✏ Edit links on every review section — one-click correction without losing other section data. Critical for trust.' },
+    { badge: 'green', type: 'Consent Design', text: 'Promotional consent is unchecked by default (GDPR/CCPA best practice). Required consents are pre-checked with visible copy.' },
+    { badge: 'amber', type: 'Pain Point ④', text: '"What happens next" sidebar sets expectations before submit — borrower knows exactly what the 3–5 days involves.' },
+    { badge: 'blue', type: 'Trust Signal', text: 'Submit button is 🔒 labelled and on green background — visual closure. Borrower feels they\'re completing something secure and significant.' },
+    { badge: 'red',   type: 'Critical Flow', text: 'Pending document notice on review screen with "pending items can be provided post-submission" copy — removes last blocker to submission.' }
+  ],
+  // step 5
+  [
+    { badge: 'green', type: 'Trust Signal', text: 'Assigned officer name, photo initials, direct email and phone shown immediately — human face on a previously faceless process.' },
+    { badge: 'blue', type: 'UX Decision', text: 'Numbered "What Happens Next" timeline — borrower knows exactly what step 1, 2, 3, 4 of the post-submission process is. No mystery.' },
+    { badge: 'amber', type: 'Pain Point ⑤', text: 'Pending document list repeated on confirmation — borrower is reminded of outstanding items while context is fresh, increasing resolution speed.' },
+    { badge: 'green', type: 'System Feature', text: 'Communications log in sidebar shows sent/scheduled messages — borrower can see they haven\'t been forgotten even before receiving them.' },
+    { badge: 'blue', type: 'Comms Design', text: '24-hour SMS scheduled nudge shown as "pending" — closes the loop: borrower expects to hear something tomorrow, reducing inbound "where is my application" calls by ~40%.' }
+  ]
+];
+
+const labels = [
+  'Screen 1 of 5 — Personal Information · FinServe Lending Portal Wireflow',
+  'Screen 2 of 5 — Loan Details · FinServe Lending Portal Wireflow',
+  'Screen 3 of 5 — Document Upload · FinServe Lending Portal Wireflow',
+  'Screen 4 of 5 — Review & Submit · FinServe Lending Portal Wireflow',
+  'Screen 5 of 5 — Application Confirmed · FinServe Lending Portal Wireflow'
+];
+
+let current = 1;
+
+function buildStepIndicator() {
+  const wrap = document.getElementById('stepIndicator');
+  wrap.innerHTML = '';
+  steps.forEach((s, i) => {
+    const idx = i + 1;
+    const state = idx < current ? 'done' : idx === current ? 'active' : 'pending';
+    if (i > 0) wrap.innerHTML += `<span class="step-sep">›</span>`;
+    wrap.innerHTML += `
+      <div class="chrome-step ${state === 'active' ? 'active' : ''}" onclick="goToStep(${idx})">
+        <div class="cs-num ${state}">${state === 'done' ? '✓' : idx}</div>
+        <span class="cs-label ${state}">${s.label}</span>
+      </div>`;
+  });
+}
+
+function buildAnnotations() {
+  const panel = document.getElementById('annotationPanel');
+  const anns = annotations[current - 1];
+  panel.innerHTML = `<div class="ann-header">Design Annotations — Step ${current}</div>`;
+  anns.forEach(a => {
+    panel.innerHTML += `
+      <div class="ann-item">
+        <div class="ann-num-row">
+          <span class="ann-badge ${a.badge}">${a.badge.toUpperCase()}</span>
+          <span class="ann-type">${a.type}</span>
+        </div>
+        <div class="ann-text">${a.text}</div>
+      </div>`;
+  });
+}
+
+function updateUI() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + current).classList.add('active');
+  document.getElementById('urlBar').textContent = `https://apply.finservelending.com/home-loan/${steps[current-1].url}`;
+  document.getElementById('screenLabel').textContent = labels[current - 1];
+  document.getElementById('btnBack').disabled = current === 1;
+  document.getElementById('btnNext').disabled = current === 5;
+  document.getElementById('btnNext').textContent = current === 4 ? '🔒 Submit →' : 'Continue →';
+  buildStepIndicator();
+  buildAnnotations();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function nextStep() {
+  if (current < 5) { current++; updateUI(); }
+}
+function prevStep() {
+  if (current > 1) { current--; updateUI(); }
+}
+function goToStep(n) {
+  current = n;
+  updateUI();
+}
+
+updateUI();
+</script>
+
+  </div>
+</div>
+
+<!-- ====== APP FLOW ====== -->
+<div id="appflow" class="section">
+  <div class="sec-header">
+    <h3>End-to-End Application Flow</h3>
+    <p>The complete journey from a borrower's first visit to loan decision — covering the borrower portal, document system, processing workflow, and communication touchpoints.</p>
+  </div>
+
+  <div class="grid-2" style="margin-bottom: 20px;">
+    <div class="card">
+      <div class="card-title">Borrower-Facing Flow (Portal)</div>
+      <div style="margin-top: 4px;">
+        <div class="flow-step">
+          <div class="step-num" style="background: #6b8fff; font-size: 11px; width: 28px; height: 28px;">1</div>
+          <div class="step-body">
+            <div class="step-title" style="font-size: 12px;">Registration & Authentication</div>
+            <div class="step-desc" style="font-size: 12px;">Borrower creates account (name, email, mobile). Email OTP verification. Session management with 30-min timeout warning.</div>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="flow-step">
+          <div class="step-num" style="background: #6b8fff; font-size: 11px; width: 28px; height: 28px;">2</div>
+          <div class="step-body">
+            <div class="step-title" style="font-size: 12px;">Product Selection & Reference Assignment</div>
+            <div class="step-desc" style="font-size: 12px;">Borrower selects loan product. System assigns APP reference number immediately. Journey begins with a tangible artifact.</div>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="flow-step">
+          <div class="step-num" style="background: #6b8fff; font-size: 11px; width: 28px; height: 28px;">3</div>
+          <div class="step-body">
+            <div class="step-title" style="font-size: 12px;">5-Step Application Form</div>
+            <div class="step-desc" style="font-size: 12px;">Step 1: Personal Info · Step 2: Loan Details · Step 3: Document Upload · Step 4: Review & Sign · Step 5: Submit. Auto-save at every step. Resume link emailed on partial save.</div>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="flow-step">
+          <div class="step-num" style="background: #6b8fff; font-size: 11px; width: 28px; height: 28px;">4</div>
+          <div class="step-body">
+            <div class="step-title" style="font-size: 12px;">Submission & Immediate Confirmation</div>
+            <div class="step-desc" style="font-size: 12px;">On-screen: reference number, submitted items, est. decision timeline, assigned officer name. Email sent immediately. SMS at 24hrs.</div>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="flow-step">
+          <div class="step-num done" style="font-size: 11px; width: 28px; height: 28px;">5</div>
+          <div class="step-body">
+            <div class="step-title" style="font-size: 12px;">Status Tracking & Decision</div>
+            <div class="step-desc" style="font-size: 12px;">Borrower can log back in to track status. Automated notifications at each status change. Final decision communicated via email + portal + optional in-branch meeting.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Internal (Loan Officer & Branch) Flow</div>
+      <div style="margin-top: 4px;">
+        <div class="flow-step">
+          <div class="step-num" style="background: #b8860b; font-size: 11px; width: 28px; height: 28px;">1</div>
+          <div class="step-body">
+            <div class="step-title" style="font-size: 12px;">Application Lands in Queue</div>
+            <div class="step-desc" style="font-size: 12px;">New application auto-assigned to loan officer based on branch, product type, and current caseload. SLA clock starts. Officer receives email alert.</div>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="flow-step">
+          <div class="step-num" style="background: #b8860b; font-size: 11px; width: 28px; height: 28px;">2</div>
+          <div class="step-body">
+            <div class="step-title" style="font-size: 12px;">Initial Review & Document Check</div>
+            <div class="step-desc" style="font-size: 12px;">Officer reviews application data and document checklist. Outstanding items are flagged. System auto-notifies borrower for missing items — officer does not chase manually.</div>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="flow-step">
+          <div class="step-num" style="background: #b8860b; font-size: 11px; width: 28px; height: 28px;">3</div>
+          <div class="step-body">
+            <div class="step-title" style="font-size: 12px;">Credit Assessment</div>
+            <div class="step-desc" style="font-size: 12px;">System pulls credit score via Experian API (Phase 1). If API unavailable, officer is flagged for manual pull within 24hrs. LTV ratio, DTI calculated automatically from income data entered.</div>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="flow-step">
+          <div class="step-num" style="background: #b8860b; font-size: 11px; width: 28px; height: 28px;">4</div>
+          <div class="step-body">
+            <div class="step-title" style="font-size: 12px;">Underwriting & Decision</div>
+            <div class="step-desc" style="font-size: 12px;">Officer logs decision (Approved / Declined / Referred for senior review). Decision reasoning is recorded. Audit log captures every action with timestamp and officer ID.</div>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="flow-step">
+          <div class="step-num done" style="font-size: 11px; width: 28px; height: 28px;">5</div>
+          <div class="step-body">
+            <div class="step-title" style="font-size: 12px;">Decision Communicated + Case Closed</div>
+            <div class="step-desc" style="font-size: 12px;">Communication engine sends decision notification with next steps. Approved: disbursement process initiated. Declined: reason letter generated per fair lending guidelines. Case archived to audit log.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 20px;">
+    <div class="card-title">Communication Touchpoint Map — Borrower Journey</div>
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 12px; min-width: 700px;">
+        <thead>
+          <tr style="background: var(--card2);">
+            <th style="text-align:left; padding: 8px 12px; font-size:10px; text-transform: uppercase; letter-spacing: 1px; color: var(--gray2); font-weight: 600; border-bottom: 1px solid var(--border);">Trigger Event</th>
+            <th style="text-align:left; padding: 8px 12px; font-size:10px; text-transform: uppercase; letter-spacing: 1px; color: var(--gray2); font-weight: 600; border-bottom: 1px solid var(--border);">Channel</th>
+            <th style="text-align:left; padding: 8px 12px; font-size:10px; text-transform: uppercase; letter-spacing: 1px; color: var(--gray2); font-weight: 600; border-bottom: 1px solid var(--border);">Timing</th>
+            <th style="text-align:left; padding: 8px 12px; font-size:10px; text-transform: uppercase; letter-spacing: 1px; color: var(--gray2); font-weight: 600; border-bottom: 1px solid var(--border);">Message Purpose</th>
+            <th style="text-align:left; padding: 8px 12px; font-size:10px; text-transform: uppercase; letter-spacing: 1px; color: var(--gray2); font-weight: 600; border-bottom: 1px solid var(--border);">Pain Point Addressed</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 10px 12px; color: var(--gray1);">Application reference assigned</td>
+            <td style="padding: 10px 12px;"><span class="tag tag-blue">Portal</span></td>
+            <td style="padding: 10px 12px; color: var(--gray1);">Instant</td>
+            <td style="padding: 10px 12px; color: var(--gray1);">Provide proof that application has started</td>
+            <td style="padding: 10px 12px; color: var(--gray1);">"Is something actually happening?"</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 10px 12px; color: var(--gray1);">Progress saved mid-form</td>
+            <td style="padding: 10px 12px;"><span class="tag tag-green">Email</span></td>
+            <td style="padding: 10px 12px; color: var(--gray1);">Instant</td>
+            <td style="padding: 10px 12px; color: var(--gray1);">Send secure resume link with exact step</td>
+            <td style="padding: 10px 12px; color: var(--gray1);">"Can I save and come back later?"</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 10px 12px; color: var(--gray1);">Form abandoned (no activity 24hrs)</td>
+            <td style="padding: 10px 12px;"><span class="tag tag-green">Email</span></td>
+            <td style="padding: 10px 12px; color: var(--gray1);">24hrs after last activity</td>
+            <td style="padding: 10px 12px; color: var(--gray1);">Personalized re-engagement with step deep-link</td>
+            <td style="padding: 10px 12px; color: var(--gray1);">Recover dropoff without cold outreach</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 10px 12px; color: var(--gray1);">Application submitted</td>
+            <td style="padding: 10px 12px;"><span class="tag tag-blue">Portal</span><span class="tag tag-green">Email</span></td>
+            <td style="padding: 10px 12px; color: var(--gray1);">Instant</td>
+            <td style="padding: 10px 12px; color: var(--gray1);">Confirmation: ref no., submitted docs, timeline, officer name</td>
+            <td style="padding: 10px 12px; color: var(--gray1);">"I submitted — why haven't I heard anything?"</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 10px 12px; color: var(--gray1);">Application under review (24hr nudge)</td>
+            <td style="padding: 10px 12px;"><span class="tag tag-warn">SMS</span></td>
+            <td style="padding: 10px 12px; color: var(--gray1);">24hrs post-submit</td>
+            <td style="padding: 10px 12px; color: var(--gray1);">"Your case is with your officer. No action needed today."</td>
+            <td style="padding: 10px 12px; color: var(--gray1);">"Am I being ignored?"</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 10px 12px; color: var(--gray1);">Document missing / rejected</td>
+            <td style="padding: 10px 12px;"><span class="tag tag-green">Email</span><span class="tag tag-warn">SMS</span></td>
+            <td style="padding: 10px 12px; color: var(--gray1);">Instant</td>
+            <td style="padding: 10px 12px; color: var(--gray1);">Specific item name, reason, upload link — not generic</td>
+            <td style="padding: 10px 12px; color: var(--gray1);">Reduces re-submission loops</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 12px; color: var(--gray1);">Final decision reached</td>
+            <td style="padding: 10px 12px;"><span class="tag tag-green">Email</span><span class="tag tag-blue">Portal</span></td>
+            <td style="padding: 10px 12px; color: var(--gray1);">Instant on decision</td>
+            <td style="padding: 10px 12px; color: var(--gray1);">Decision + next steps (disbursement or reason for decline)</td>
+            <td style="padding: 10px 12px; color: var(--gray1);">Completes the trust loop</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Branch Operations Dashboard — KPIs Tracked</div>
+    <div class="grid-3" style="margin-top: 8px;">
+      <div class="stat-card stat-accent">
+        <div class="stat-label">Applications Received</div>
+        <div class="stat-value">248</div>
+        <div class="stat-sub">This month · Branch: Houston</div>
+      </div>
+      <div class="stat-card stat-green">
+        <div class="stat-label">Approved & Disbursed</div>
+        <div class="stat-value">164</div>
+        <div class="stat-sub">66% conversion rate</div>
+      </div>
+      <div class="stat-card stat-warn">
+        <div class="stat-label">SLA Breaches</div>
+        <div class="stat-value">11</div>
+        <div class="stat-sub">Cases past 5-day SLA</div>
+      </div>
+      <div class="stat-card stat-gold">
+        <div class="stat-label">Avg. Processing Time</div>
+        <div class="stat-value">3.8<span style="font-size:16px;">d</span></div>
+        <div class="stat-sub">Target: ≤4 days</div>
+      </div>
+      <div class="stat-card stat-accent">
+        <div class="stat-label">Disbursed Value</div>
+        <div class="stat-value">$14.2M</div>
+        <div class="stat-sub">vs $16M target · 88.8%</div>
+      </div>
+      <div class="stat-card" style="border-left: 3px solid var(--danger);">
+        <div class="stat-label">Pending Documents</div>
+        <div class="stat-value">37</div>
+        <div class="stat-sub">Cases awaiting borrower docs</div>
+      </div>
+    </div>
+    <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);">
+      <p style="font-size: 12.5px; color: var(--gray2); line-height: 1.6;"><strong style="color: var(--white);">These KPIs directly address Problem 3 from the brief.</strong> Branch managers see their own branch data. Regional managers see roll-ups across branches. HQ sees cross-region aggregates. All data is refreshed every 15 minutes. SLA breach alerts are pushed to branch managers the moment a case exceeds the threshold — not at end-of-day.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- Portfolio Footer -->
+<div style="border-top:1px solid rgba(255,255,255,0.06); margin-top:40px; padding-top:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+  <div>
+    <div style="font-family:'Fraunces',serif; font-size:15px; color:rgba(255,255,255,0.7); margin-bottom:4px;">Sandeep Kumar <span style="color:#00C9A7; font-style:italic;">— AI Product Manager</span></div>
+    <div style="font-family:'DM Mono',monospace; font-size:10px; color:rgba(255,255,255,0.25); letter-spacing:0.8px;">Finance & Banking · BA Case Study · 2024 Interview Submission</div>
+  </div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <a href="https://sandeepreddy27ba-blip.github.io/ai-pm-portfolio-sandeep27/" target="_blank" style="font-family:'DM Mono',monospace; font-size:10px; background:rgba(0,201,167,0.1); border:1px solid rgba(0,201,167,0.2); color:#00C9A7; padding:7px 14px; border-radius:6px; text-decoration:none; letter-spacing:0.5px;">↗ Full Portfolio</a>
+    <a href="mailto:sandeepreddy27pm@gmail.com" style="font-family:'DM Mono',monospace; font-size:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.45); padding:7px 14px; border-radius:6px; text-decoration:none; letter-spacing:0.5px;">✉ Contact</a>
+  </div>
+</div>
+</div><!-- end .content -->
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({ top: 56, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
